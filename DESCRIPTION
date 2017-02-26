@@ -14,5 +14,6 @@ Imports:
   dplyr,
   modelr,
   purrr,
+  stringr,
   tibble
 Suggests: testthat

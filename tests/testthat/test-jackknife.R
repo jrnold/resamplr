@@ -17,7 +17,7 @@ test_that("jackknife works as expected", {
   expect_equal(ncol(y), 2)
   expect_named(y, c("jackknife", ".id"))
   expect_is(y$jackknife, "list")
-  expect_is(y$.id, "integer")
+  expect_is(y$.id, "character")
   expect_true(all(purrr::map_lgl(y[["jackknife"]], inherits, "resample")))
   expect_true(all(purrr::map_int(y[["jackknife"]], nrow) == (nrow(x) - 1L)))
 })

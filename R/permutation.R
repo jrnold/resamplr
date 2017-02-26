@@ -24,6 +24,6 @@ resample_permutation <- function(data) {
 permute <- function(data, n, id = ".id") {
   perm <- purrr::rerun(n, resample_permutation(data))
   df <- tibble::tibble(perm = perm)
-  df[[id]] <- id(n)
+  df[[id]] <- id(nrow(df))
   df
 }

@@ -12,7 +12,7 @@ jackknife <- function(data, id = ".id") {
   idx <- seq_len(nrow(data))
   jack <- purrr::map(idx, function(i) resample_jackknife(data, i))
   df <- tibble::tibble(jackknife = jack)
-  df[[id]] <- idx
+  df[[id]] <- id(nrow(df))
   df
 }
 

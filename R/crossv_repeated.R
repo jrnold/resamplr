@@ -22,5 +22,7 @@
 #' errs <- map2_dbl(models, cv$test, rmse)
 #' hist(errs)
 crossv_repeated <- function(data, k = 5, n = 1, id = ".id") {
-  bind_rows(rerun(n, crossv_kfold(data, k = k, id = id)))
+  out <- bind_rows(rerun(n, crossv_kfold(data, k = k, id = id)))
+  out[[id]] <- id(nrow(out))
+  out
 }
