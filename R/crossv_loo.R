@@ -11,6 +11,14 @@
 #'
 #' @importFrom modelr crossv_kfold
 #' @export
+#' @example
+#'
+#' cv <- crossv_loo(mtcars)
+#' cv
+#' library(purrr)
+#' models <- map(cv$train, ~ lm(mpg ~ wt, data = .))
+#' errs <- map2_dbl(models, cv$test, rmse)
+#' hist(errs)
 crossv_loo <- function(data, id = ".id") {
   crossv_kfold(data, nrow(data), id = id)
 }

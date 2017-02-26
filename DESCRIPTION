@@ -12,3 +12,4 @@ LazyData: true
 RoxygenNote: 6.0.1
 Imports:
   modelr
+Suggests: testthat
