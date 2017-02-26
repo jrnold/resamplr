@@ -10,10 +10,12 @@ permute(data, n, id = ".id")
 \item{data}{A data frame}
 
 \item{n}{Number of replicates to draw}
+
+\item{id}{Name of variable that gives each model a unique integer id.}
 }
 \value{
 A data frame with a single column named \code{perm}.
-  This column is a list column of \code{\link[dplyr]{resample}} objects.
+  This column is a list column of \code{\link[modelr]{resample}} objects.
 }
 \description{
 Generate permutation replicates, which randomly shuffles the row of

@@ -1,29 +1,3 @@
-# adapted from boot:::ts.array
-ts_idx <- function(n, n.sim, l, sim, endcorr) {
-  endpt <- if (endcorr)
-    n
-  else n - l + 1
-  if (sim == "geom") {
-    len.tot <- 0
-    lens <- NULL
-    while (len.tot < n.sim) {
-      temp <- 1 + rgeom(1, 1/l)
-      temp <- pmin(temp, n.sim - len.tot)
-      lens <- c(lens, temp)
-      len.tot <- len.tot + temp
-    }
-    st <- sampl.int(endpt, length(lens), replace = TRUE)
-  }
-  else {
-    nn <- ceiling(n.sim / l)
-    lens <- c(rep(l, nn - 1), 1 + (n.sim - 1) %% l)
-    st <- sample.int(endpt, nn, replace = TRUE)
-  }
-  map2_int(st, lens, function(s, l) {
-    if (l > 1) seq(s, s + l - 1L)
-    else integer()
-  })
-}
 
 #' Generate a time-series bootstrap replicate
 #'
@@ -67,4 +41,30 @@ ts_bootstrap <- function(data,
   df <- tibble::tibble(perm = perm)
   df[[id]] <- id(n)
   df
+}
+
+
+ts_idx <- function(n, n.sim, l, sim, endcorr) {
+  endpt <- if (endcorr)
+    n
+  else n - l + 1
+  if (sim == "geom") {
+    len.tot <- 0
+    lens <- NULL
+    while (len.tot < n.sim) {
+      temp <- 1 + stats::rgeom(1, 1 / l)
+      temp <- pmin(temp, n.sim - len.tot)
+      lens <- c(lens, temp)
+      len.tot <- len.tot + temp
+    }
+    st <- sample.int(endpt, length(lens), replace = TRUE)
+  } else {
+    nn <- ceiling(n.sim / l)
+    lens <- c(rep(l, nn - 1), 1 + (n.sim - 1) %% l)
+    st <- sample.int(endpt, nn, replace = TRUE)
+  }
+  purrr:::map2_int(st, lens, function(s, l) {
+    if (l > 1) seq(s, s + l - 1L)
+    else integer()
+  })
 }

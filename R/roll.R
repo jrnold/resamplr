@@ -71,7 +71,7 @@ get_window_idx <- function(i, width, n, partial, align) {
   idx <- i + offset
   idx <- if (partial) {
     idx <- idx[idx >= 1L & idx <= n]
-    if length(idx) idx
+    if (length(idx)) idx
     else NULL
   } else {
     if (any(idx < 1L | idx > n)) NULL

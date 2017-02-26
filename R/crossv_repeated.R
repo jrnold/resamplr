@@ -4,6 +4,8 @@
 #'
 #' @param data A data frame
 #' @param id Name of variable that gives each model a unique integer id.
+#' @param k Number of folds
+#' @param
 #' @return A data frame with n rows and columns \code{test} and \code{train}.
 #'   \code{test} and \code{train} are list-columns containing
 #'   \code{\link{resample}} objects.
@@ -14,7 +16,6 @@
 #' @inheritParams modelr::crossv_kfold
 #' @export
 #' @example
-#'
 #' cv <- crossv_repeated(mtcars, 10, 5)
 #' cv
 #' library(purrr)
