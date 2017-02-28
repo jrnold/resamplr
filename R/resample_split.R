@@ -20,10 +20,10 @@ resample_groups <- function(data, test = NULL, train = NULL) {
   if (is.null(test) && is.null(train)) {
     stop("Either test or train must be non-null", call. = FALSE)
   } else if (!is.null(test)) {
-    idx <- split_idx_by_group(data, get_group_indexes(idx, test))
+    idx <- split_idx_by_group(data, test)
   } else if (!is.null(train)) {
-    idx <- rev(split_idx_by_group(data, get_group_indexes(idx, test)))
+    idx <- rev(split_idx_by_group(data, train))
   }
-  purrr::set_names(map(idx, function(i) resample(i, data)),
-                   c("train", "test"))
+  purrr::set_names(map(idx, function(i) resample(data, i)), c("train", "test"))
+
 }
