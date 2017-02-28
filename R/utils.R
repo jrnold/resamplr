@@ -58,3 +58,8 @@ rpartition <- function(x, k) {
 }
 
 group_ids <- function(data) seq_len(dplyr::n_groups(data))
+
+map_resample <- function(data, idx) {
+  tibble::as_tibble(transpose(map(idx, function(i, data) resample(data, i),
+                                  data = data)))
+}
