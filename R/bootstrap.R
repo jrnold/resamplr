@@ -1,8 +1,8 @@
-#' Generate a bootstrap
+#' Generate a bootstrap replicate
 #'
 #' @param data A data frame
 #' @param ... Passed to methods
-#' @param within Resample within groups (stratified bootstrap)
+#' @param stratify Resample within groups (stratified bootstrap)
 #' @param groups Resample groups (clustered bootstrap)
 #' @return A \code{\link[modelr]{resample}} object.
 #' @export
@@ -10,22 +10,25 @@ resample_bootstrap <- function(data, ...) {
   UseMethod("resample_bootstrap")
 }
 
+#' @rdname resample_bootstrap
 #' @export
 resample_bootstrap.data_frame <- function(data, ...) {
   modelr::resample(data, sample.int(nrow(data), replace = TRUE))
 }
 
+
+#' @rdname resample_bootstrap
 #' @export
-resample_bootstrap.grouped_df <- function(data, within = TRUE, groups = FALSE,
+resample_bootstrap.grouped_df <- function(data, stratify = TRUE, groups = FALSE,
                                           ...) {
-  idx <- attr(data, "indices")
+  idx <- get_group_indexes(data)
   # resample the groups
   if (groups) {
     idx <- idx[sample.int(length(idx), size = length(idx), replace = TRUE)]
   }
   # resample within groups
-  if (within) {
-    idx <- purrr::map(indices, function(x) {
+  if (stratify) {
+    idx <- purrr::map(idx, function(x) {
       sample(x, size = length(x), replace = TRUE)
     })
   }
@@ -43,7 +46,7 @@ resample_bootstrap.grouped_df <- function(data, within = TRUE, groups = FALSE,
 #' @param id Name of variable that gives each model a unique integer id
 #' @return A data frame with two columns and \code{n} rows
 #' \describe{
-#' \item{strap}{A list column of \code{\link[modelr]{objects}}}
+#' \item{strap}{A list column of \code{\link[modelr]{resample}} objects.}
 #' \item{id}{The replicate identifier}
 #' }
 #' @export

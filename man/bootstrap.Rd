@@ -18,7 +18,7 @@ bootstrap(data, n, ..., id = ".id")
 \value{
 A data frame with two columns and \code{n} rows
 \describe{
-\item{strap}{A list column of \code{\link[modelr]{objects}}}
+\item{strap}{A list column of \code{\link[modelr]{resample}} objects.}
 \item{id}{The replicate identifier}
 }
 }

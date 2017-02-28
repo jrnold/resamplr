@@ -2,6 +2,7 @@
 #'
 #' Generate a \code{\link[modelr]{resample}} object for a window.
 #'
+#'
 #' @param data A data frame
 #' @param idx An integer index
 #' @param width The width of the window
@@ -16,7 +17,7 @@ resample_window <- function(data, idx, width, partial = TRUE,
   align <- match.arg(align)
   indexes <- get_window_idx(idx, width, nrow(data), partial = partial,
                             align = align)
-  if (!is.null(idexes)) {
+  if (!is.null(indexes)) {
     resample(data, as.integer(indexes))
   } else {
     NULL
@@ -28,8 +29,10 @@ resample_window <- function(data, idx, width, partial = TRUE,
 #'
 #' Generate \code{\link[modelr]{resample}} objects for rolling windows.
 #'
-#'
 #' @inheritParams resample_window
+#' @param by Start windows at every by-th point rather than every point.
+#' @param id Name of variable that gives each model a unique integer id.
+#'
 #' @return A data frame with four columns
 #' \describe{
 #' \item{window}{A list column of \code{\link[modelr]{resample}} objects}
@@ -38,7 +41,7 @@ resample_window <- function(data, idx, width, partial = TRUE,
 #' \item{.align}{character: alignment of the window. "l" for left,
 #' "c" for center, "r" for right}
 #' }
-#'
+#' @seealso The \code{\link[zoo]{rollapply}} function in \pkg{zoo}
 #' @importFrom purrr map compact
 #' @importFrom tibble tibble
 #' @importFrom stringr str_sub
@@ -49,11 +52,10 @@ roll <- function(data, width, by = 1, partial = FALSE,
   n <- nrow(data)
   align <- match.arg(align)
   posn <- seq(1L, n, by = by)
-  indexes <- compact(map(posn, get_resample_idx, width = width,
-                         partial = partial, align = align))
   df <- tibble(
-    window = map(indexes, function(i, data) resample(data, i), data = data),
-    .idx = indexes,
+    window = compact(map(posn, resample_window, data = data, width = width,
+                         partial = partial, align = align)),
+    .idx = posn,
     .width = width,
     .align = str_sub(align, 1, 1)
   )

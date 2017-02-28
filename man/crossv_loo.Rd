@@ -2,14 +2,33 @@
 % Please edit documentation in R/crossv_loo.R
 \name{crossv_loo}
 \alias{crossv_loo}
-\title{Leave-on-out cross-validation}
+\alias{crossv_loo.data.frame}
+\alias{crossv_loo.grouped_df}
+\alias{crossv_lpo}
+\alias{crossv_lpo.data.frame}
+\alias{crossv_lpo.grouped_df}
+\title{Leave-one-out cross-validation}
 \usage{
-crossv_loo(data, id = ".id")
+crossv_loo(data, id = ".id", ...)
+
+\method{crossv_loo}{data.frame}(data, id = ".id", ...)
+
+\method{crossv_loo}{grouped_df}(data, id = ".id", ...)
+
+crossv_lpo(data, ...)
+
+\method{crossv_lpo}{data.frame}(data, p = 1, id = ".id", ...)
+
+\method{crossv_lpo}{grouped_df}(data, p = 1, id = ".id", ...)
 }
 \arguments{
 \item{data}{A data frame}
 
 \item{id}{Name of variable that gives each model a unique integer id.}
+
+\item{...}{Arguments passed to methods}
+
+\item{p}{Number of objects to leave out}
 }
 \value{
 A data frame with n rows and columns \code{test} and \code{train}.
@@ -20,3 +39,14 @@ A data frame with n rows and columns \code{test} and \code{train}.
 Leave one out cross-validation. This is a convenience function
 for \code{\link[modelr]{crossv_kfold}} when \code{k = nrow(data)}.
 }
+\section{Methods (by class)}{
+\itemize{
+\item \code{data.frame}: Leave-one-out cross validation
+
+\item \code{grouped_df}: Leave-one-group out cross validation
+
+\item \code{data.frame}: Leave-p-out out cross validation
+
+\item \code{grouped_df}: Leave-p-groups out cross validation
+}}
+

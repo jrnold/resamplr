@@ -12,10 +12,14 @@ roll(data, width, by = 1, partial = FALSE, align = c("center", "left",
 
 \item{width}{The width of the window}
 
+\item{by}{Start windows at every by-th point rather than every point.}
+
 \item{partial}{If \code{TRUE}, and the window is not fully inside the data,
 then a truncated window is returned. Otherwise, \code{NULL} is returned.}
 
 \item{align}{Alignment of the window relative to \code{idx}}
+
+\item{id}{Name of variable that gives each model a unique integer id.}
 }
 \value{
 A data frame with four columns
@@ -29,4 +33,7 @@ A data frame with four columns
 }
 \description{
 Generate \code{\link[modelr]{resample}} objects for rolling windows.
+}
+\seealso{
+The \code{\link[zoo]{rollapply}} function in \pkg{zoo}
 }

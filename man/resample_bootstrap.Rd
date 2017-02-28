@@ -2,16 +2,23 @@
 % Please edit documentation in R/bootstrap.R
 \name{resample_bootstrap}
 \alias{resample_bootstrap}
-\title{Generate a bootstrap}
+\alias{resample_bootstrap.data_frame}
+\alias{resample_bootstrap.grouped_df}
+\title{Generate a bootstrap replicate}
 \usage{
 resample_bootstrap(data, ...)
+
+\method{resample_bootstrap}{data_frame}(data, ...)
+
+\method{resample_bootstrap}{grouped_df}(data, stratify = TRUE,
+  groups = FALSE, ...)
 }
 \arguments{
 \item{data}{A data frame}
 
 \item{...}{Passed to methods}
 
-\item{within}{Resample within groups (stratified bootstrap)}
+\item{stratify}{Resample within groups (stratified bootstrap)}
 
 \item{groups}{Resample groups (clustered bootstrap)}
 }
@@ -19,5 +26,5 @@ resample_bootstrap(data, ...)
 A \code{\link[modelr]{resample}} object.
 }
 \description{
-Generate a bootstrap
+Generate a bootstrap replicate
 }
