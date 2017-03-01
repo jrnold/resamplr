@@ -50,3 +50,11 @@ for \code{\link[modelr]{crossv_kfold}} when \code{k = nrow(data)}.
 \item \code{grouped_df}: Leave-p-groups out cross validation
 }}
 
+\examples{
+cv <- crossv_loo(mtcars)
+cv
+library(purrr)
+models <- map(cv$train, ~ lm(mpg ~ wt, data = .))
+errs <- map2_dbl(models, cv$test, rmse)
+hist(errs)
+}

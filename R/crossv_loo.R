@@ -12,7 +12,7 @@
 #'   \code{\link{resample}} objects.
 #' @importFrom modelr crossv_kfold
 #' @export
-#' @example
+#' @examples
 #' cv <- crossv_loo(mtcars)
 #' cv
 #' library(purrr)
@@ -27,7 +27,7 @@ crossv_loo <- function(data, id = ".id", ...) {
 #' @export
 crossv_loo.data.frame <- function(data, id = ".id", ...) {
   df <- transpose(map(seq_len(nrow(data)), function(i) {
-    resample_split(data, test = i)
+    resample_holdout(data, test = i)
   }))
   df <- tibble::as_tibble(df)
   df[[id]] <- id(nrow(df))
@@ -38,7 +38,7 @@ crossv_loo.data.frame <- function(data, id = ".id", ...) {
 #' @export
 crossv_loo.grouped_df <- function(data, id = ".id", ...) {
   df <- transpose(map(group_ids(data), function(i) {
-    resample_groups(data, test = i)
+    resample_holdout.grouped_df(data, test = i)
   }))
   df <- tibble::as_tibble(df)
   df[[id]] <- id(nrow(df))
@@ -59,7 +59,7 @@ crossv_lpo.data.frame <- function(data, p = 1, id = ".id", ...) {
   } else {
     idx <- seq_len(nrow(data))
     df <- transpose(map(utils::combn(idx, p, simplify = FALSE),
-                        function(i) resample_split(data, idx)))
+                        function(i) resample_holdout(data, i)))
     df <- tibble::as_tibble(df)
     df[[id]] <- id(nrow(df))
     df
@@ -73,7 +73,7 @@ crossv_lpo.grouped_df <- function(data, p = 1, id = ".id", ...) {
     crossv_loo.grouped_df(data, id)
   } else {
     df <- transpose(map(utils::combn(group_ids(data), p, simplify = FALSE),
-                        function(i) resample_groups(data, i)))
+                        function(i) resample_holdout.grouped_df(data, i)))
     df <- tibble::as_tibble(df)
     df[[id]] <- id(nrow(df))
     df

@@ -21,7 +21,7 @@ is.resample <- function(x) inherits(x, "resample")
 #' @export
 c.resample <- function(...) {
   objs <- list(...)
-  if (length(objs) == 1) return(objs)
+  if (length(objs) == 1) return(objs[[1]])
   if (!all(map_lgl(objs, is.resample))) {
     stop("All objects must inherit from class ", sQuote("resample"), ".",
          call. = FALSE)
