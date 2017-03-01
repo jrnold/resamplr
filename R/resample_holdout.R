@@ -1,27 +1,23 @@
 #' Generate test/train resample objects
 #'
 #' @param test,train Integer vectors with the indexes of the test
-#'   and training samples. One of test or train must be specified.
+#'   and training samples.
+#'   In \code{resample_holdout.data.frame}, \code{test} and \code{train}
+#'   are the indexes of observations.
+#'   In \code{resample_holdout.grouped_df}, \code{test} and \code{train}
+#'   are group numbers.
+#'   One of \code{test} or \code{train} must be non-\code{NULL}.
 #' @param data A data table
+#' @param ... Arguments passed to methods
 #' @return A named list of two \code{\link[modelr]{resample}} objects
 #'   for the "test" and "train" sets.
-<<<<<<< HEAD:R/resample_split.R
-#' @example
-resample_split <- function(data, ...) {
-  UseMethod("resample_split")
-}
-
-#' @export
-resample_split.data.frame <- function(data, test = NULL, train = NULL, ...) {
-=======
 #' @export
 resample_holdout <- function(data, ...) {
   UseMethod("resample_holdout")
 }
 
 #' @export
-resample_holdout.data.frame <- function(data, test = NULL, train = NULL) {
->>>>>>> 92bcbbffd79b2b58231c33f3e6674a3a47a7434f:R/resample_holdout.R
+resample_holdout.data.frame <- function(data, test = NULL, train = NULL, ...) {
   if (is.null(test) && is.null(train)) {
     stop("Either test or train must be non-null", call. = FALSE)
   }
@@ -30,12 +26,9 @@ resample_holdout.data.frame <- function(data, test = NULL, train = NULL) {
   list(train = resample(data, train), test = resample(data, test))
 }
 
+#' @describeIn resample_holdout Resamples
 #' @export
-<<<<<<< HEAD:R/resample_split.R
-resample_split.grouped_df <- function(data, test = NULL, train = NULL, ...) {
-=======
-resample_holdout.grouped_df <- function(data, test = NULL, train = NULL) {
->>>>>>> 92bcbbffd79b2b58231c33f3e6674a3a47a7434f:R/resample_holdout.R
+resample_holdout.grouped_df <- function(data, test = NULL, train = NULL, ...) {
   if (is.null(test) && is.null(train)) {
     stop("Either test or train must be non-null", call. = FALSE)
   } else if (is.null(test)) {

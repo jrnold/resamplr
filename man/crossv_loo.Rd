@@ -53,7 +53,8 @@ for \code{\link[modelr]{crossv_kfold}} when \code{k = nrow(data)}.
 \examples{
 cv <- crossv_loo(mtcars)
 cv
-library(purrr)
+require("purrr")
+require("modelr")
 models <- map(cv$train, ~ lm(mpg ~ wt, data = .))
 errs <- map2_dbl(models, cv$test, rmse)
 hist(errs)
