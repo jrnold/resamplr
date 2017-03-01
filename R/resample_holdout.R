@@ -40,5 +40,4 @@ resample_holdout.grouped_df <- function(data, test = NULL, train = NULL, ...) {
                 get_group_indexes_int(data, test))
   }
   purrr::set_names(map(idx, function(i) resample(data, i)), c("train", "test"))
-
 }

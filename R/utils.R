@@ -23,7 +23,7 @@ c.resample <- function(...) {
   objs <- list(...)
   if (length(objs) == 1) return(objs[[1]])
   if (!all(map_lgl(objs, is.resample))) {
-    stop("All objects must inherit from class ", sQuote("resample"), ".",
+    stop("All objects must inherit from class `resample`.",
          call. = FALSE)
   }
   identical_data <- function(x) identical(x[["data"]], objs[[1]][["data"]])
@@ -61,7 +61,7 @@ rpartition <- function(x, k) {
 
 group_ids <- function(data) seq_len(dplyr::n_groups(data))
 
-map_resample <- function(data, idx) {
-  tibble::as_tibble(transpose(map(idx, function(i, data) resample(data, i),
-                                  data = data)))
-}
+# map_resample_df <- function(data, idx) {
+#   tibble::as_tibble(transpose(map(idx, function(i, data) resample(data, i),
+#                                   data = data)))
+# }
