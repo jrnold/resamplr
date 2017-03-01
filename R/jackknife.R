@@ -10,8 +10,8 @@
 #' @export
 jackknife <- function(data, id = ".id") {
   idx <- seq_len(nrow(data))
-  jack <- purrr::map(idx, function(i) resample_jackknife(data, i))
-  df <- tibble::tibble(jackknife = jack)
+  jack <- map(idx, function(i) resample_jackknife(data, i))
+  df <- tibble(jackknife = jack)
   df[[id]] <- id(nrow(df))
   df
 }
@@ -27,5 +27,5 @@ jackknife <- function(data, id = ".id") {
 #' @export
 resample_jackknife <- function(data, i) {
   idx <- seq_len(nrow(data))
-  modelr::resample(data, setdiff(idx, i))
+  resample(data, setdiff(idx, i))
 }

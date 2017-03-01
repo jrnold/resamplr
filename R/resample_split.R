@@ -5,7 +5,13 @@
 #' @param data A data table
 #' @return A named list of two \code{\link[modelr]{resample}} objects
 #'   for the "test" and "train" sets.
-resample_split <- function(data, test = NULL, train = NULL) {
+#' @example
+resample_split <- function(data, ...) {
+  UseMethod("resample_split")
+}
+
+#' @export
+resample_split.data.frame <- function(data, test = NULL, train = NULL, ...) {
   if (is.null(test) && is.null(train)) {
     stop("Either test or train must be non-null", call. = FALSE)
   }
@@ -14,9 +20,8 @@ resample_split <- function(data, test = NULL, train = NULL) {
   list(train = resample(data, train), test = resample(data, test))
 }
 
-#' @rdname resample_split
 #' @export
-resample_groups <- function(data, test = NULL, train = NULL) {
+resample_split.grouped_df <- function(data, test = NULL, train = NULL, ...) {
   if (is.null(test) && is.null(train)) {
     stop("Either test or train must be non-null", call. = FALSE)
   } else if (!is.null(test)) {
