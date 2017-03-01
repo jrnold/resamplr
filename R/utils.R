@@ -21,7 +21,7 @@ is.resample <- function(x) inherits(x, "resample")
 #' @export
 c.resample <- function(...) {
   objs <- list(...)
-  if (length(objs) == 1) return(objs)
+  if (length(objs) == 1) return(objs[[1]])
   if (!all(map_lgl(objs, is.resample))) {
     stop("All objects must inherit from class ", sQuote("resample"), ".",
          call. = FALSE)
@@ -37,8 +37,10 @@ c.resample <- function(...) {
 
 # extract indexes of a numbered group from a grouped_df
 get_group_indexes <- function(data, groups = NULL) {
-  idx <- attr(data, "indexes")
+  # indices are 0-indexed
+  idx <- map(attr(data, "indices"), `+`, 1L)
   if (!is.null(groups)) idx <- idx[groups]
+  idx
 }
 
 get_group_indexes_int <- function(data, groups = NULL) {
@@ -47,8 +49,8 @@ get_group_indexes_int <- function(data, groups = NULL) {
 
 # split indexes by groups from a grouped_df
 split_idx_by_group <- function(data, ids) {
-  idx <- get_group_indexes(data, ids)
-  list(idx, setdiff(seq_len(nrow(data)), idx))
+  idx <- get_group_indexes_int(data, ids)
+  list(as.integer(idx), as.integer(setdiff(seq_len(nrow(data)), idx)))
 }
 
 rpartition <- function(x, k) {

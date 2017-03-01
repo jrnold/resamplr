@@ -17,9 +17,9 @@ crossv_kfold.grouped_df <- function(data, k = 1, id = ".id", ...) {
   if (!is.numeric(k) || length(k) != 1) {
     stop("`k` must be a single integer.", call. = FALSE)
   }
-  df <- map_df(rpartition(group_ids(data), k), function(i) {
-    resample_groups(data, test = i)
-  })
+  df <- as_tibble(transpose(map(rpartition(group_ids(data), k), function(i) {
+    resample_holdout.grouped_df(data, test = i)
+  })))
   df[[id]] <- id(k)
   df
 }
