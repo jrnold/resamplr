@@ -65,3 +65,33 @@ map_resample <- function(data, idx) {
   tibble::as_tibble(transpose(map(idx, function(i, data) resample(data, i),
                                   data = data)))
 }
+
+split_kfold <- function(idx, k) {
+  n <- length(idx)
+  folds <- sample(rep(seq_len(k), length.out = n))
+  split(idx, folds)
+}
+
+split_test_train_n <- function(idx, test = NULL, train = NULL) {
+  n <- length(idx)
+  if (is.null(test) && is.null(train)) {
+    stop("Either test or train must be non-null", call. = FALSE)
+  } else if (is.null(test)) {
+    test <- length(idx) - train
+  } else if (is.null(train)) {
+    train <- length(idx) - test
+  }
+  m <- test + train
+  if (m < n) {
+    idx <- sample(idx, size = m, replace = FALSE)
+  }
+  g <- sample(rep(1:2, length.out = m))
+  set_names(split(idx, g), c("train", "test"))
+}
+
+split_test_train_p <- function(idx, test = NULL, train = NULL) {
+  n <- length(idx)
+  if (!is.null(test)) test <- round(test * n)
+  if (!is.null(train)) train <- round(train * n)
+  split_test_train_n(idx, test = test, train = train)
+}
