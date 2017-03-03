@@ -106,10 +106,12 @@ sample_tsboot <- function(n, m, size = 1, sim = "fixed", endcorr = FALSE) {
   })
 }
 
-sample_tskfold <- function(idx, k) {
+sample_tskfold <- function(idx, k, cumtrain = TRUE, cumtest = TRUE) {
   g <- cut(idx, k, include.lowest = TRUE, labels = FALSE)
   idx_list <- split(idx, g)
   map(seq_len(k), function(i) {
-    list(train = idx_list[1:i], test = idx_list[(i + 1):k])
+    test <- if (cumtest) idx_list[(i + 1):k] else idx_list[i + 1]
+    train <- if (cumtest) idx_list[1:i] else idx_list[i]
+    list(train = train, test = test)
   })
 }
