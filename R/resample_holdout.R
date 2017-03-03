@@ -21,6 +21,9 @@ resample_holdout.data.frame <- function(data, test = NULL, train = NULL, ...) {
   if (is.null(test) && is.null(train)) {
     stop("Either test or train must be non-null", call. = FALSE)
   }
+  if (is.integer(test) || (test >= 1L)) {
+
+  }
   test <- test %||% setdiff(seq_len(nrow(data)), train)
   train <- train %||% setdiff(seq_len(nrow(data)), test)
   list(train = resample(data, train), test = resample(data, test))

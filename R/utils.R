@@ -61,6 +61,18 @@ rpartition <- function(x, k) {
 
 group_ids <- function(data) seq_len(dplyr::n_groups(data))
 
+#' Create a list of resample objects
+#'
+#' Create a list of resample objects from a data frame and a list
+#' of indexes.
+#'
+#' @param data A data frame
+#' @param idx A list of integer vectors of indexes
+#' @return A list of \code{\link[modelr]{resample}} objects.
+resample_list <- function(data, idxs) {
+  map(idxs, function(i) resample(data, as.integer(i)))
+}
+
 # map_resample_df <- function(data, idx) {
 #   tibble::as_tibble(transpose(map(idx, function(i, data) resample(data, i),
 #                                   data = data)))
