@@ -1,5 +1,5 @@
 #' @importFrom modelr resample
-#' @importFrom tibble tibble
+#' @importFrom tibble tibble as_tibble
 #' @importFrom purrr map map_int map_lgl map_df flatten_int %||% transpose
 NULL
 
@@ -70,12 +70,6 @@ split_idx_by_group <- function(data, ids) {
   list(as.integer(idx), as.integer(setdiff(seq_len(nrow(data)), idx)))
 }
 
-rpartition <- function(x, k) {
-  n <- length(x)
-  parts <- sample(rep(seq_len(k), length.out = n), n, replace = FALSE)
-  split(x, parts)
-}
-
 group_ids <- function(data) seq_len(dplyr::n_groups(data))
 
 resample_list <- function(data, idxs) {
@@ -84,7 +78,7 @@ resample_list <- function(data, idxs) {
 
 split_kfold <- function(idx, k) {
   n <- length(idx)
-  folds <- sample(rep(seq_len(k), length.out = n))
+  folds <- sample(rep(seq_len(k), length.out = n), n, replace = FALSE)
   split(idx, folds)
 }
 
@@ -111,6 +105,7 @@ split_test_train_p <- function(idx, test = NULL, train = NULL) {
   if (!is.null(train)) train <- round(train * n)
   split_test_train_n(idx, test = test, train = train)
 }
+
 
 bs_ts <- function(n, m, size = 1, sim = "fixed", endcorr = FALSE) {
   endpt <- if (endcorr) {
@@ -139,12 +134,3 @@ bs_ts <- function(n, m, size = 1, sim = "fixed", endcorr = FALSE) {
   })
 }
 
-split_tskfold <- function(idx, k, cumtrain = TRUE, cumtest = TRUE) {
-  g <- cut(idx, k, include.lowest = TRUE, labels = FALSE)
-  idx_list <- split(idx, g)
-  map(seq_len(k), function(i) {
-    test <- if (cumtest) idx_list[(i + 1):k] else idx_list[i + 1]
-    train <- if (cumtest) idx_list[1:i] else idx_list[i]
-    list(train = train, test = test)
-  })
-}

@@ -9,13 +9,13 @@
 \alias{crossv_lpo.grouped_df}
 \title{Leave-one-out cross-validation}
 \usage{
-crossv_loo(data, id = ".id", ...)
+crossv_loo(data, ...)
 
 \method{crossv_loo}{data.frame}(data, id = ".id", ...)
 
 \method{crossv_loo}{grouped_df}(data, id = ".id", ...)
 
-crossv_lpo(data, ...)
+crossv_lpo(data, p, ...)
 
 \method{crossv_lpo}{data.frame}(data, p = 1, id = ".id", ...)
 
@@ -24,9 +24,9 @@ crossv_lpo(data, ...)
 \arguments{
 \item{data}{A data frame}
 
-\item{id}{Name of variable that gives each model a unique integer id.}
-
 \item{...}{Arguments passed to methods}
+
+\item{id}{Name of variable that gives each model a unique integer id.}
 
 \item{p}{Number of objects to leave out}
 }

@@ -4,11 +4,9 @@
 \alias{crossv_kfold}
 \title{Generate cross-validated k-fold test-training pairs}
 \usage{
-crossv_kfold(data, ...)
+crossv_kfold(data, k, ...)
 }
 \arguments{
-\item{data}{A data frame}
-
 \item{...}{Passed to methods}
 }
 \description{
