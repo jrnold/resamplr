@@ -77,3 +77,39 @@ resample_list <- function(data, idxs) {
 #   tibble::as_tibble(transpose(map(idx, function(i, data) resample(data, i),
 #                                   data = data)))
 # }
+
+
+sample_tsboot <- function(n, m, size = 1, sim = "fixed", endcorr = FALSE) {
+  endpt <- if (endcorr) {
+    n
+  } else {
+    n - size + 1
+  }
+  if (sim == "geom") {
+    len_tot <- 0
+    lens <- NULL
+    while (len_tot < m) {
+      temp <- 1 + rgeom(1, 1 / size)
+      temp <- pmin(temp, m - len_tot)
+      lens <- c(lens, temp)
+      len_tot <- len_tot + temp
+    }
+    st <- sampl.int(endpt, length(lens), replace = TRUE)
+  } else {
+    nn <- ceiling(m / size)
+    lens <- c(rep(size, nn - 1), 1 + (m - 1) %% size)
+    st <- sample.int(endpt, nn, replace = TRUE)
+  }
+  map2_int(st, lens, function(s, sz) {
+    if (sz > 1) seq(s, s + sz - 1L)
+    else integer()
+  })
+}
+
+sample_tskfold <- function(idx, k) {
+  g <- cut(idx, k, include.lowest = TRUE, labels = FALSE)
+  idx_list <- split(idx, g)
+  map(seq_len(k), function(i) {
+    list(train = idx_list[1:i], test = idx_list[(i + 1):k])
+  })
+}
