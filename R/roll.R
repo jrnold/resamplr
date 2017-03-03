@@ -31,35 +31,34 @@ resample_window <- function(data, idx, width, partial = TRUE,
 #'
 #' @inheritParams resample_window
 #' @param by Start windows at every by-th point rather than every point.
-#' @param id Name of variable that gives each model a unique integer id.
 #'
 #' @return A data frame with four columns
 #' \describe{
 #' \item{window}{A list column of \code{\link[modelr]{resample}} objects}
-#' \item{.i}{integer: the index position of the window}
+#' \item{.id}{integer: the index position of the window}
 #' \item{.width}{integer: the width of the window}
 #' \item{.align}{character: alignment of the window. "l" for left,
 #' "c" for center, "r" for right}
 #' }
 #' @seealso The \code{\link[zoo]{rollapply}} function in \pkg{zoo}
-#' @importFrom purrr map compact
+#' @importFrom purrr map compact negate map_lgl
 #' @importFrom tibble tibble
-#' @importFrom stringr str_sub
+#' @importFrom stringr str_sub str_to_upper
 #' @export
-roll <- function(data, width, by = 1, partial = FALSE,
-                 align = c("center", "left", "right"),
-                 id = ".id") {
-  n <- nrow(data)
+roll <- function(data, width, by = 1L,
+                 partial = FALSE,
+                 align = c("center", "left", "right")) {
   align <- match.arg(align)
-  posn <- seq(1L, n, by = by)
+  posn <- seq(from = 1L, to = nrow(data), by = by)
+  window <- map(posn, resample_window, data = data, width = width,
+                partial = partial, align = align)
+  posn <- posn[map_lgl(window, negate(is.null))]
   df <- tibble(
-    window = compact(map(posn, resample_window, data = data, width = width,
-                         partial = partial, align = align)),
-    .idx = posn,
-    .width = width,
-    .align = str_sub(align, 1, 1)
+    window = compact(window),
+    .id = posn,
+    .width = as.integer(width),
+    .align = str_to_upper(str_sub(align, 1, 1))
   )
-  df[[id]] <- id
   df
 }
 

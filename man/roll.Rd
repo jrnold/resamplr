@@ -4,8 +4,8 @@
 \alias{roll}
 \title{Generate rolling windows}
 \usage{
-roll(data, width, by = 1, partial = FALSE, align = c("center", "left",
-  "right"), id = ".id")
+roll(data, width, by = 1L, partial = FALSE, align = c("center", "left",
+  "right"))
 }
 \arguments{
 \item{data}{A data frame}
@@ -18,14 +18,12 @@ roll(data, width, by = 1, partial = FALSE, align = c("center", "left",
 then a truncated window is returned. Otherwise, \code{NULL} is returned.}
 
 \item{align}{Alignment of the window relative to \code{idx}}
-
-\item{id}{Name of variable that gives each model a unique integer id.}
 }
 \value{
 A data frame with four columns
 \describe{
 \item{window}{A list column of \code{\link[modelr]{resample}} objects}
-\item{.i}{integer: the index position of the window}
+\item{.id}{integer: the index position of the window}
 \item{.width}{integer: the width of the window}
 \item{.align}{character: alignment of the window. "l" for left,
 "c" for center, "r" for right}

@@ -18,7 +18,7 @@ test_that("c.resample works with one object", {
 
 test_that("c.resample throws error with a non-resample object", {
   expect_error(c(resample(tibble(a = 1:10), 1:3), 5:10),
-               regexp = "All objects must inherit from class 'resample'")
+               regexp = "All objects must inherit from class `resample`")
 })
 
 test_that("c.resample throws error with non-identical data", {

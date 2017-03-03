@@ -26,7 +26,7 @@ test_that("crossv_loo.grouped_df works as expected", {
   expect_identical(cv$.id, expected$.id)
 })
 
-test_that("crossv_lpo.grouped_df works as expected", {
+test_that("crossv_lpo.data.frame works as expected", {
   dat <- tibble::tibble(x = 1:3)
   cv <- crossv_lpo(dat, 2)
   expected <- tibble(
@@ -38,6 +38,12 @@ test_that("crossv_lpo.grouped_df works as expected", {
   expect_identical(cv$test, expected$test)
   expect_identical(cv$.id, expected$.id)
 })
+
+test_that("crossv_lpo.data.frame same as loo with p = ", {
+  dat <- tibble::tibble(x = 1:3)
+  expect_identical(crossv_lpo(dat, 1), crossv_loo(dat))
+})
+
 
 test_that("crossv_lpo.grouped_df works as expected", {
   dat <- tibble::tibble(foo = c("a", "a", "b", "c", "c"),
@@ -52,4 +58,9 @@ test_that("crossv_lpo.grouped_df works as expected", {
   expect_identical(cv$train, expected$train)
   expect_identical(cv$test, expected$test)
   expect_identical(cv$.id, expected$.id)
+})
+
+test_that("crossv_lpo.grouped_df same as loo with p = ", {
+  dat <- group_by(tibble::tibble(x = 1:3), x)
+  expect_identical(crossv_lpo(dat, 1), crossv_loo(dat))
 })

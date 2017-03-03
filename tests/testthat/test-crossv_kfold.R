@@ -26,3 +26,10 @@ test_that("crossv_kfold.grouped_df works as expected", {
   expect_equal(cv$.id, as.character(1:3))
 })
 
+test_that("crossv_kfold.grouped_df throws error with non-single integer", {
+  msg <- "`k` must be a single integer"
+  x <- group_by(tibble(a = 1:5), a)
+  expect_error(crossv_kfold(x, k = 1:2), regexp = msg)
+  expect_error(crossv_kfold(x, k = NULL), regexp = msg)
+  expect_error(crossv_kfold(x, k = "12"), regexp = msg)
+})

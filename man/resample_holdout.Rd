@@ -2,15 +2,25 @@
 % Please edit documentation in R/resample_holdout.R
 \name{resample_holdout}
 \alias{resample_holdout}
+\alias{resample_holdout.grouped_df}
 \title{Generate test/train resample objects}
 \usage{
 resample_holdout(data, ...)
+
+\method{resample_holdout}{grouped_df}(data, test = NULL, train = NULL, ...)
 }
 \arguments{
 \item{data}{A data table}
 
+\item{...}{Arguments passed to methods}
+
 \item{test, train}{Integer vectors with the indexes of the test
-and training samples. One of test or train must be specified.}
+and training samples.
+In \code{resample_holdout.data.frame}, \code{test} and \code{train}
+are the indexes of observations.
+In \code{resample_holdout.grouped_df}, \code{test} and \code{train}
+are group numbers.
+One of \code{test} or \code{train} must be non-\code{NULL}.}
 }
 \value{
 A named list of two \code{\link[modelr]{resample}} objects
@@ -19,3 +29,8 @@ A named list of two \code{\link[modelr]{resample}} objects
 \description{
 Generate test/train resample objects
 }
+\section{Methods (by class)}{
+\itemize{
+\item \code{grouped_df}: Resamples
+}}
+
