@@ -24,6 +24,8 @@ crossv_loo <- function(data, ...) {
   UseMethod("crossv_loo")
 }
 
+# stratified loo would require equal sized groups
+
 #' @describeIn crossv_loo Leave-one-out cross validation
 #' @export
 crossv_loo.data.frame <- function(data, id = ".id", ...) {
@@ -49,9 +51,10 @@ crossv_loo.grouped_df <- function(data, id = ".id", ...) {
 #' @rdname crossv_loo
 #' @export
 crossv_lpo <- function(data, p, ...) {
-  is.number(p)
   UseMethod("crossv_lpo")
 }
+
+# stratified lpo would require equal sized groups
 
 #' @describeIn crossv_loo Leave-p-out out cross validation
 #' @export

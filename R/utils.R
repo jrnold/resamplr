@@ -70,42 +70,39 @@ split_idx_by_group <- function(data, ids) {
   list(as.integer(idx), as.integer(setdiff(seq_len(nrow(data)), idx)))
 }
 
-group_ids <- function(data) seq_len(dplyr::n_groups(data))
+# Return either row numbers or group numbers
+data_idx <- function(data) {
+  UseMethod("data_idx")
+}
+
+data_idx.data.frame <- function(data) {
+  seq_len(nrow(data))
+}
+
+data_idx.grouped_df <- function(data) {
+  seq_len(dplyr::n_groups(data))
+}
+
+# split indexes into k groups
+split_kfold <- function(idx, k, shuffle = TRUE) {
+  n <- length(idx)
+  folds <- if (shuffle) {
+    sample(rep(seq_len(k), length.out = n), n, replace = FALSE)
+  } else {
+    cut(x, k, include.lowest = TRUE, labels = FALSE)
+  }
+  split(idx, folds)
+}
+
+
+# group ids
+group_ids <- function(data) {
+  seq_len(dplyr::n_groups(data))
+}
 
 resample_list <- function(data, idxs) {
   map(idxs, resample, data = data)
 }
-
-split_kfold <- function(idx, k) {
-  n <- length(idx)
-  folds <- sample(rep(seq_len(k), length.out = n), n, replace = FALSE)
-  split(idx, folds)
-}
-
-split_test_train_n <- function(idx, test = NULL, train = NULL) {
-  n <- length(idx)
-  if (is.null(test) && is.null(train)) {
-    stop("Either test or train must be non-null", call. = FALSE)
-  } else if (is.null(test)) {
-    test <- length(idx) - train
-  } else if (is.null(train)) {
-    train <- length(idx) - test
-  }
-  m <- test + train
-  if (m < n) {
-    idx <- sample(idx, size = m, replace = FALSE)
-  }
-  g <- sample(rep(1:2, length.out = m))
-  purrr::set_names(split(idx, g), c("train", "test"))
-}
-
-split_test_train_p <- function(idx, test = NULL, train = NULL) {
-  n <- length(idx)
-  if (!is.null(test)) test <- round(test * n)
-  if (!is.null(train)) train <- round(train * n)
-  split_test_train_n(idx, test = test, train = train)
-}
-
 
 bs_ts <- function(n, m, size = 1, sim = "fixed", endcorr = FALSE) {
   endpt <- if (endcorr) {

@@ -7,6 +7,10 @@
 crossv_tskfold(data, k, ...)
 }
 \arguments{
+\item{data}{A data frame}
+
+\item{k}{Number of folds (an integer).}
+
 \item{...}{Passed to methods}
 }
 \description{

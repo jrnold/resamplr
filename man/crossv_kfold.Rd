@@ -7,6 +7,10 @@
 crossv_kfold(data, k, ...)
 }
 \arguments{
+\item{data}{A data frame}
+
+\item{k}{Number of folds}
+
 \item{...}{Passed to methods}
 }
 \description{

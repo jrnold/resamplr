@@ -4,11 +4,38 @@
 #' the data frame.
 #'
 #' @param data A data frame
+#' @param stratify If \code{TRUE}, permute rows within groups
+#' @param groups If \code{TRUE}, permute groups
 #' @return A \code{\link[modelr]{resample}} object.
 #' @export
-resample_permutation <- function(data) {
-  modelr::resample(data = data, idx = sample.int(nrow(data), replace = FALSE))
+resample_permutation <- function(data, ...) {
+  UseMethod("resample_permutation")
+
 }
+
+#' @describeIn resample_permutation Permute observations
+#' @export
+resample_permutation.data.frame <- function(data, ...) {
+  idx <- sample.int(nrow(data), replace = FALSE)
+  resample(data = data, idx = idx)
+}
+
+#' @describeIn resample_permutation Permute groups or observations within
+#'    groups.
+#' @export
+#' @importFrom dplyr n_groups
+resample_permutation.grouped_df <- function(data,
+                                            stratify = TRUE,
+                                            groups = FALSE, ...) {
+  g <- if (groups) {
+    sample.int(n_groups(data), replace = FALSE)
+  } else {
+    NULL
+  }
+  idx <- get_group_indexes_int(data, g)
+  resample(data = data, idx = idx)
+}
+
 
 #' Generate permutation replicates
 #'
