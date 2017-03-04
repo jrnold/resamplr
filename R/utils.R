@@ -3,6 +3,17 @@
 #' @importFrom purrr map map_int map_lgl map_df flatten_int %||% transpose
 NULL
 
+#' Create a lazy resample object
+#'
+#' This is a slightly modified version of \code{\link[modelr]{resample}}.
+#' It has more tests for the validity of the indexes, but also coerces
+#' numeric \code{idx} to integers.
+#'
+#' @param data A data frame
+#' @param idx An integer vector
+#' @returns A \code{resample} object, a list with two elements: \code{data}
+#'   and \code{idx}.
+#' @export
 resample <- function(data, idx) {
   if (!is.data.frame(data)) {
     stop("`data` must be a data frame.", call. = FALSE)
@@ -20,14 +31,19 @@ resample <- function(data, idx) {
   structure(list(data = data, idx = idx), class = "resample")
 }
 
-id <- function(n) {
-  width <- nchar(n)
-  sprintf(paste0("%0", width, "d"), seq_len(n))
+#' Create a list of resample objects
+#'
+#' @param data A data frame
+#' @param idx A list of integer vectors of indexes.
+#' @returns A \code{list} of \code{\link{resample}} objects.
+#' @export
+resample_lst <- function(data, idx) {
+  map(idx, resample, data = data)
 }
 
 #' Is it a resample object?
 #'
-#' Checks whether an object is an \code{\link[modelr]{resample}}
+#' Checks whether an object is an \code{\link{resample}}
 #' object.
 #'
 #' @param x An object
@@ -51,23 +67,23 @@ c.resample <- function(...) {
            flatten_int(map(objs, as.integer)))
 }
 
-
-# extract indexes of a numbered group from a grouped_df
-get_group_indexes <- function(data, groups = NULL) {
-  # indices are 0-indexed
-  idx <- map(attr(data, "indices"), `+`, 1L)
-  if (!is.null(groups)) idx <- idx[groups]
-  idx
+is_single_integer <- function(x) {
+  is.integer(x) && (length(x) == 1)
 }
 
-get_group_indexes_int <- function(data, groups = NULL) {
-  flatten_int(get_group_indexes(data, groups = groups))
+is_natural_number <- function(x) {
+  is_single_integer(x) && x >= 1
 }
 
-# split indexes by groups from a grouped_df
-split_idx_by_group <- function(data, ids) {
-  idx <- get_group_indexes_int(data, ids)
-  list(as.integer(idx), as.integer(setdiff(seq_len(nrow(data)), idx)))
+
+id <- function(n) {
+  width <- nchar(n)
+  sprintf(paste0("%0", width, "d"), seq_len(n))
+}
+
+group_indices_lst <- function(data) {
+  g <- seq_len(dplyr::n_groups(data))
+  split(dplyr::group_indices(data), g)
 }
 
 # Return either row numbers or group numbers
@@ -82,52 +98,3 @@ data_idx.data.frame <- function(data) {
 data_idx.grouped_df <- function(data) {
   seq_len(dplyr::n_groups(data))
 }
-
-# split indexes into k groups
-split_kfold <- function(idx, k, shuffle = TRUE) {
-  n <- length(idx)
-  folds <- if (shuffle) {
-    sample(rep(seq_len(k), length.out = n), n, replace = FALSE)
-  } else {
-    cut(x, k, include.lowest = TRUE, labels = FALSE)
-  }
-  split(idx, folds)
-}
-
-
-# group ids
-group_ids <- function(data) {
-  seq_len(dplyr::n_groups(data))
-}
-
-resample_list <- function(data, idxs) {
-  map(idxs, resample, data = data)
-}
-
-bs_ts <- function(n, m, size = 1, sim = "fixed", endcorr = FALSE) {
-  endpt <- if (endcorr) {
-    n
-  } else {
-    n - size + 1
-  }
-  if (sim == "geom") {
-    len_tot <- 0
-    lens <- NULL
-    while (len_tot < m) {
-      temp <- 1 + stats::rgeom(1, 1 / size)
-      temp <- pmin(temp, m - len_tot)
-      lens <- c(lens, temp)
-      len_tot <- len_tot + temp
-    }
-    st <- sample.int(endpt, length(lens), replace = TRUE)
-  } else {
-    nn <- ceiling(m / size)
-    lens <- c(rep(size, nn - 1), 1 + (m - 1) %% size)
-    st <- sample.int(endpt, nn, replace = TRUE)
-  }
-  purrr::map2_int(st, lens, function(s, sz) {
-    if (sz > 1) seq(s, s + sz - 1L)
-    else integer()
-  })
-}
-

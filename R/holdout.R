@@ -17,51 +17,87 @@ resample_holdout <- function(data, ...) {
 }
 
 #' @export
-resample_holdout.data.frame <- function(data, test = NULL, train = NULL, ...) {
-  if (is.null(test) && is.null(train)) {
-    stop("Either test or train must be non-null", call. = FALSE)
+resample_holdout.data.frame <- function(data, test = 0.3, train = 0.7,
+                                        shuffle = TRUE, ...) {
+  n <- nrow(data)
+  test <- if (!is.null(test)) round(test * n)
+  train <- if (!is.null(train)) round(train * n)
+  resample_holdout_n(data, test = test, train = train, shuffle = shuffle)
+}
+
+#' @export
+resample_holdout.grouped_df <- function(data, test = 0.3, train = 0.7,
+                                        shuffle = TRUE, stratify = FALSE) {
+  idx <- group_indices_lst(data)
+  if (stratify) {
+    idx <- map(idx, split_test_train_frac, test = test, train = train,
+               shuffle = shuffle)
+    test_train(data, test = flatten_int(map(idx, "test")),
+               train = flatten_int(map(idx, "train")))
+  } else {
+    g <- split_test_train_frac(seq_along(idx), test, train, shuffle = shuffle)
+    test_train(data, test = flatten_int(idx[g$test]),
+               train = flatten_int(idx[g$train]))
   }
-  test <- test %||% setdiff(seq_len(nrow(data)), train)
-  train <- train %||% setdiff(seq_len(nrow(data)), test)
-  list(train = resample(data, train), test = resample(data, test))
+}
+
+#' @export
+resample_holdout_n <- function(data, ...) {
+  UseMethod("resample_holdout_n")
+}
+
+#' @export
+resample_holdout_n.data.frame <- function(data, test = NULL, train = NULL,
+                                          shuffle = TRUE) {
+  purrr::invoke(test_train,
+                split_test_train(seq_len(data), test = test, train = train,
+                                 shuffle = shuffle),
+                data = data)
 }
 
 #' @describeIn resample_holdout Resamples
+#' @importFrom assertthat is.number
 #' @export
-resample_holdout.grouped_df <- function(data, test = NULL, train = NULL, ...) {
-  if (is.null(test) && is.null(train)) {
-    stop("Either test or train must be non-null", call. = FALSE)
-  } else if (is.null(test)) {
-    idx <- split_idx_by_group(data, train)
-  } else if (is.null(train)) {
-    idx <- rev(split_idx_by_group(data, test))
+resample_holdout_n.grouped_df <- function(data, test = NULL, train = NULL,
+                                        shuffle = TRUE, stratify = FALSE) {
+  idx <- group_indices_lst(data)
+  if (stratify) {
+    idx <- map(idx, split_test_train, test = test, train = train,
+               shuffle = shuffle)
+    test_train(data, test = flatten_int(map(idx, "test")),
+               train = flatten_int(map(idx, "train")))
   } else {
-    idx <- list(get_group_indexes_int(data, train),
-                get_group_indexes_int(data, test))
+    g <- split_test_train(seq_along(idx), test, train, shuffle = shuffle)
+    test_train(data, test = flatten_int(idx[g$test]),
+               train = flatten_int(idx[g$train]))
   }
-  purrr::set_names(map(idx, function(i) resample(data, i)), c("train", "test"))
 }
 
-split_test_train_n <- function(idx, test = NULL, train = NULL) {
+test_train <- function(data, test, train) {
+  list(test = resample(data, test), train = resample(data, train))
+}
+
+split_test_train_n <- function(idx, test = NULL, train = NULL, shuffle = TRUE) {
   n <- length(idx)
   if (is.null(test) && is.null(train)) {
     stop("Either test or train must be non-null", call. = FALSE)
-  } else if (is.null(test)) {
+  }
+  # fill missing groups
+  if (is.null(test)) {
     test <- length(idx) - train
   } else if (is.null(train)) {
     train <- length(idx) - test
   }
-  m <- test + train
-  if (m < n) {
-    idx <- sample(idx, size = m, replace = FALSE)
+  if (shuffle) {
+    idx <- sample(idx, length(idx), replace = TRUE)
   }
-  g <- sample(rep(1:2, length.out = m))
-  purrr::set_names(split(idx, g), c("train", "test"))
+  list(test = idx[1:test], train = idx[test + 1:train])
 }
 
-split_test_train_p <- function(idx, test = NULL, train = NULL) {
+split_test_train_frac <- function(idx, test = NULL, train = NULL,
+                                  shuffle = TRUE) {
   n <- length(idx)
   if (!is.null(test)) test <- round(test * n)
   if (!is.null(train)) train <- round(train * n)
-  split_test_train_n(idx, test = test, train = train)
+  split_test_train_n(idx, test = test, train = train, shuffle = shuffle)
 }
