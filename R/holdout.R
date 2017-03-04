@@ -101,3 +101,27 @@ split_test_train_frac <- function(idx, test = NULL, train = NULL,
   if (!is.null(train)) train <- round(train * n)
   split_test_train_n(idx, test = test, train = train, shuffle = shuffle)
 }
+
+#' Generate cross-validated test-training pairs
+#'
+#' @export
+crossv_mc <- function(data, n, ...) {
+  UseMethod("crossv_mc")
+}
+
+crossv_mc_ <- function(data, n, ...) {
+  df <- as_tibble(transpose(rerun(n, resample_holdout(data, ...))))
+  df[[".id"]] <- id(nrow(df))
+  df
+}
+
+#' @export
+crossv_mc.data.frame <- function(data, n, test = 0.3, ...) {
+  crossv_mc_(data, n, test = test)
+}
+
+#' @export
+crossv_mc.grouped_df <- function(data, n, test = 0.3, stratify = FALSE, ...) {
+  crossv_mc_(data, n, test = test, stratify = stratify)
+}
+
