@@ -103,7 +103,6 @@ test_train_df <- function(data, test, train) {
 }
 
 split_test_train_n <- function(idx, test, shuffle = TRUE) {
-  train <- length(idx) - test
   if (shuffle) {
     idx <- sample(idx, length(idx), replace = FALSE)
   }
@@ -114,5 +113,3 @@ split_test_train_n <- function(idx, test, shuffle = TRUE) {
 split_test_train_frac <- function(idx, test, shuffle = TRUE) {
   split_test_train_n(idx, test = round(test * length(idx)), shuffle = shuffle)
 }
-
-

@@ -1,6 +1,6 @@
 context("resample")
 
-{
+local({
   dat <- tibble(a = 1:5)
   test_that("resample works as expected", {
     idx <- 2:3
@@ -39,4 +39,4 @@ context("resample")
     expect_is(resample_lst(dat, list(1:2, 3:4)), "list")
   })
 
-}
+})

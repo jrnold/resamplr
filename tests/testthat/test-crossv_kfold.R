@@ -1,17 +1,18 @@
 context("crossv_kfold.data.frame")
-{
-  dat <- tibble(a = 1:4)
 
-  expect_crossv_kfold <- function(x, k) {
-    expect_is(x, "data.frame")
-    expect_named(x, c("train", "test", ".id"))
-    expect_equal(nrow(x), k)
-    expect_is(x$train, "list")
-    expect_true(all(map_lgl(x$train, is.resample)))
-    expect_is(x$test, "list")
-    expect_true(all(map_lgl(x$test, is.resample)))
-    expect_is(x$.id, "character")
-  }
+expect_crossv_kfold <- function(x, k) {
+  expect_is(x, "data.frame")
+  expect_named(x, c("train", "test", ".id"))
+  expect_equal(nrow(x), k)
+  expect_is(x$train, "list")
+  expect_true(all(map_lgl(x$train, is.resample)))
+  expect_is(x$test, "list")
+  expect_true(all(map_lgl(x$test, is.resample)))
+  expect_is(x$.id, "character")
+}
+
+local({
+  dat <- tibble(a = 1:4)
 
   test_that("crossv_kfold works as expected", {
     k <- 2
@@ -36,10 +37,10 @@ context("crossv_kfold.data.frame")
     expect_equal(map(x$test, as.integer),
                  map(list(c(1, 2), c(3, 4)), as.integer))
   })
-}
+})
 
 context("crossv_kfold.grouped_df")
-{
+local({
   dat <- group_by(tibble(a = rep(1:4, each = 2)), a)
 
   test_that(paste0("crossv_kfold.grouped_df works with",
@@ -99,4 +100,4 @@ context("crossv_kfold.grouped_df")
                        tibble(a = as.integer(c(1, 2, 3, 4)))))
    })
 
-}
+})

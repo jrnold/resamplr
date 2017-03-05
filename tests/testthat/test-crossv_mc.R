@@ -1,5 +1,6 @@
 context("crossv_mc")
-{
+
+local({
   dat <- tibble(a = 1:4)
 
   expect_crossv_mc <- function(x, n) {
@@ -52,4 +53,4 @@ context("crossv_mc")
                       tibble(a = rep(1:4, each = 3))))
   })
 
-}
+})

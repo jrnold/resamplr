@@ -1,15 +1,14 @@
-context("resmple_holdout")
+context("resmple_holdout.data.frame")
 
-{
+expect_holdout <- function(x) {
+  expect_is(x, "list")
+  expect_named(x, c("train", "test"))
+  expect_identical(map_chr(x, class),
+                   c(train = "resample", test = "resample"))
+}
+
+local({
   dat <- tibble(a = c(rep("a", 5), rep("b", 3), rep("c", 2)))
-  dat_grouped <- group_by(dat, a)
-
-  expect_holdout <- function(x) {
-    expect_is(x, "list")
-    expect_named(x, c("train", "test"))
-    expect_identical(map_chr(x, class),
-                     c(train = "resample", test = "resample"))
-  }
 
   test_that("resample_holdout.data.frame works as expected", {
     x <- resample_holdout(dat)
@@ -24,7 +23,13 @@ context("resmple_holdout")
     expect_identical(map(x, dim),
                      list(train = c(9L, 1L), test = c(1L, 1L)))
   })
+})
 
+context("resample.grouped_df")
+
+local({
+  dat <- tibble(a = c(rep("a", 5), rep("b", 3), rep("c", 2)))
+  dat_grouped <- group_by(dat, a)
   test_that("resample_holdout.grouped_df works as expected", {
     x <- resample_holdout(dat_grouped)
     expect_holdout(x)
@@ -49,8 +54,6 @@ context("resmple_holdout")
                      list(train = c(8L, 1L), test = c(2L, 1L)))
   })
 
-  # ---- resample_holdout_n
-
   test_that("resample_holdout_n.grouped_df works as expected", {
     x <- resample_holdout_n(dat_grouped)
     expect_holdout(x)
@@ -66,4 +69,4 @@ context("resmple_holdout")
     expect_holdout(x)
   })
 
-}
+})
