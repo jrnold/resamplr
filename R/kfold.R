@@ -41,14 +41,27 @@ crossv_kfold.grouped_df <- function(data, k = 5, shuffle = TRUE,
   assert_that(is.flag(stratify))
   idx <- group_indices_lst(data)
   if (stratify) {
-    g <- transpose(map(idx, split_kfold, k = k, shuffle = shuffle))
-    test_train(data, test = flatten_int(map(g, "test")),
-               train = flatten_int(map(g, "train")))
+    f <- function(j) {
+      .f <- function(i) flatten_int(map(i, j))
+      unname(resample_lst(data, map(folds, .f)))
+    }
+    folds <- transpose(map(idx, split_kfold, k = k, shuffle = shuffle))
+    tibble(
+      train = f("train"),
+      test = f("test"),
+      .id = id(k)
+    )
   } else {
-    g <- split_kfold(seq_along(idx), k = k, shuffle = shuffle)
-    test_train(data,
-               test = flatten_int(idx[g$test]),
-               train = flatten_int(idx[g$train]))
+    g <- transpose(split_kfold(seq_along(idx), k = k, shuffle = shuffle))
+    tibble(
+      train = resample_lst(data,
+                           unname(map(g[["train"]],
+                                      function(i) flatten_int(idx[i])))),
+      test = resample_lst(data,
+                          unname(map(g[["test"]],
+                                     function(i) flatten_int(idx[i])))),
+      .id = id(k)
+    )
   }
 }
 
