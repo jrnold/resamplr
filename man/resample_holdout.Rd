@@ -2,35 +2,56 @@
 % Please edit documentation in R/holdout.R
 \name{resample_holdout}
 \alias{resample_holdout}
+\alias{resample_holdout.data.frame}
 \alias{resample_holdout.grouped_df}
+\alias{resample_holdout_n}
+\alias{resample_holdout_n.data.frame}
+\alias{resample_holdout_n.grouped_df}
 \title{Generate test/train resample objects}
 \usage{
 resample_holdout(data, ...)
 
-\method{resample_holdout}{grouped_df}(data, test = NULL, train = NULL, ...)
+\method{resample_holdout}{data.frame}(data, test = 0.3, train = 0.7,
+  shuffle = TRUE, ...)
+
+\method{resample_holdout}{grouped_df}(data, test = 0.3, train = 0.7,
+  shuffle = TRUE, stratify = FALSE, ...)
+
+resample_holdout_n(data, ...)
+
+\method{resample_holdout_n}{data.frame}(data, test = 1, train = NULL,
+  shuffle = TRUE, ...)
+
+\method{resample_holdout_n}{grouped_df}(data, test = 1, train = NULL,
+  shuffle = TRUE, stratify = FALSE, ...)
 }
 \arguments{
 \item{data}{A data table}
 
 \item{...}{Arguments passed to methods}
 
-\item{test, train}{Integer vectors with the indexes of the test
-and training samples.
-In \code{resample_holdout.data.frame}, \code{test} and \code{train}
-are the indexes of observations.
-In \code{resample_holdout.grouped_df}, \code{test} and \code{train}
-are group numbers.
-One of \code{test} or \code{train} must be non-\code{NULL}.}
+\item{test}{Fraction of observations (or groups) in the test set.
+If \code{NULL}, then it defaults to \code{1 - train}.}
+
+\item{train}{Fraction of observations (or groups) in the training set.
+If \code{NULL}, then it defaults to \code{1 - test}.
+and training samples.}
+
+\item{shuffle}{If \code{TRUE}, the observations are randomly assigned to the
+test and training sets. If \code{FALSE}, then the first \code{train} of
+the observations are assigned to the training set, and the next
+\code{test} of the observations are assigned to the test set.}
+
+\item{stratify}{If \code{TRUE}, then test-train splits are done within each
+code group, so that the final test and train subsets have approximately
+equal proportions of groups. If \code{FALSE}, the the test-train splits
+splits groups into the testing and training sets.}
 }
 \value{
 A named list of two \code{\link[modelr]{resample}} objects
   for the "test" and "train" sets.
 }
 \description{
-Generate test/train resample objects
+Generate test and train resample objects.
+\code{resample_holdout} splits the
 }
-\section{Methods (by class)}{
-\itemize{
-\item \code{grouped_df}: Resamples
-}}
-

@@ -1,13 +1,25 @@
 #' Generate test/train resample objects
 #'
-#' @param test,train Integer vectors with the indexes of the test
+#' Generate test and train resample objects.
+#' The function \code{resample_holdout} splits the set into test and training
+#' sets with specified fractions in each, while \code{resample_holdout_n} splits
+#' them using specified numbers of observations.
+#'
+#' @param test Fraction of observations (or groups) in the test set.
+#'   If \code{NULL}, then it defaults to \code{1 - train}.
+#' @param train Fraction of observations (or groups) in the training set.
+#'   If \code{NULL}, then it defaults to \code{1 - test}.
 #'   and training samples.
-#'   In \code{resample_holdout.data.frame}, \code{test} and \code{train}
-#'   are the indexes of observations.
-#'   In \code{resample_holdout.grouped_df}, \code{test} and \code{train}
-#'   are group numbers.
-#'   One of \code{test} or \code{train} must be non-\code{NULL}.
 #' @param data A data table
+#' @param shuffle If \code{TRUE}, the observations are randomly assigned to the
+#'   test and training sets. If \code{FALSE}, then the first \code{train} of
+#'   the observations are assigned to the training set, and the next
+#'   \code{test} of the observations are assigned to the test set.
+#'
+#' @param stratify If \code{TRUE}, then test-train splits are done within each
+#'   code group, so that the final test and train subsets have approximately
+#'   equal proportions of groups. If \code{FALSE}, the the test-train splits
+#'   splits groups into the testing and training sets.
 #' @param ... Arguments passed to methods
 #' @return A named list of two \code{\link[modelr]{resample}} objects
 #'   for the "test" and "train" sets.
@@ -16,18 +28,25 @@ resample_holdout <- function(data, ...) {
   UseMethod("resample_holdout")
 }
 
+#' @rdname resample_holdout
 #' @export
 resample_holdout.data.frame <- function(data, test = 0.3, train = 0.7,
                                         shuffle = TRUE, ...) {
   n <- nrow(data)
+  if (!is.null(test) && !is.null(train) && (test + train) < 0 &&
+      (test + train) > 1) {
+    stop("`test` and `train` must sum to a fraction between 0 and 1.",
+         call. = FALSE)
+  }
   test <- if (!is.null(test)) round(test * n)
   train <- if (!is.null(train)) round(train * n)
   resample_holdout_n(data, test = test, train = train, shuffle = shuffle)
 }
 
+#' @rdname resample_holdout
 #' @export
 resample_holdout.grouped_df <- function(data, test = 0.3, train = 0.7,
-                                        shuffle = TRUE, stratify = FALSE) {
+                                        shuffle = TRUE, stratify = FALSE, ...) {
   idx <- group_indices_lst(data)
   if (stratify) {
     idx <- map(idx, split_test_train_frac, test = test, train = train,
@@ -41,33 +60,34 @@ resample_holdout.grouped_df <- function(data, test = 0.3, train = 0.7,
   }
 }
 
+#' @rdname resample_holdout
 #' @export
 resample_holdout_n <- function(data, ...) {
   UseMethod("resample_holdout_n")
 }
 
+#' @rdname resample_holdout
 #' @export
-resample_holdout_n.data.frame <- function(data, test = NULL, train = NULL,
-                                          shuffle = TRUE) {
+resample_holdout_n.data.frame <- function(data, test = 1, train = NULL,
+                                          shuffle = TRUE, ...) {
   purrr::invoke(test_train,
-                split_test_train(seq_len(data), test = test, train = train,
-                                 shuffle = shuffle),
+                split_test_train_n(seq_len(data), test = test,
+                                   train = train, shuffle = shuffle),
                 data = data)
 }
 
-#' @describeIn resample_holdout Resamples
-#' @importFrom assertthat is.number
+#' @rdname resample_holdout
 #' @export
-resample_holdout_n.grouped_df <- function(data, test = NULL, train = NULL,
-                                        shuffle = TRUE, stratify = FALSE) {
+resample_holdout_n.grouped_df <- function(data, test = 1, train = NULL,
+                                        shuffle = TRUE, stratify = FALSE, ...) {
   idx <- group_indices_lst(data)
   if (stratify) {
-    idx <- map(idx, split_test_train, test = test, train = train,
+    idx <- map(idx, split_test_train_n, test = test, train = train,
                shuffle = shuffle)
     test_train(data, test = flatten_int(map(idx, "test")),
                train = flatten_int(map(idx, "train")))
   } else {
-    g <- split_test_train(seq_along(idx), test, train, shuffle = shuffle)
+    g <- split_test_train_n(seq_along(idx), test, train, shuffle = shuffle)
     test_train(data, test = flatten_int(idx[g$test]),
                train = flatten_int(idx[g$train]))
   }
@@ -102,26 +122,4 @@ split_test_train_frac <- function(idx, test = NULL, train = NULL,
   split_test_train_n(idx, test = test, train = train, shuffle = shuffle)
 }
 
-#' Generate cross-validated test-training pairs
-#'
-#' @export
-crossv_mc <- function(data, n, ...) {
-  UseMethod("crossv_mc")
-}
-
-crossv_mc_ <- function(data, n, ...) {
-  df <- as_tibble(transpose(rerun(n, resample_holdout(data, ...))))
-  df[[".id"]] <- id(nrow(df))
-  df
-}
-
-#' @export
-crossv_mc.data.frame <- function(data, n, test = 0.3, ...) {
-  crossv_mc_(data, n, test = test)
-}
-
-#' @export
-crossv_mc.grouped_df <- function(data, n, test = 0.3, stratify = FALSE, ...) {
-  crossv_mc_(data, n, test = test, stratify = stratify)
-}
 
