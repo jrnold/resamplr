@@ -13,16 +13,3 @@ group_indices_lst <- function(data) {
   g <- dplyr::group_indices(data)
   split(seq_along(g), g)
 }
-
-# Return either row numbers or group numbers
-data_idx <- function(data) {
-  UseMethod("data_idx")
-}
-
-data_idx.data.frame <- function(data) {
-  seq_len(nrow(data))
-}
-
-data_idx.grouped_df <- function(data) {
-  seq_len(dplyr::n_groups(data))
-}
