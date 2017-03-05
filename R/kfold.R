@@ -24,9 +24,12 @@ crossv_kfold <- function(data, k, ...) {
 crossv_kfold.data.frame <- function(data, k = 5, shuffle = TRUE, ...) {
   assert_that(is.number(k) && k >= 0)
   assert_that(is.flag(shuffle))
-  df <- as_tibble(transpose(split_kfold(seq_len(nrow(data)), shuffle = shuffle)))
-  df[[".id"]] <- id(k)
-  df
+  folds <- split_kfold(seq_len(nrow(data)), k, shuffle = shuffle)
+  tibble(
+    train = resample_lst(data, unname(map(folds, "train"))),
+    test = resample_lst(data, unname(map(folds, "test"))),
+    .id = id(k)
+  )
 }
 
 #' @rdname crossv_kfold
@@ -60,6 +63,6 @@ split_n <- function(idx, k, shuffle = TRUE) {
 }
 
 split_kfold <- function(idx, k, shuffle = shuffle) {
-  f <- function(i) list(train = setdiff(i, idx), test = i)
+  f <- function(i) list(train = setdiff(idx, i), test = i)
   map(split_n(idx, k, shuffle = shuffle), f)
 }
