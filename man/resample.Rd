@@ -11,6 +11,10 @@ resample(data, idx)
 
 \item{idx}{An integer vector}
 }
+\value{
+A \code{resample} object, a list with two elements: \code{data}
+  and \code{idx}.
+}
 \description{
 This is a slightly modified version of \code{\link[modelr]{resample}}.
 It has more tests for the validity of the indexes, but also coerces

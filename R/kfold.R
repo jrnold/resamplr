@@ -22,6 +22,8 @@ crossv_kfold <- function(data, k, ...) {
 #' @rdname crossv_kfold
 #' @export
 crossv_kfold.data.frame <- function(data, k = 5, shuffle = TRUE, ...) {
+  assert_that(is.number(k) && k >= 0)
+  assert_that(is.flag(shuffle))
   df <- as_tibble(transpose(split_kfold(seq_len(nrow(data)), shuffle = shuffle)))
   df[[".id"]] <- id(k)
   df
@@ -31,6 +33,9 @@ crossv_kfold.data.frame <- function(data, k = 5, shuffle = TRUE, ...) {
 #' @export
 crossv_kfold.grouped_df <- function(data, k = 5, shuffle = TRUE,
                                     stratify = FALSE, ...) {
+  assert_that(is.number(k) && k >= 0)
+  assert_that(is.flag(shuffle))
+  assert_that(is.flag(stratify))
   idx <- group_indices_lst(data)
   if (stratify) {
     g <- transpose(map(idx, split_kfold, k = k, shuffle = shuffle))

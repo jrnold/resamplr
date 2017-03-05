@@ -11,31 +11,25 @@
 \usage{
 resample_holdout(data, ...)
 
-\method{resample_holdout}{data.frame}(data, test = 0.3, train = 0.7,
-  shuffle = TRUE, ...)
+\method{resample_holdout}{data.frame}(data, test = 0.3, shuffle = TRUE, ...)
 
-\method{resample_holdout}{grouped_df}(data, test = 0.3, train = 0.7,
-  shuffle = TRUE, stratify = FALSE, ...)
+\method{resample_holdout}{grouped_df}(data, test = 0.3, shuffle = TRUE,
+  stratify = FALSE, ...)
 
 resample_holdout_n(data, ...)
 
-\method{resample_holdout_n}{data.frame}(data, test = 1, train = NULL,
-  shuffle = TRUE, ...)
+\method{resample_holdout_n}{data.frame}(data, test = 1L, shuffle = TRUE,
+  ...)
 
-\method{resample_holdout_n}{grouped_df}(data, test = 1, train = NULL,
-  shuffle = TRUE, stratify = FALSE, ...)
+\method{resample_holdout_n}{grouped_df}(data, test = 1L, shuffle = TRUE,
+  stratify = FALSE, ...)
 }
 \arguments{
 \item{data}{A data table}
 
 \item{...}{Arguments passed to methods}
 
-\item{test}{Fraction of observations (or groups) in the test set.
-If \code{NULL}, then it defaults to \code{1 - train}.}
-
-\item{train}{Fraction of observations (or groups) in the training set.
-If \code{NULL}, then it defaults to \code{1 - test}.
-and training samples.}
+\item{test}{Fraction of observations (or groups) in the test set.}
 
 \item{shuffle}{If \code{TRUE}, the observations are randomly assigned to the
 test and training sets. If \code{FALSE}, then the first \code{train} of
@@ -53,5 +47,7 @@ A named list of two \code{\link[modelr]{resample}} objects
 }
 \description{
 Generate test and train resample objects.
-\code{resample_holdout} splits the
+The function \code{resample_holdout} splits the set into test and training
+sets with specified fractions in each, while \code{resample_holdout_n} splits
+them using specified numbers of observations.
 }

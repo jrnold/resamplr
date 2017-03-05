@@ -1,55 +1,69 @@
 context("resmple_holdout")
 
-test_that("resample_holdout.data.frame throws error with two NULL args", {
-  expect_error(resample_holdout(tibble(a = 1:10)))
-  expect_error(resample_holdout(tibble(a = 1:10), test = NULL, train = NULL))
-})
+{
+  dat <- tibble(a = c(rep("a", 5), rep("b", 3), rep("c", 2)))
+  dat_grouped <- group_by(dat, a)
 
-test_that("resample_holdout.data.frame works with non-null test", {
-  dat <- tibble(a = 1:3)
-  expect_equal(resample_holdout(dat, test = 1L),
-               list(train = resample(dat, 2:3), test = resample(dat, 1L)))
-})
+  expect_holdout <- function(x) {
+    expect_is(x, "list")
+    expect_named(x, c("train", "test"))
+    expect_identical(map_chr(x, class),
+                     c(train = "resample", test = "resample"))
+  }
 
-test_that("resample_holdout.data.frame works with non-null train", {
-  dat <- tibble(a = 1:3)
-  expect_equal(resample_holdout(dat, train = 2L),
-               list(train = resample(dat, 2L),
-                    test = resample(dat, c(1L, 3L))))
-})
+  test_that("resample_holdout.data.frame works as expected", {
+    x <- resample_holdout(dat)
+    expect_holdout(x)
+    expect_identical(map(x, dim),
+                     list(train = c(7L, 1L), test = c(3L, 1L)))
+  })
 
-test_that("resample_holdout.data.frame works with non-null train and test", {
-  dat <- tibble(a = 1:3)
-  expect_equal(resample_holdout(dat, train = 2L, test = 3L),
-               list(train = resample(dat, 2L),
-                    test = resample(dat, 3L)))
-})
+  test_that("resample_holdout.data.frame works with test arg", {
+    x <- resample_holdout(dat, test = 0.1)
+    expect_holdout(x)
+    expect_identical(map(x, dim),
+                     list(train = c(9L, 1L), test = c(1L, 1L)))
+  })
 
-# grouped_df
+  test_that("resample_holdout.grouped_df works as expected", {
+    x <- resample_holdout(dat_grouped)
+    expect_holdout(x)
+  })
 
-test_that("resample_holdout.grouped_df works with non-null train and test", {
-  dat <- group_by(tibble(a = c(1, 1, 3, 3, 10)), a)
-  expect_equal(resample_holdout(dat, train = 2L, test = 3L),
-               list(train = resample(dat, 3:4),
-                    test = resample(dat, 5L)))
-})
+  test_that("resample_holdout.grouped_df works with stratify", {
+    x <- resample_holdout(dat_grouped, stratify = TRUE)
+    expect_holdout(x)
+  })
 
-test_that("resample_holdout.grouped_df works with non-null train", {
-  dat <- group_by(tibble(a = c(1, 1, 3, 3, 10)), a)
-  expect_equal(resample_holdout(dat, train = 2L),
-               list(train = resample(dat, 3:4),
-                    test = resample(dat, c(1:2, 5L))))
-})
+  test_that("resample_holdout_n.data.frame works as expected", {
+    x <- resample_holdout_n(dat)
+    expect_holdout(x)
+    expect_identical(map(x, dim),
+                     list(train = c(9L, 1L), test = c(1L, 1L)))
+  })
 
-test_that("resample_holdout.grouped_df works with non-null test", {
-  dat <- group_by(tibble(a = c(1, 1, 3, 3, 10)), a)
-  expect_equal(resample_holdout(dat, test = 2L),
-               list(train = resample(dat, c(1:2, 5L)),
-                    test = resample(dat, 3:4)))
-})
+  test_that("resample_holdout_n.data.frame works with test = NULL", {
+    x <- resample_holdout_n(dat, test = 2L)
+    expect_holdout(x)
+    expect_identical(map(x, dim),
+                     list(train = c(8L, 1L), test = c(2L, 1L)))
+  })
 
-test_that("resample_holdout.grouped_df throws error with NULL train and test", {
-  dat <- group_by(tibble(a = c(1, 1, 3, 3, 10)), a)
-  expect_error(resample_holdout(dat))
-  expect_error(resample_holdout(dat, test = NULL, train = NULL))
-})
+  # ---- resample_holdout_n
+
+  test_that("resample_holdout_n.grouped_df works as expected", {
+    x <- resample_holdout_n(dat_grouped)
+    expect_holdout(x)
+  })
+
+  test_that("resample_holdout_n.grouped_df works with stratify = TRUE", {
+    x <- resample_holdout_n(dat_grouped, test = 1L, stratify = TRUE)
+    expect_holdout(x)
+  })
+
+  test_that("resample_holdout_n.grouped_df works as expected", {
+    x <- resample_holdout_n(dat_grouped, test = 2L, stratify = TRUE)
+    expect_holdout(x)
+  })
+
+}

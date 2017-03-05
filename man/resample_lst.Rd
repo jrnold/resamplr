@@ -11,6 +11,9 @@ resample_lst(data, idx)
 
 \item{idx}{A list of integer vectors of indexes.}
 }
+\value{
+A \code{list} of \code{\link{resample}} objects.
+}
 \description{
 Create a list of resample objects
 }

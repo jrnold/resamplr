@@ -1,6 +1,7 @@
 #' @importFrom modelr resample
 #' @importFrom tibble tibble as_tibble
-#' @importFrom purrr map flatten_int transpose
+#' @importFrom purrr map flatten_int transpose %||%
+#' @importFrom assertthat assert_that is.number is.flag
 NULL
 
 id <- function(n) {
@@ -9,8 +10,8 @@ id <- function(n) {
 }
 
 group_indices_lst <- function(data) {
-  g <- seq_len(dplyr::n_groups(data))
-  split(dplyr::group_indices(data), g)
+  g <- dplyr::group_indices(data)
+  split(seq_along(g), g)
 }
 
 # Return either row numbers or group numbers

@@ -6,7 +6,7 @@
 #'
 #' @param data A data frame
 #' @param idx An integer vector
-#' @returns A \code{resample} object, a list with two elements: \code{data}
+#' @return A \code{resample} object, a list with two elements: \code{data}
 #'   and \code{idx}.
 #' @export
 resample <- function(data, idx) {
@@ -17,11 +17,12 @@ resample <- function(data, idx) {
     idx <- as.integer(idx)
   }
   if (!is.integer(idx)) {
-    stop("`idx` must be an integer vector.")
+    stop("`idx` must be a numeric vector.", call. = FALSE)
   } else if (any(is.na(idx))) {
-    stop("All elements of `idx` must be non-missing integers.")
+    stop("All elements of `idx` must be non-missing.", call. = FALSE)
   } else if (any(idx < 1) || any(idx > nrow(data))) {
-    stop("All elements of `idx` must be between 1 and `nrow(data)`.")
+    stop("All elements of `idx` must be between 1 and `nrow(data)`.",
+         call. = FALSE)
   }
   structure(list(data = data, idx = idx), class = "resample")
 }
@@ -30,7 +31,7 @@ resample <- function(data, idx) {
 #'
 #' @param data A data frame
 #' @param idx A list of integer vectors of indexes.
-#' @returns A \code{list} of \code{\link{resample}} objects.
+#' @return A \code{list} of \code{\link{resample}} objects.
 #' @export
 resample_lst <- function(data, idx) {
   map(idx, resample, data = data)
