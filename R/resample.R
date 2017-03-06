@@ -64,4 +64,3 @@ c.resample <- function(...) {
   resample(objs[[1]][["data"]],
            flatten_int(map(objs, as.integer)))
 }
-
