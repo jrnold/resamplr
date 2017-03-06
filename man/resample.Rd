@@ -20,3 +20,12 @@ This is a slightly modified version of \code{\link[modelr]{resample}}.
 It has more tests for the validity of the indexes, but also coerces
 numeric \code{idx} to integers.
 }
+\examples{
+# from modler::resample
+resample(mtcars, 1:10)
+
+b <- resample_bootstrap(mtcars)
+b
+as.integer(b)
+as.data.frame(b)
+}

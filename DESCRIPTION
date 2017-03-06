@@ -2,11 +2,13 @@ Package: resamplr
 Type: Package
 Title: Resampling methods
 Version: 0.0.1
-Authors@R: person("Jeffrey", "Arnold", role = c("aut", "cre"),
-                  email = "jeffrey.arnold@gmail.com")
+Authors@R: c(person("Jeffrey", "Arnold", role = c("aut", "cre"),
+                    email = "jeffrey.arnold@gmail.com"),
+             person("Rstudio", role = "cph", 
+                    comment = "Some code from the modelr package"))
 Description: Resampling methods (bootstrap, cross-validation, rolling subsets,
     permutations) using the resampler class in 'modelr'.
-License: MIT + file LICENSE
+License: GPL-3
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 6.0.1
