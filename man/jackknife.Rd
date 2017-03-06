@@ -3,14 +3,14 @@
 \name{jackknife}
 \alias{jackknife}
 \alias{jackknife.data.frame}
-\alias{jackknife.data.frame}
+\alias{jackknife.grouped_df}
 \title{Generate jackknife replicates}
 \usage{
 jackknife(data, ...)
 
 \method{jackknife}{data.frame}(data, ...)
 
-\method{jackknife}{data.frame}(data, ...)
+\method{jackknife}{grouped_df}(data, ...)
 }
 \arguments{
 \item{data}{A data frame}
