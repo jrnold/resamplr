@@ -52,6 +52,7 @@ resample_bootstrap.grouped_df <- function(data, stratify = FALSE, groups = TRUE,
 #' \item{id}{The replicate identifier}
 #' }
 #' @export
+#' @example inst/examples/bootstrap.R
 bootstrap <- function(data, n = 1, ...) {
   assert_that(is.number(n) && n > 0)
   n <- as.integer(n)

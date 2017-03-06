@@ -10,8 +10,8 @@ resample_bootstrap(data, ...)
 
 \method{resample_bootstrap}{data.frame}(data, ...)
 
-\method{resample_bootstrap}{grouped_df}(data, stratify = TRUE,
-  groups = FALSE, ...)
+\method{resample_bootstrap}{grouped_df}(data, stratify = FALSE,
+  groups = TRUE, ...)
 }
 \arguments{
 \item{data}{A data frame}

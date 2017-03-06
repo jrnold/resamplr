@@ -17,4 +17,6 @@ Imports:
   purrr,
   stringr,
   tibble
-Suggests: testthat
+Suggests: 
+  testthat,
+  broom

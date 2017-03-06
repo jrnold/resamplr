@@ -9,6 +9,7 @@
 #' @return A \code{resample} object, a list with two elements: \code{data}
 #'   and \code{idx}.
 #' @export
+#' @example inst/examples/resample.R
 resample <- function(data, idx) {
   if (!is.data.frame(data)) {
     stop("`data` must be a data frame.", call. = FALSE)
@@ -63,3 +64,4 @@ c.resample <- function(...) {
   resample(objs[[1]][["data"]],
            flatten_int(map(objs, as.integer)))
 }
+

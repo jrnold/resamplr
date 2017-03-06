@@ -15,6 +15,7 @@
 #' \item{.id}{Character vector. ID of the fold.}
 #' }
 #' @export
+#' @example inst/examples/crossv_kfold.R
 crossv_mc <- function(data, n, ...) {
   UseMethod("crossv_mc")
 }
