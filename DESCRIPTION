@@ -4,8 +4,8 @@ Title: Resampling methods
 Version: 0.0.1
 Authors@R: c(person("Jeffrey", "Arnold", role = c("aut", "cre"),
                     email = "jeffrey.arnold@gmail.com"),
-             person("Rstudio", role = "cph", 
-                    comment = "Some code from the modelr package"))
+             person("Hadley", "Wickham", role = "ctb", 
+                    comment = "Some code extracted from the modelr package"))
 Description: Resampling methods (bootstrap, cross-validation, rolling subsets,
     permutations) using the resampler class in 'modelr'.
 License: GPL-3
