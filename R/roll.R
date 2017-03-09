@@ -32,13 +32,23 @@ roll <- function(data, ...) {
 
 #' @rdname roll
 #' @export
-roll.data.frame <- function(data, width, by = 1L,
+roll.data.frame <- function(data, width = 1L, by = 1L, from = 1L, to = nrow(data),
                             partial = FALSE,
-                            align = c("center", "left", "right"), ...) {
+                            align = c("center", "left", "right"),
+                            offsets = NULL,
+                            ...) {
+  assert_that(is.flag(partial) || (is.number(partial) && partial >= 0))
+  assert_that(is.number(width))
+  assert_that(is.number(by))
+  from <- max(from %||% 1L, 1L)
+  assert_that(is.number(from))
+  to <- min(to %||% nrow(data), nrow(data))
+  assert_that(is.number(to))
   align <- match.arg(align)
-  posn <- seq(from = 1L, to = nrow(data), by = by)
+  posn <- seq(from = from, to = to, by = by)
   windows <- compact(purrr::set_names(map(posn, data = data, width = width,
-                                           partial = partial, align = align),
+                                          partial = partial, align = align,
+                                          offsets = offsets),
                                        posn))
   df <- tibble(
     window = unname(map(windows, resample, data = data)),
@@ -51,14 +61,19 @@ roll.data.frame <- function(data, width, by = 1L,
 
 #' @rdname roll
 #' @export
-roll.grouped_df <- function(data, width, by = 1L,
+roll.grouped_df <- function(data, width = 1L,
+                            by = 1L, from = 1L, to = dplyr::n_groups(data),
                             partial = FALSE,
-                            align = c("center", "left", "right"), ...) {
+                            align = c("center", "left", "right"),
+                            offsets = NULL,
+                            ...) {
   align <- match.arg(align)
   posn <- seq(from = 1L, to = dplyr::n_groups(data), by = by)
   grp_windows <- compact(purrr::set_names(get_windows(posn, width = width,
-                                                       partial = partial,
-                                                       align = align), posn))
+                                                      partial = partial,
+                                                      align = align,
+                                                      offsets = offsets),
+                                          posn))
   idx <- group_indices_lst(data)
   windows <- map(grp_windows, function(w) flatten_int(idx[w]))
   df <- tibble(
@@ -70,25 +85,20 @@ roll.grouped_df <- function(data, width, by = 1L,
   df
 }
 
-get_windows <- function(idx, width, partial, align) {
-  n <- length(idx)
-  windows <- map(idx, get_window_idx, n = n, width = width, partial = partial,
-                 align = align)
-  names(windows) <- idx
-  compact(windows)
-}
 
-get_window_idx <- function(i, width, n, partial, align) {
-  offset <- as.integer(switch(
-    align,
-    right = seq(to = 0L, length.out = width),
-    center = seq(to = floor(width / 2), length.out = width),
-    left = seq(from = 0L, length.out = width)
+get_window_idx <- function(i,
+                           width = NULL, n = Inf, partial = TRUE,
+                           align = "center", offsets = NULL) {
+  offsets <- as.integer(offsets) %||% as.integer(switch(
+      align,
+      right = seq(to = 0L, length.out = width),
+      center = seq(to = floor(width / 2), length.out = width),
+      left = seq(from = 0L, length.out = width)
   ))
-  idx <- i + offset
+  idx <- i + offsets
   idx <- if (partial) {
     idx <- idx[idx >= 1L & idx <= n]
-    if (length(idx)) as.integer(idx)
+    if (length(idx) >= partial) as.integer(idx)
     else NULL
   } else {
     if (any(idx < 1L | idx > n)) NULL
