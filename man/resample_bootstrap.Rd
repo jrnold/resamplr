@@ -8,19 +8,36 @@
 \usage{
 resample_bootstrap(data, ...)
 
-\method{resample_bootstrap}{data.frame}(data, ...)
+\method{resample_bootstrap}{data.frame}(data, weights = NULL, bayes = FALSE,
+  ...)
 
 \method{resample_bootstrap}{grouped_df}(data, stratify = FALSE,
-  groups = TRUE, ...)
+  groups = TRUE, weights = NULL, weight_groups = TRUE,
+  weight_within = TRUE, bayes = FALSE, ...)
 }
 \arguments{
 \item{data}{A data frame}
 
 \item{...}{Passed to methods}
 
+\item{weights}{Observation level weights. This must be the name of a column
+in \code{data}.}
+
+\item{bayes}{If \code{TRUE}, a Bayesian bootstrap is used.}
+
 \item{stratify}{Resample within groups (stratified bootstrap)}
 
 \item{groups}{Resample groups (clustered bootstrap)}
+
+\item{weight_groups}{If \code{TRUE} and \code{groups = TRUE},
+then sample groups using group-level weights.
+If \code{weights} is \code{NULL}, then weight groups by the number
+of observations in each. If \code{weights}, is not-\code{NULL}, then
+use the sum of the observation level weights in each group as the
+group-level weight.}
+
+\item{weight_within}{If \code{TRUE} and \code{stratify = TRUE}, then
+use observation level weights to sample observations within each group.}
 }
 \value{
 A \code{\link[modelr]{resample}} object.
