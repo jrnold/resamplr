@@ -15,7 +15,7 @@ holdout_frac(x, ...)
 
 \method{holdout_frac}{data.frame}(x, p = 0.3, k = 1, shuffle = TRUE, ...)
 
-\method{holdout_frac}{grouped_df}(x, p = p, k = k, shuffle = shuffle,
+\method{holdout_frac}{grouped_df}(x, p = p, k = k, shuffle = TRUE,
   stratify = FALSE, ...)
 
 \method{holdout_frac}{default}(x, p = 0.3, k = 1L, shuffle = TRUE, ...)
@@ -58,26 +58,4 @@ A data frame
 set and \code{1 - p} is in the training set. Likewise, \code{holdout_n}
 splits the data so that \code{n} elements are in the test set and the
 remainder are in the training set.
-}
-\examples{
-# Example originally from modelr::crossv_mc
-library("purrr")
-library("dplyr")
-
-# holdout three obs, repeat 10 times
-cv1 <- holdout_n(mtcars, n = 3, k = 10)
-models <- map(cv1$train, ~ lm(mpg ~ wt, data = .))
-summary(map2_dbl(models, cv1$test, modelr::rmse))
-
-# holdout two groups at a time in the test set
-# repeat four times.
-cv2 <- holdout_n(group_by(mtcars, cyl), n = 2, k = 4)
-models <- map(cv2$train, ~ lm(mpg ~ wt, data = .))
-summary(map2_dbl(models, cv2$test, modelr::rmse))
-
-# stratified holdout
-# holdout 1 obs each from each group. repeat 5 times.
-cv2 <- holdout_n(group_by(mtcars, am), n = 1, k = 5, stratified = TRUE)
-models <- map(cv2$train, ~ lm(mpg ~ wt, data = .))
-summary(map2_dbl(models, cv2$test, modelr::rmse))
 }

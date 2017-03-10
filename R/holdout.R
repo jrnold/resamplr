@@ -39,7 +39,7 @@ holdout_frac.data.frame <- function(x, p = 0.3, k = 1, shuffle = TRUE, ...) {
 #' @rdname holdout_frac
 #' @export
 holdout_frac.grouped_df <- function(x, p = p, k = k,
-                                    shuffle = shuffle,
+                                    shuffle = TRUE,
                                     stratify = FALSE,
                                     ...) {
   assert_that(is.number(p) && p >= 0 && p <= 1)
@@ -61,7 +61,7 @@ holdout_frac.grouped_df <- function(x, p = p, k = k,
     }
     x <- purrr::map_df(seq_len(k), f)
   } else {
-    n <- round(p * nrow(x))
+    n <- round(p * length(idx))
     res <- holdout_n(x, n = n, k = k, stratify = FALSE, ...)
   }
   to_crossv_df(res, x)
