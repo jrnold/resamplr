@@ -8,11 +8,13 @@
 \usage{
 roll(data, ...)
 
-\method{roll}{data.frame}(data, width, by = 1L, partial = FALSE,
-  align = c("center", "left", "right"), ...)
+\method{roll}{data.frame}(data, width = 1L, by = 1L, from = 1L,
+  to = nrow(data), partial = FALSE, align = c("center", "left", "right"),
+  offsets = NULL, ...)
 
-\method{roll}{grouped_df}(data, width, by = 1L, partial = FALSE,
-  align = c("center", "left", "right"), ...)
+\method{roll}{grouped_df}(data, width = 1L, by = 1L, from = 1L,
+  to = dplyr::n_groups(data), partial = FALSE, align = c("center", "left",
+  "right"), offsets = NULL, ...)
 }
 \arguments{
 \item{data}{A data frame}

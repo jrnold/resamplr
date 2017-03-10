@@ -4,7 +4,7 @@
 \alias{resample}
 \title{Create a lazy resample object}
 \usage{
-resample(data, idx)
+resample(data, idx, check = FALSE)
 }
 \arguments{
 \item{data}{A data frame}

@@ -80,11 +80,16 @@ roll.grouped_df <- function(data, width = 1L,
     window = unname(map(windows, resample, data = data)),
     .id = names(windows),
     .width = as.integer(width),
-    .align = str_to_upper(str_sub(align, 1, 1))
+    .align = str_to_upper(str_sub(align, 1L, 1L))
   )
   df
 }
 
+get_windows <- function(idx, width = NULL, n = Inf, partial = TRUE,
+                        align = "center", offsets = NULL) {
+  map_df(idx, get_window_idx, width = width, n = n, partial = partial,
+         align = align, offsets = offsets)
+}
 
 get_window_idx <- function(i,
                            width = NULL, n = Inf, partial = TRUE,
@@ -96,12 +101,19 @@ get_window_idx <- function(i,
       left = seq(from = 0L, length.out = width)
   ))
   idx <- i + offsets
-  idx <- if (partial) {
-    idx <- idx[idx >= 1L & idx <= n]
-    if (length(idx) >= partial) as.integer(idx)
-    else NULL
-  } else {
-    if (any(idx < 1L | idx > n)) NULL
-    else as.integer(idx)
+  inside <- (idx >= 1L & idx <= n)
+  if (partial) {
+    if (!any(inside)) {
+      return(NULL)
+    }
+    idx <- idx[inside]
+    offsets <- offsets[inside]
+  } else if (!all(inside)) {
+    return(NULL)
   }
+  tibble(window = list(as.integer(idx)),
+         .offsets = list(as.integer(offsets)),
+         .align = str_sub(align, 1, 1),
+         .width = width,
+         .id = i)
 }

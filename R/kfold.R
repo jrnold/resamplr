@@ -16,67 +16,62 @@
 #' }
 #' @export
 #' @example inst/examples/crossv_kfold.R
-crossv_kfold <- function(data, k, ...) {
+crossv_kfold <- function(x, k, ...) {
   UseMethod("crossv_kfold")
 }
 
 #' @rdname crossv_kfold
 #' @export
-crossv_kfold.data.frame <- function(data, k = 5, shuffle = TRUE, ...) {
-  assert_that(is.number(k) && k >= 0)
+crossv_kfold.data.frame <- function(x, k = 5L, shuffle = TRUE, ...) {
+  assert_that(is.number(k) && k >= 1)
   assert_that(is.flag(shuffle))
-  folds <- split_kfold(seq_len(nrow(data)), k, shuffle = shuffle)
-  tibble(
-    train = resample_lst(data, unname(map(folds, "train"))),
-    test = resample_lst(data, unname(map(folds, "test"))),
-    .id = id(k)
-  )
+  idx <- seq_len(nrow(x))
+  to_crossv_df(crossv_kfold(idx, k, shuffle = shuffle), x)
 }
 
 #' @rdname crossv_kfold
+#' @importFrom dplyr summarise_ group_by_ mutate_
+#' @importFrom purrr map_df
 #' @export
-crossv_kfold.grouped_df <- function(data, k = 5, shuffle = TRUE,
+crossv_kfold.grouped_df <- function(x, k = 5L, shuffle = TRUE,
                                     stratify = FALSE, ...) {
   assert_that(is.number(k) && k >= 0)
   assert_that(is.flag(shuffle))
   assert_that(is.flag(stratify))
-  idx <- group_indices_lst(data)
+  idx <- group_indices_lst(x)
   if (stratify) {
-    f <- function(j) {
-      .f <- function(i) flatten_int(map(i, j))
-      unname(resample_lst(data, map(folds, .f)))
-    }
-    folds <- transpose(map(idx, split_kfold, k = k, shuffle = shuffle))
-    tibble(
-      train = f("train"),
-      test = f("test"),
-      .id = id(k)
-    )
+    f <- function(i) crossv_kfold(i, k = k, shuffle = shuffle)
+    ret <- summarise_(group_by_(map_df(idx, f), ".id"),
+                      train = ~ flatten_int(train),
+                      test = ~ flatten_int(test))
   } else {
-    g <- transpose(split_kfold(seq_along(idx), k = k, shuffle = shuffle))
-    tibble(
-      train = resample_lst(data,
-                           unname(map(g[["train"]],
-                                      function(i) flatten_int(idx[i])))),
-      test = resample_lst(data,
-                          unname(map(g[["test"]],
-                                     function(i) flatten_int(idx[i])))),
-      .id = id(k)
-    )
+    ret <- mutate_(crossv_kfold(idx, k, shuffle = shuffle),
+                   train = ~ flatten_int(train),
+                   test = ~ flatten_int(test))
+    ret
   }
+  to_crossv_df(ret)
 }
 
-split_n <- function(idx, k, shuffle = TRUE) {
+#' @export crossv_kfold
+#' @rdname
+crossv_kfold.default <- function(x, k = 5L, shuffle = shuffle) {
+  f <- function(i) {
+    tibble(train = list(setdiff(x, i)), test = list(i))
+  }
+  ret <- purrr::map_df(partition(x, k, shuffle = shuffle), f)
+  ret[[".id"]] <- id(nrow(ret))
+  ret
+}
+
+partition <- function(x, k, shuffle = TRUE) {
   if (shuffle) {
-    n <- length(idx)
-    folds <- sample(rep(seq_len(k), length.out = n), n, replace = FALSE)
+    n <- length(x)
+    folds <- sample(rep(seq_len(k), length.out = n), size = n, replace = FALSE)
   } else {
-    folds <- cut(idx, k, include.lowest = TRUE, labels = FALSE)
+    folds <- cut(x, k, include.lowest = TRUE, labels = FALSE)
   }
-  split(idx, folds)
+  split(x, folds)
 }
 
-split_kfold <- function(idx, k, shuffle = shuffle) {
-  f <- function(i) list(train = setdiff(idx, i), test = i)
-  map(split_n(idx, k, shuffle = shuffle), f)
-}
+

@@ -1,13 +1,28 @@
-crossv_roll <- function(data,
-                        test_len = NULL,
-                        train_len = NULL,
-                        test_min = 1L,
-                        train_min = 1L,
-                        gap = 1L,
-                        from = 1L,
-                        to = nrow(data),
-                        by = 1L) {
-  assert_that(is.data.frame(data))
+
+crossv_roll.data.frame <- function(x,
+                                    test_len = NULL,
+                                    train_len = NULL,
+                                    test_min = 1L,
+                                    train_min = 1L,
+                                    gap = 1L,
+                                    from = 1L,
+                                    to = length(x),
+                                    by = 1L) {
+  purrr::map_df(seq_len(nrow(x)),
+                crossv_roll_, n = length(x),
+                test_len = test_len, train_len = train_len,
+                test_min = test_min, train_min = train_min, gap = gap)
+}
+
+crossv_roll.default <- function(x,
+                                test_len = NULL,
+                                train_len = NULL,
+                                test_min = 1L,
+                                train_min = 1L,
+                                gap = 1L,
+                                from = 1L,
+                                to = length(x),
+                                by = 1L) {
   assert_that(is.null(train_len) || (is.number(train_len) && test_len >= 1))
   assert_that(is.null(test_len) || (is.number(test_len) && test_len >= 1))
   assert_that(is.number(test_min) && test_min >= 1)
@@ -19,17 +34,18 @@ crossv_roll <- function(data,
   assert_that(is.number(to) && to >= 1)
   assert_that(is.number(by) && by >= 1)
   idx <- seq(from = from, to = to, by = by)
-  map(idx, crossv_roll_, n = nrow(data),
-      test_len = test_len, train_len = train_len,
-      test_min = test_min, train_min = train_min, gap = gap)
+  purrr::map_df(idx,
+                crossv_roll_, n = length(x),
+                test_len = test_len, train_len = train_len,
+                test_min = test_min, train_min = train_min, gap = gap)
 }
 
 crossv_roll_ <- function(test_start, n,
-                          test_len = NULL,
-                          train_len = NULL,
-                          test_min = 1L,
-                          train_min = 1L,
-                          gap = 1L) {
+                         test_len = NULL,
+                         train_len = NULL,
+                         test_min = 1L,
+                         train_min = 1L,
+                         gap = 1L) {
   # end of test
   test_end <- if (is.null(test_len)) {
     n
@@ -48,6 +64,7 @@ crossv_roll_ <- function(test_start, n,
   if ((train_start - train_end + 1L) < train_min) {
     return(NULL)
   }
-  list(train = seq(from = train_start, to = train_end),
-      test = seq(from = test_start, to = test_end))
+  tibble(train = seq(from = train_start, to = train_end),
+         test = seq(from = test_start, to = test_end),
+         .id = test_start)
 }

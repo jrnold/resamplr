@@ -10,20 +10,14 @@
 #'   and \code{idx}.
 #' @export
 #' @example inst/examples/resample.R
-resample <- function(data, idx) {
-  if (!is.data.frame(data)) {
-    stop("`data` must be a data frame.", call. = FALSE)
-  }
-  if (is.numeric(idx)) {
+resample <- function(data, idx, check = FALSE) {
+  assert_that(is.flag(check))
+  if (check) {
+    assert_that(is.data.frame(data))
+    assert_that(is.numeric(idx))
     idx <- as.integer(idx)
-  }
-  if (!is.integer(idx)) {
-    stop("`idx` must be a numeric vector.", call. = FALSE)
-  } else if (any(is.na(idx))) {
-    stop("All elements of `idx` must be non-missing.", call. = FALSE)
-  } else if (any(idx < 1) || any(idx > nrow(data))) {
-    stop("All elements of `idx` must be between 1 and `nrow(data)`.",
-         call. = FALSE)
+    assert_that(all(!is.na(idx)))
+    assert_that(all(idx >= 1) && all(idx < nrow(data)))
   }
   structure(list(data = data, idx = idx), class = "resample")
 }

@@ -5,10 +5,18 @@
 NULL
 
 id <- function(n) {
-  width <- nchar(n)
-  sprintf(paste0("%0", width, "d"), seq_len(n))
+  # width <- nchar(n)
+  # sprintf(paste0("%0", width, "d"), seq_len(n))
+  seq_len(n)
 }
 
+#' Extract group indexes
+#'
+#' @param data A data frame
+#' @return A list of integer vectors; each element of the
+#'   list is a group, each vector contains the data frame
+#'   indexes of that group.
+#' @noRd
 group_indices_lst <- function(data) {
   g <- dplyr::group_indices(data)
   split(seq_along(g), g)

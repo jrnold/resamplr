@@ -6,16 +6,14 @@
 \alias{crossv_kfold.grouped_df}
 \title{Generate cross-validated k-fold test-training pairs}
 \usage{
-crossv_kfold(data, k, ...)
+crossv_kfold(x, k, ...)
 
-\method{crossv_kfold}{data.frame}(data, k = 5, shuffle = TRUE, ...)
+\method{crossv_kfold}{data.frame}(x, k = 5L, shuffle = TRUE, ...)
 
-\method{crossv_kfold}{grouped_df}(data, k = 5, shuffle = TRUE,
+\method{crossv_kfold}{grouped_df}(x, k = 5L, shuffle = TRUE,
   stratify = FALSE, ...)
 }
 \arguments{
-\item{data}{A data frame}
-
 \item{k}{The number of folds}
 
 \item{...}{Passed to methods}
@@ -26,6 +24,8 @@ Otherwise, observations are sequentially assigned to folds.}
 \item{stratify}{If \code{TRUE}, within each group observations are split
 into folds, and those folds combined. If \code{FALSE}, groups are assigned
 into folds.}
+
+\item{data}{A data frame}
 }
 \value{
 A data frame with \code{k} rows and the following columns:

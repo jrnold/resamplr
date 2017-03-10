@@ -1,115 +1,144 @@
-#' Generate test/train resample objects
+#' Generate objects
 #'
-#' Generate test and train resample objects.
-#' The function \code{resample_holdout} splits the set into test and training
-#' sets with specified fractions in each, while \code{resample_holdout_n} splits
-#' them using specified numbers of observations.
-#'
-#' @param test Fraction of observations (or groups) in the test set.
-#' @param data A data table
+#' @param p Fraction in the test set.
+#' @param n Number in the test set.
+#' @param k Number of test/train splits to generate.
+#' @param data A data table or vector.
 #' @param shuffle If \code{TRUE}, the observations are randomly assigned to the
-#'   test and training sets. If \code{FALSE}, then the first \code{train} of
-#'   the observations are assigned to the training set, and the next
-#'   \code{test} of the observations are assigned to the test set.
-#'
-#' @param stratify If \code{TRUE}, then test-train splits are done within each
+#'   test and training sets. If \code{FALSE}, then the last \code{p} or
+#'   \code{n} of the observations are assigned to the training set, and
+#'   the remainder of the observations are assigned to the test set.
+#' @param stratify If \code{TRUE}, then test-train splits are within each
 #'   code group, so that the final test and train subsets have approximately
-#'   equal proportions of groups. If \code{FALSE}, the the test-train splits
+#'   equal proportions of each group. If \code{FALSE}, the the test-train splits
 #'   splits groups into the testing and training sets.
-#' @param ... Arguments passed to methods
-#' @return A named list of two \code{\link[modelr]{resample}} objects
-#'   for the "test" and "train" sets.
+#' @param ... Arguments passed to methods.
+#' @return A data frame
 #' @export
-resample_holdout <- function(data, ...) {
-  UseMethod("resample_holdout")
+holdout_frac <- function(x, ...) {
+  UseMethod("holdout_frac")
 }
 
-#' @rdname resample_holdout
+#' @rdname holdout_frac
 #' @export
-#' @importFrom assertthat is.number
-resample_holdout.data.frame <- function(data, test = 0.3, shuffle = TRUE, ...) {
-  n <- nrow(data)
-  assert_that(is.number(test))
-  assert_that(test >= 0 & test <= 1)
-  resample_holdout_n(data, test = round(n * test), shuffle = shuffle)
+holdout_frac.data.frame <- function(x, p = 0.3, k = 1, shuffle = TRUE, ...) {
+  assert_that(is.number(p) && p >= 0 && p <= 1)
+  assert_that(is.number(k) && k > 0)
+  assert_that(is.flag(shuffle))
+  idx <- seq_len(nrow(x))
+  res <- holdout_frac(idx, p = p, k = k, shuffle = shuffle, ...)
+  to_crossv_df(res, x)
 }
 
-#' @rdname resample_holdout
+#' @rdname holdout_frac
 #' @export
-resample_holdout.grouped_df <- function(data, test = 0.3, shuffle = TRUE,
-                                        stratify = FALSE, ...) {
-  assert_that(is.number(test))
-  assert_that(test >= 0 & test <= 1)
+holdout_frac.grouped_df <- function(x, p = p, k = k,
+                                    shuffle = shuffle,
+                                    stratify = FALSE,
+                                    ...) {
+  assert_that(is.number(p) && p >= 0 && p <= 1)
+  assert_that(is.number(k) && k > 0)
   assert_that(is.flag(shuffle))
   assert_that(is.flag(stratify))
-  idx <- group_indices_lst(data)
+  idx <- group_indices_lst(x)
   if (stratify) {
-    idx <- map(idx, split_test_train_frac, test = test, shuffle = shuffle)
-    test_train(data, test = flatten_int(map(idx, "test")),
-               train = flatten_int(map(idx, "train")))
+    # since n varies with group, need to
+    grp_sz <- round(purrr::map_int(idx, length) * p)
+    f <- function(.id) {
+      x <- purrr::map2_df(idx, grp_sz, function(i, n) {
+        holdout_n(i, n = n, k = 1L, shuffle = shuffle)
+      })
+      x[[".id"]] <- .id
+      x[["test"]] <- flatten_int(x[["test"]])
+      x[["train"]] <- flatten_int(x[["train"]])
+      x
+    }
+    x <- purrr::map_df(seq_len(k), f)
   } else {
-    g <- split_test_train_frac(seq_along(idx), test, shuffle = shuffle)
-    test_train(data, test = flatten_int(idx[g$test]),
-               train = flatten_int(idx[g$train]))
+    n <- round(p * nrow(x))
+    res <- holdout_n(x, n = n, k = k, stratify = FALSE, ...)
   }
+  to_crossv_df(res, x)
 }
 
-#' @rdname resample_holdout
+#' @rdname holdout_frac
 #' @export
-resample_holdout_n <- function(data, ...) {
-  UseMethod("resample_holdout_n")
+holdout_frac.default <- function(x, p = 0.3, k = 1L, shuffle = TRUE, ...) {
+  n <- round(p * length(x))
+  holdout_n(x, n, k = k, shuffle = shuffle)
 }
 
-#' @rdname resample_holdout
+#' @rdname holdout_frac
 #' @export
-resample_holdout_n.data.frame <- function(data, test = 1L,
-                                          shuffle = TRUE, ...) {
-  assert_that(is.number(test))
-  assert_that(test >= 0 & test <= nrow(data))
+holdout_n <- function(x, ...) {
+  UseMethod("holdout_n")
+}
+
+#' @rdname holdout_frac
+#' @export
+holdout_n.data.frame <- function(x, n = 1L, k = 1L, shuffle = TRUE, ...) {
+  assert_that(is.number(n) && n >= 0 && n <= nrow(x))
+  assert_that(is.number(k) && k > 0)
   assert_that(is.flag(shuffle))
-  purrr::invoke(test_train,
-                split_test_train_n(seq_len(nrow(data)), test = test,
-                                   shuffle = shuffle),
-                data = data)
+  idx <- seq_len(nrow(x))
+  holdout_n(idx, n = n, k = k, shuffle = shuffle, ...)
 }
 
-#' @rdname resample_holdout
+#' @rdname holdout_frac
 #' @export
-resample_holdout_n.grouped_df <- function(data, test = 1L, shuffle = TRUE,
-                                          stratify = FALSE, ...) {
-  assert_that(is.number(test) && test >= 0)
+holdout_n.grouped_df <- function(x, n = 1L, k = 1L, shuffle = TRUE,
+                                 stratify = FALSE, ...) {
+  assert_that(is.number(n) && n >= 0)
+  assert_that(is.number(k) && k >= 0)
   assert_that(is.flag(shuffle))
   assert_that(is.flag(stratify))
-  idx <- group_indices_lst(data)
+  idx <- group_indices_lst(x)
   if (stratify) {
-    idx <- map(idx, split_test_train_n, test = test, shuffle = shuffle)
-    test_train(data, test = flatten_int(map(idx, "test")),
-               train = flatten_int(map(idx, "train")))
+    f <- function(.id) {
+      d <- purrr::map_df(idx, function(i) {
+        holdout_n(i, n = n, k = 1L, shuffle = shuffle)
+      })
+      d[[".id"]] <- .id
+      d[["test"]] <- flatten_int(d[["test"]])
+      d[["train"]] <- flatten_int(d[["train"]])
+      d
+    }
+    res <- purrr::map_df(seq_len(k), f)
   } else {
-    g <- split_test_train_n(seq_along(idx), test, shuffle = shuffle)
-    test_train(data,
-               test = flatten_int(idx[g$test]),
-               train = flatten_int(idx[g$train]))
+    res <- dplyr::mutate_(holdout_n(idx, n = n, k = k, shuffle = shuffle),
+                         train = ~ map(train, flatten_int),
+                         test = ~ map(test, flatten_int))
   }
+  to_crossv_df(res, x)
 }
 
-test_train <- function(data, test, train) {
-  list(train = resample(data, train), test = resample(data, test))
-}
-
-test_train_df <- function(data, test, train) {
-  tibble(train = list(resample(data, train)),
-         test = list(resample(data, test)))
-}
-
-split_test_train_n <- function(idx, test, shuffle = TRUE) {
+holdout_n_ <- function(idx, n, shuffle = TRUE) {
   if (shuffle) {
     idx <- sample(idx, length(idx), replace = FALSE)
   }
-  test_idx <- utils::tail(idx, test)
+  test_idx <- utils::tail(idx, n)
   list(train = setdiff(idx, test_idx), test = test_idx)
 }
 
-split_test_train_frac <- function(idx, test, shuffle = TRUE) {
-  split_test_train_n(idx, test = round(test * length(idx)), shuffle = shuffle)
+#' @rdname holdout_frac
+#' @importFrom purrr rerun transpose
+#' @export
+holdout_n.default <- function(x, n, k = 1, shuffle = TRUE, ...) {
+  res <- as_tibble(transpose(rerun(k, holdout_n_(x, n, shuffle = shuffle))))
+  res[[".id"]] <- id(nrow(x))
+  res
+}
+
+to_crossv_df <- function(x, data) {
+  x[["train"]] <- resample_lst(data, x[["train"]])
+  x[["test"]] <- resample_lst(data, x[["test"]])
+  x
+}
+
+crossv_df <- function(.data, ...) {
+  structure(.data, class = c("crossv_df", class(.data)))
+}
+
+resample_df <- function(.data, ...) {
+  structure(.data, class = c("resample_df", class(.data)))
 }
