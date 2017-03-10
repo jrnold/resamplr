@@ -39,17 +39,28 @@ crossv_lpo.grouped_df <- function(x, p = 1L, ...) {
 #' @importFrom dplyr bind_rows
 #' @rdname crossv_lpo
 crossv_lpo.default <- function(x, p = 1L, ...) {
+  assert_that(is_vector(x))
   assert_that(is.number(p) && p >= 1)
+  p <- as.integer(p)
+  f <- function(i) x[i]
+  res <- jackknife_(length(x), p = p)
+  res[["train"]] <- map(res[["train"]], f)
+  res[["test"]] <- map(res[["test"]], f)
+  res[[".id"]] <- seq_len(nrow(res))
+  res
+}
+
+crossv_lpo_ <- function(n, p = 1L, ...) {
+  p <- as.integer(p)
+  x <- seq_len(n)
   f <- function(i) {
     tibble(train = list(setdiff(x, i)), test = list(i))
   }
   if (p == 1) {
-    res <- map_df(x, f)
+    map_df(x, f)
   } else {
-    res <- bind_rows(utils::combn(x, p, FUN = f, simplify = FALSE))
+    bind_rows(utils::combn(x, p, FUN = f, simplify = FALSE))
   }
-  res[[".id"]] <- seq_len(nrow(res))
-  res
 }
 
 #' @export

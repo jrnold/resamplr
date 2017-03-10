@@ -13,6 +13,6 @@ models <- map(cv2$train, ~ lm(mpg ~ wt, data = .))
 summary(map2_dbl(models, cv2$test, modelr::rmse))
 
 # stratified k-fold
-cv3 <- crossv_kfold(group_by(mtcars, am), k = 4, stratified = TRUE)
+cv3 <- crossv_kfold(group_by(mtcars, am), k = 3, stratify = TRUE)
 models <- map(cv3$train, ~ lm(mpg ~ wt, data = .))
 summary(map2_dbl(models, cv3$test, modelr::rmse))
