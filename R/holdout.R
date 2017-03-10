@@ -1,9 +1,14 @@
-#' Generate objects
+#' Generate cross-validation test-training pairs
+#'
+#' \code{holdout_frac} splits the data so that proportion \code{p} is in test
+#' set and \code{1 - p} is in the training set. Likewise, \code{holdout_n}
+#' splits the data so that \code{n} elements are in the test set and the
+#' remainder are in the training set.
 #'
 #' @param p Fraction in the test set.
 #' @param n Number in the test set.
 #' @param k Number of test/train splits to generate.
-#' @param data A data table or vector.
+#' @param x A data table or vector.
 #' @param shuffle If \code{TRUE}, the observations are randomly assigned to the
 #'   test and training sets. If \code{FALSE}, then the last \code{p} or
 #'   \code{n} of the observations are assigned to the training set, and

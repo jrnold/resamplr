@@ -9,7 +9,7 @@
 \alias{holdout_n.data.frame}
 \alias{holdout_n.grouped_df}
 \alias{holdout_n.default}
-\title{Generate objects}
+\title{Generate cross-validation test-training pairs}
 \usage{
 holdout_frac(x, ...)
 
@@ -30,6 +30,8 @@ holdout_n(x, ...)
 \method{holdout_n}{default}(x, n, k = 1, shuffle = TRUE, ...)
 }
 \arguments{
+\item{x}{A data table or vector.}
+
 \item{...}{Arguments passed to methods.}
 
 \item{p}{Fraction in the test set.}
@@ -47,12 +49,13 @@ equal proportions of each group. If \code{FALSE}, the the test-train splits
 splits groups into the testing and training sets.}
 
 \item{n}{Number in the test set.}
-
-\item{data}{A data table or vector.}
 }
 \value{
 A data frame
 }
 \description{
-Generate objects
+\code{holdout_frac} splits the data so that proportion \code{p} is in test
+set and \code{1 - p} is in the training set. Likewise, \code{holdout_n}
+splits the data so that \code{n} elements are in the test set and the
+remainder are in the training set.
 }

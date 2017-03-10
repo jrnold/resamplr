@@ -2,7 +2,7 @@
 % Please edit documentation in R/resample.R
 \name{resample}
 \alias{resample}
-\title{Create a lazy resample object}
+\title{Create lazy resample object(s)}
 \usage{
 resample(data, idx, check = FALSE)
 }
@@ -10,22 +10,18 @@ resample(data, idx, check = FALSE)
 \item{data}{A data frame}
 
 \item{idx}{An integer vector}
+
+\item{check}{If \code{TRUE}, then run test that \code{idx} is consistent
+with}
 }
 \value{
 A \code{resample} object, a list with two elements: \code{data}
   and \code{idx}.
 }
 \description{
-This is a slightly modified version of \code{\link[modelr]{resample}}.
-It has more tests for the validity of the indexes, but also coerces
-numeric \code{idx} to integers.
+Create lazy resample object(s)
 }
-\examples{
-# from modler::resample
-resample(mtcars, 1:10)
-
-b <- resample_bootstrap(mtcars)
-b
-as.integer(b)
-as.data.frame(b)
+\seealso{
+This function is a slight variant of \code{\link[modelr]{resample}}.
+  The function \code{\link{resample_lst}} generates a list of resample objects.
 }
