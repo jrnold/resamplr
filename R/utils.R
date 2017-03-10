@@ -15,3 +15,11 @@ group_indices_lst <- function(data) {
   g <- dplyr::group_indices(data)
   split(seq_along(g), g)
 }
+
+
+# convert resample data frame with index list column to one with resample
+# list column.
+to_resample_df <- function(x, .data) {
+  x[["sample"]] <- resample_lst(x[["sample"]], .data)
+  x
+}

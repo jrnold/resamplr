@@ -21,12 +21,13 @@ crossv_loo(x)
 \arguments{
 \item{x}{A data frame or vector}
 
-\item{p}{The number of elements to include in the training set}
+\item{p}{The number of elements to include in the test set.}
 
 \item{...}{Passed to methods}
 }
 \value{
-A data frame with \code{p} rows and the following columns:
+A data frame with \eqn{\binom{n}{p}}{n choose p} rows and the
+following columns:
 \describe{
 \item{train}{A list of \code{\link{resample}} objects. Training sets.}
 \item{test}{A list of \code{\link{resample}} objects. Test sets.}
