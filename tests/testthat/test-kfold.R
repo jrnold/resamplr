@@ -1,4 +1,4 @@
-context("holdout_n.data.frame")
+context("crossv_kfold")
 
 local({
   dat <- tibble(a = c(rep("a", 5), rep("b", 3), rep("c", 2)))
@@ -22,14 +22,14 @@ local({
     expect_equal(nrow(x), k)
   })
 
-  test_that("holdout_n.grouped_df stratify = TRUE works as expected", {
+  test_that("crossv_kfold.grouped_df stratify = TRUE works as expected", {
     k <- 2
     x <- crossv_kfold(dat_grouped, k = k, stratify = TRUE)
     expect_crossv_df(x)
     expect_equal(nrow(x), k)
   })
 
-  test_that("holdout_n.default works as expected", {
+  test_that("crossv_kfold.default works as expected", {
     k <- 5
     v <- 1:10
     n <- length(v)
