@@ -27,7 +27,7 @@ resample <- function(data, idx, check = TRUE) {
 #' @param data A data frame
 #' @param check If \code{TRUE}, check that \code{idx} are valid.
 #' @param idx A list of integer vectors of indexes.
-#' @seeals \code{\link{resample}} generates a single resample object.
+#' @seealso \code{\link{resample}} generates a single resample object.
 #' @return A \code{list} of \code{\link{resample}} objects.
 #' @export
 #' @examples

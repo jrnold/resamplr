@@ -20,7 +20,7 @@
 #' @param ... Arguments passed to methods.
 #' @return A data frame
 #' @export
-#' @example inst/examples/holdout.R
+#' @example inst/examples/ex-holdout.R
 holdout_frac <- function(x, ...) {
   UseMethod("holdout_frac")
 }

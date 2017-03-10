@@ -22,3 +22,6 @@ Create a list of resample objects
 \examples{
 resample_lst(mtcars, list(1:3, 4:6, 7:10))
 }
+\seealso{
+\code{\link{resample}} generates a single resample object.
+}
