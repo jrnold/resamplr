@@ -9,13 +9,15 @@
 #' @seealso This function is a slight variant of \code{\link[modelr]{resample}}.
 #'   The function \code{\link{resample_lst}} generates a list of resample objects.
 #' @export
-resample <- function(data, idx, check = FALSE) {
+#' @examples
+#' resample(mtcars, 1:10)
+resample <- function(data, idx, check = TRUE) {
   assert_that(is.flag(check))
   if (check) {
     assert_that(is.data.frame(data))
     assert_that(is.numeric(idx))
     assert_that(all(!is.na(idx)))
-    assert_that(all(idx >= 1) && all(idx < nrow(data)))
+    assert_that(all(idx >= 1) && all(idx <= nrow(data)))
   }
   structure(list(data = data, idx = as.integer(idx)), class = "resample")
 }
@@ -23,12 +25,15 @@ resample <- function(data, idx, check = FALSE) {
 #' Create a list of resample objects
 #'
 #' @param data A data frame
+#' @param check If \code{TRUE}, check that \code{idx} are valid.
 #' @param idx A list of integer vectors of indexes.
 #' @seeals \code{\link{resample}} generates a single resample object.
 #' @return A \code{list} of \code{\link{resample}} objects.
 #' @export
-resample_lst <- function(data, idx) {
-  map(idx, resample, data = data)
+#' @examples
+#' resample_lst(mtcars, list(1:3, 4:6, 7:10))
+resample_lst <- function(data, idx, check = TRUE) {
+  map(idx, resample, data = data, check = check)
 }
 
 #' Is it a resample object?
@@ -55,5 +60,5 @@ c.resample <- function(...) {
     stop("All resample objects must have identical data", call. = FALSE)
   }
   resample(objs[[1]][["data"]],
-           flatten_int(map(objs, as.integer)))
+           flatten_int(map(objs, as.integer)), FALSE)
 }

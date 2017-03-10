@@ -4,12 +4,6 @@
 #' @importFrom assertthat assert_that is.number is.flag
 NULL
 
-id <- function(n) {
-  # width <- nchar(n)
-  # sprintf(paste0("%0", width, "d"), seq_len(n))
-  seq_len(n)
-}
-
 #' Extract group indexes
 #'
 #' @param data A data frame

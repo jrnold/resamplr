@@ -1,72 +1,56 @@
-context("resmple_holdout.data.frame")
-
-expect_holdout <- function(x) {
-  expect_is(x, "list")
-  expect_named(x, c("train", "test"))
-  expect_identical(map_chr(x, class),
-                   c(train = "resample", test = "resample"))
-}
-
-local({
-  dat <- tibble(a = c(rep("a", 5), rep("b", 3), rep("c", 2)))
-
-  test_that("resample_holdout.data.frame works as expected", {
-    x <- resample_holdout(dat)
-    expect_holdout(x)
-    expect_identical(map(x, dim),
-                     list(train = c(7L, 1L), test = c(3L, 1L)))
-  })
-
-  test_that("resample_holdout.data.frame works with test arg", {
-    x <- resample_holdout(dat, test = 0.1)
-    expect_holdout(x)
-    expect_identical(map(x, dim),
-                     list(train = c(9L, 1L), test = c(1L, 1L)))
-  })
-})
-
-context("resample.grouped_df")
+context("holdout_n.data.frame")
 
 local({
   dat <- tibble(a = c(rep("a", 5), rep("b", 3), rep("c", 2)))
   dat_grouped <- group_by(dat, a)
-  test_that("resample_holdout.grouped_df works as expected", {
-    x <- resample_holdout(dat_grouped)
-    expect_holdout(x)
+
+  expect_holdout_df <- function(x, data = TRUE) {
+    expect_is(x, "data.frame")
+    expect_named(x, c("train", "test", ".id"))
+    expect_is(x$train, "list")
+    expect_is(x$test, "list")
+    expect_is(x$.id, "integer")
+    if (data) {
+      expect_true(all(map_lgl(x$train, is.resample)))
+      expect_true(all(map_lgl(x$test, is.resample)))
+    }
+  }
+
+  test_that("holdout_n.data.frame works as expected", {
+    n <- 2
+    k <- 5
+    x <- holdout_n(dat, n = n, k = k)
+    expect_holdout_df(x)
+    expect_equal(nrow(x), k)
+    expect_true(all(map_int(x$test, ~ dim(.x)[1]) == n))
+    expect_true(all(map_int(x$train, ~ dim(.x)[1]) == (nrow(dat) - n)))
   })
 
-  test_that("resample_holdout.grouped_df works with stratify", {
-    x <- resample_holdout(dat_grouped, stratify = TRUE)
-    expect_holdout(x)
+  test_that("holdout_n.grouped_df works as expected", {
+    n <- 2
+    k <- 5
+    x <- holdout_n(dat_grouped, n = n, k = k, stratify = FALSE)
+    expect_holdout_df(x)
+    expect_equal(nrow(x), k)
   })
 
-  test_that("resample_holdout_n.data.frame works as expected", {
-    x <- resample_holdout_n(dat)
-    expect_holdout(x)
-    expect_identical(map(x, dim),
-                     list(train = c(9L, 1L), test = c(1L, 1L)))
+  test_that("holdout_n.grouped_df stratify = TRUE works as expected", {
+    n <- 1
+    k <- 5
+    x <- holdout_n(dat_grouped, n = n, k = k, stratify = TRUE)
+    expect_holdout_df(x)
+    expect_equal(nrow(x), k)
   })
 
-  test_that("resample_holdout_n.data.frame works with test = NULL", {
-    x <- resample_holdout_n(dat, test = 2L)
-    expect_holdout(x)
-    expect_identical(map(x, dim),
-                     list(train = c(8L, 1L), test = c(2L, 1L)))
-  })
-
-  test_that("resample_holdout_n.grouped_df works as expected", {
-    x <- resample_holdout_n(dat_grouped)
-    expect_holdout(x)
-  })
-
-  test_that("resample_holdout_n.grouped_df works with stratify = TRUE", {
-    x <- resample_holdout_n(dat_grouped, test = 1L, stratify = TRUE)
-    expect_holdout(x)
-  })
-
-  test_that("resample_holdout_n.grouped_df works as expected", {
-    x <- resample_holdout_n(dat_grouped, test = 2L, stratify = TRUE)
-    expect_holdout(x)
+  test_that("holdout_n.default works as expected", {
+    n <- 3
+    k <- 5
+    v <- 1:10
+    x <- holdout_n(v, n = n, k = k)
+    expect_holdout_df(x, data = FALSE)
+    expect_equal(nrow(x), k)
+    expect_true(all(map_int(x$test, length) == n))
+    expect_true(all(map_int(x$train, length) == (length(v) - n)))
   })
 
 })

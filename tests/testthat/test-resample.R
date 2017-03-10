@@ -16,21 +16,21 @@ local({
   })
 
   test_that("resample throws error with non-numeric idx", {
-    msg <- "`idx` must be a numeric vector"
+    msg <- "idx is not a numeric or integer vector"
     expect_error(resample(dat, c("1", "2")), regexp = msg)
   })
 
   test_that("resample throws error if data is not a data frame",  {
-    expect_error(resample(1:3, 1:3), regexp = "`data` must be a data frame")
+    expect_error(resample(1:3, 1:3), regexp = "data is not a data frame")
   })
 
   test_that("resample throws errors if idx is missing",  {
     expect_error(resample(dat, c(1L, NA_integer_)),
-                 regexp = "All elements of `idx` must be non-missing")
+                 regexp = "Elements .* of !is.na\\(idx\\) are not true")
   })
 
   test_that("resample throws errors if idx outside",  {
-    msg <- "All elements of `idx` must be between 1 and `nrow\\(data\\)`"
+    msg <- "Elements .* of idx .* are not true"
     expect_error(resample(dat, c(0L, 1:2)), regexp = msg)
     expect_error(resample(dat, c(1L, nrow(dat) + 1L)), regexp = msg)
   })

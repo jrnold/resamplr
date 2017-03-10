@@ -4,7 +4,7 @@
 \alias{resample}
 \title{Create lazy resample object(s)}
 \usage{
-resample(data, idx, check = FALSE)
+resample(data, idx, check = TRUE)
 }
 \arguments{
 \item{data}{A data frame}
@@ -20,6 +20,9 @@ A \code{resample} object, a list with two elements: \code{data}
 }
 \description{
 Create lazy resample object(s)
+}
+\examples{
+resample(mtcars, 1:10)
 }
 \seealso{
 This function is a slight variant of \code{\link[modelr]{resample}}.

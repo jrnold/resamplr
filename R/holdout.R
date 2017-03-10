@@ -20,6 +20,7 @@
 #' @param ... Arguments passed to methods.
 #' @return A data frame
 #' @export
+#' @example inst/examples/holdout.R
 holdout_frac <- function(x, ...) {
   UseMethod("holdout_frac")
 }
@@ -86,7 +87,8 @@ holdout_n.data.frame <- function(x, n = 1L, k = 1L, shuffle = TRUE, ...) {
   assert_that(is.number(k) && k > 0)
   assert_that(is.flag(shuffle))
   idx <- seq_len(nrow(x))
-  holdout_n(idx, n = n, k = k, shuffle = shuffle, ...)
+  res <- holdout_n(idx, n = n, k = k, shuffle = shuffle, ...)
+  to_crossv_df(res, x)
 }
 
 #' @rdname holdout_frac
@@ -103,10 +105,10 @@ holdout_n.grouped_df <- function(x, n = 1L, k = 1L, shuffle = TRUE,
       d <- purrr::map_df(idx, function(i) {
         holdout_n(i, n = n, k = 1L, shuffle = shuffle)
       })
-      d[[".id"]] <- .id
-      d[["test"]] <- flatten_int(d[["test"]])
-      d[["train"]] <- flatten_int(d[["train"]])
-      d
+      tibble(
+        train = list(flatten_int(d[["train"]])),
+        test = list(flatten_int(d[["test"]])),
+        .id = .id)
     }
     res <- purrr::map_df(seq_len(k), f)
   } else {
@@ -122,28 +124,31 @@ holdout_n_ <- function(idx, n, shuffle = TRUE) {
     idx <- sample(idx, length(idx), replace = FALSE)
   }
   test_idx <- utils::tail(idx, n)
-  list(train = setdiff(idx, test_idx), test = test_idx)
+  tibble(train = list(setdiff(idx, test_idx)), test = list(test_idx))
 }
 
 #' @rdname holdout_frac
-#' @importFrom purrr rerun transpose
+#' @importFrom purrr map_df
 #' @export
 holdout_n.default <- function(x, n, k = 1, shuffle = TRUE, ...) {
-  res <- as_tibble(transpose(rerun(k, holdout_n_(x, n, shuffle = shuffle))))
-  res[[".id"]] <- id(nrow(x))
-  res
+  f <- function(i) {
+    res <- holdout_n_(x, n, shuffle = shuffle)
+    res[[".id"]] <- i
+    res
+  }
+  map_df(seq_len(k), f)
 }
 
 to_crossv_df <- function(x, data) {
-  x[["train"]] <- resample_lst(data, x[["train"]])
-  x[["test"]] <- resample_lst(data, x[["test"]])
+  x[["train"]] <- resample_lst(data, x[["train"]], check = FALSE)
+  x[["test"]] <- resample_lst(data, x[["test"]], check = FALSE)
   x
 }
 
-crossv_df <- function(.data, ...) {
-  structure(.data, class = c("crossv_df", class(.data)))
-}
-
-resample_df <- function(.data, ...) {
-  structure(.data, class = c("resample_df", class(.data)))
-}
+# crossv_df <- function(.data, ...) {
+#   structure(.data, class = c("crossv_df", class(.data)))
+# }
+#
+# resample_df <- function(.data, ...) {
+#   structure(.data, class = c("resample_df", class(.data)))
+# }
