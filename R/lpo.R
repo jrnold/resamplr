@@ -39,14 +39,15 @@ crossv_lpo_ <- function(n, p = 1L, ...) {
   assert_that(is.number(p) && p >= 1)
   p <- as.integer(p)
   x <- seq_len(n)
-  f <- function(i) {
-    tibble(train = list(setdiff(x, i)), test = list(i), .id = i)
+  f <- function(i, .id) {
+    tibble(train = list(setdiff(x, i)), test = list(i), .id = .id)
   }
-  if (p == 1) {
-    map_df(x, f)
+  idx <- if (p == 1) {
+    x
   } else {
-    bind_rows(utils::combn(x, p, FUN = f, simplify = FALSE))
+    utils::combn(x, p, simplify = FALSE)
   }
+  map2_df(idx, seq_along(idx), f)
 }
 
 #' @export

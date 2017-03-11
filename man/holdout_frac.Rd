@@ -8,7 +8,6 @@
 \alias{holdout_n}
 \alias{holdout_n.data.frame}
 \alias{holdout_n.grouped_df}
-\alias{holdout_n.default}
 \title{Generate cross-validation test-training pairs}
 \usage{
 holdout_frac(x, ...)
@@ -26,32 +25,37 @@ holdout_n(x, ...)
 
 \method{holdout_n}{grouped_df}(x, n = 1L, k = 1L, shuffle = TRUE,
   stratify = FALSE, ...)
-
-\method{holdout_n}{default}(x, n, k = 1, shuffle = TRUE, ...)
 }
 \arguments{
-\item{x}{A data table or vector.}
+\item{x}{A data frame}
 
 \item{...}{Arguments passed to methods.}
 
-\item{p}{Fraction in the test set.}
+\item{p}{Fraction (proportion) of elements in the test set.}
 
 \item{k}{Number of test/train splits to generate.}
 
 \item{shuffle}{If \code{TRUE}, the observations are randomly assigned to the
 test and training sets. If \code{FALSE}, then the last \code{p} or
-\code{n} of the observations are assigned to the training set, and
-the remainder of the observations are assigned to the test set.}
+\code{n} of the observations are assigned to the test set, and
+the remainder of the observations are assigned to the training set.}
 
 \item{stratify}{If \code{TRUE}, then test-train splits are within each
 code group, so that the final test and train subsets have approximately
 equal proportions of each group. If \code{FALSE}, the the test-train splits
 splits groups into the testing and training sets.}
 
-\item{n}{Number in the test set.}
+\item{n}{Number of elements in the test set.}
 }
 \value{
-A data frame
+A data frame with \code{k} rows and columns
+\describe{
+\item{\code{train}}{A list of \code{\link{resample}} objects representing
+  the training sets}
+\item{\code{test}}{A list of \code{\link{resample}} objects representing the
+  test sets}
+\item{\code{.id}}{An integer vector of ids of the replicates}
+}
 }
 \description{
 \code{holdout_frac} splits the data so that proportion \code{p} is in test

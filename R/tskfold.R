@@ -18,12 +18,11 @@
 #' \item{.id}{Character vector. ID of the fold.}
 #' }
 #' @export
-#' @example inst/examples/ex-crossv_tskfold.R
 crossv_tskfold <- function(x, k, ...) {
   UseMethod("crossv_tskfold")
 }
 
-#' @rdname crossv_tskfold Rows (observations) are split into folds.
+#' @describeIn crossv_tskfold Rows (observations) are split into folds.
 #'    The ordering of the data frame is assmed to be meaningful.
 #' @export
 crossv_tskfold.data.frame <- function(x, k = 5L, ...) {

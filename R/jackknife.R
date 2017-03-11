@@ -37,7 +37,7 @@ jackknife.grouped_df <- function(x, p = 1L, ...) {
 }
 
 jackknife_ <- function(n, p = 1L, ...) {
-  assert_that(is_number(n) && n >= 1)
+  assert_that(is.number(n) && n >= 1)
   assert_that(is.number(p) && p >= 1)
   idx <- seq_len(n)
   f <- function(i) setdiff(idx, i)

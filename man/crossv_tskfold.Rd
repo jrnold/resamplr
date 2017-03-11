@@ -2,10 +2,13 @@
 % Please edit documentation in R/tskfold.R
 \name{crossv_tskfold}
 \alias{crossv_tskfold}
+\alias{crossv_tskfold.data.frame}
 \alias{crossv_tskfold.grouped_df}
 \title{Generate cross-validated time-series k-fold test-training pairs}
 \usage{
 crossv_tskfold(x, k, ...)
+
+\method{crossv_tskfold}{data.frame}(x, k = 5L, ...)
 
 \method{crossv_tskfold}{grouped_df}(x, k = 5L, ...)
 }
@@ -36,6 +39,9 @@ and the \eqn{1:(i - 1)}-th folds are the training set.
 }
 \section{Methods (by class)}{
 \itemize{
+\item \code{data.frame}: Rows (observations) are split into folds.
+The ordering of the data frame is assmed to be meaningful.
+
 \item \code{grouped_df}: The groups are split into folds. The
 ordering of the groups is assumed to be meaningful. No stratification
 option is provided since the cases in which stratification can usually

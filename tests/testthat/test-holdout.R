@@ -30,15 +30,4 @@ local({
     expect_equal(nrow(x), k)
   })
 
-  test_that("holdout_n.default works as expected", {
-    n <- 3
-    k <- 5
-    v <- 1:10
-    x <- holdout_n(v, n = n, k = k)
-    expect_crossv_df(x, data = FALSE)
-    expect_equal(nrow(x), k)
-    expect_true(all(map_int(x$test, length) == n))
-    expect_true(all(map_int(x$train, length) == (length(v) - n)))
-  })
-
 })

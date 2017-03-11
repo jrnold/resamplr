@@ -1,7 +1,9 @@
 #' Generate permutations samples
 #'
-#' @param x A data frame or vector
+#' @param x A data frame
 #' @param k The number of permutations to generate.
+#' @param stratify If \code{TRUE}, the permute observations within each group.
+#'   Otherwise permute the groups themselves.
 #' @param ... Passed to methods
 #' @return A data frame with \code{k} rows and the following columns:
 #' \describe{
@@ -9,7 +11,7 @@
 #' \item{.id}{Character vector. ID of the sample.}
 #' }
 #' @export
-permute <- function(x, p, ...) {
+permute <- function(x, ...) {
   UseMethod("permute")
 }
 
@@ -39,7 +41,7 @@ permute.grouped_df <- function(x, k = 1L, stratify = TRUE, ...) {
                function(i) flatten_int(idx[i]))
     res[[".id"]] <- seq_len(k)
   }
-  to_resample_df(res, x)[ , c("sample", ".id")]
+  to_resample_df(res, x)[, c("sample", ".id")]
 }
 
 permute_ <- function(n, k = 1L, ...) {

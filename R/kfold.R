@@ -1,8 +1,11 @@
 #' Generate cross-validated k-fold test-training pairs
 #'
-#' Generate cross-validated k-fold test-training pairs.
+#' Generate cross-validated k-fold test-training pairs. In addition to ordinary
+#' k-fold cross-validation, this supports stratified k-fold cross validation
+#' if \code{x} is a grouped data frame and \code{stratify = TRUE}, and
+#' Group k-fold if \code{x} is a grouped data frame and \code{stratify = FALSE}.
 #'
-#' @param x A data frame or vector
+#' @param x A data frame
 #' @param k The number of folds
 #' @param shuffle If \code{TRUE}, randomly assign observations to folds.
 #'   Otherwise, observations are sequentially assigned to folds.
@@ -39,11 +42,11 @@ crossv_kfold.grouped_df <- function(x, k = 5L, shuffle = TRUE,
   if (stratify) {
     f <- function(g) {
       mutate_(crossv_kfold_(length(g), k = k, shuffle = shuffle),
-              train = ~ map(train, function(i) flatten_int(g[i])),
-              test = ~ map(test, function(i) flatten_int(g[i])))
+              train = ~ map(train, function(i) g[i]),
+              test = ~ map(test, function(i) g[i]))
     }
     res <- summarise_(group_by_(map_df(idx, f), ".id"),
-                      train = ~ list(flatten_int(train))
+                      train = ~ list(flatten_int(train)),
                       test = ~ list(flatten_int(test)))
   } else {
     res <- mutate_(crossv_kfold_(length(idx), k, shuffle = shuffle),
@@ -51,15 +54,16 @@ crossv_kfold.grouped_df <- function(x, k = 5L, shuffle = TRUE,
                    test = ~ map(test, function(i) flatten_int(idx[i])))
     res
   }
-  to_crossv_df(res, x)[ , c("train", "test", ".id")]
+  to_crossv_df(res, x)[, c("train", "test", ".id")]
 }
 
 crossv_kfold_ <- function(n, k = 5L, shuffle = TRUE, ...) {
   x <- seq_len(n)
-  f <- function(i) {
-    tibble(train = list(setdiff(x, i)), test = list(i), .id = i)
+  f <- function(i, .id) {
+    tibble(train = list(setdiff(x, i)), test = list(i), .id = .id)
   }
-  purrr::map_df(partition(x, as.integer(k), shuffle = shuffle), f)
+  folds <- partition(x, as.integer(k), shuffle = shuffle)
+  map2_df(folds, seq_along(folds), f)
 }
 
 partition <- function(x, k, shuffle = TRUE) {

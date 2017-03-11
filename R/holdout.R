@@ -5,20 +5,28 @@
 #' splits the data so that \code{n} elements are in the test set and the
 #' remainder are in the training set.
 #'
-#' @param p Fraction in the test set.
-#' @param n Number in the test set.
+#'
+#' @param x A data frame
+#' @param p Fraction (proportion) of elements in the test set.
+#' @param n Number of elements in the test set.
 #' @param k Number of test/train splits to generate.
-#' @param x A data table or vector.
 #' @param shuffle If \code{TRUE}, the observations are randomly assigned to the
 #'   test and training sets. If \code{FALSE}, then the last \code{p} or
-#'   \code{n} of the observations are assigned to the training set, and
-#'   the remainder of the observations are assigned to the test set.
+#'   \code{n} of the observations are assigned to the test set, and
+#'   the remainder of the observations are assigned to the training set.
 #' @param stratify If \code{TRUE}, then test-train splits are within each
 #'   code group, so that the final test and train subsets have approximately
 #'   equal proportions of each group. If \code{FALSE}, the the test-train splits
 #'   splits groups into the testing and training sets.
 #' @param ... Arguments passed to methods.
-#' @return A data frame
+#' @return A data frame with \code{k} rows and columns
+#' \describe{
+#' \item{\code{train}}{A list of \code{\link{resample}} objects representing
+#'   the training sets}
+#' \item{\code{test}}{A list of \code{\link{resample}} objects representing the
+#'   test sets}
+#' \item{\code{.id}}{An integer vector of ids of the replicates}
+#' }
 #' @export
 #' @example inst/examples/ex-holdout.R
 holdout_frac <- function(x, ...) {
@@ -75,7 +83,7 @@ holdout_n <- function(x, ...) {
 #' @rdname holdout_frac
 #' @export
 holdout_n.data.frame <- function(x, n = 1L, k = 1L, shuffle = TRUE, ...) {
-  res <- holdout_n(nrow(x), n = n, k = k, shuffle = shuffle, ...)
+  res <- holdout_n_(nrow(x), n = n, k = k, shuffle = shuffle, ...)
   to_crossv_df(res, x)
 }
 
@@ -99,7 +107,7 @@ holdout_n.grouped_df <- function(x, n = 1L, k = 1L, shuffle = TRUE,
                    train ~ map(train, function(i) flatten_int(idx[i])),
                    test ~ map(test, function(i) flatten_int(idx[i])))
   }
-  to_crossv_df(res, x)
+  to_crossv_df(res, x)[ , c("train", "test", ".id")]
 }
 
 holdout_n_ <- function(x, n = 1L, k = 1L, shuffle = TRUE) {

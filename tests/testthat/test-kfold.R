@@ -29,15 +29,4 @@ local({
     expect_equal(nrow(x), k)
   })
 
-  test_that("crossv_kfold.default works as expected", {
-    k <- 5
-    v <- 1:10
-    n <- length(v)
-    x <- crossv_kfold(v, k = k)
-    expect_crossv_df(x, data = FALSE)
-    expect_equal(nrow(x), k)
-    expect_true(all(map_int(x$train, length) == (k - 1) / k * n))
-    expect_true(all(map_int(x$test, length) == n / k))
-  })
-
 })

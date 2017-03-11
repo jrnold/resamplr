@@ -4,7 +4,6 @@
 \alias{jackknife}
 \alias{jackknife.data.frame}
 \alias{jackknife.grouped_df}
-\alias{jackknife.default}
 \title{Generate Jackknife Subsamples}
 \usage{
 jackknife(x, p, ...)
@@ -12,8 +11,6 @@ jackknife(x, p, ...)
 \method{jackknife}{data.frame}(x, p = 1L, ...)
 
 \method{jackknife}{grouped_df}(x, p = 1L, ...)
-
-\method{jackknife}{default}(x, p = 1L, ...)
 }
 \arguments{
 \item{x}{A data frame or vector}

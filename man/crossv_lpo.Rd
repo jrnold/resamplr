@@ -4,7 +4,6 @@
 \alias{crossv_lpo}
 \alias{crossv_lpo.data.frame}
 \alias{crossv_lpo.grouped_df}
-\alias{crossv_lpo.default}
 \alias{crossv_loo}
 \title{Generate cross-validated leave-p-out test-training pairs}
 \usage{
@@ -13,8 +12,6 @@ crossv_lpo(x, p, ...)
 \method{crossv_lpo}{data.frame}(x, p = 1L, ...)
 
 \method{crossv_lpo}{grouped_df}(x, p = 1L, ...)
-
-\method{crossv_lpo}{default}(x, p = 1L, ...)
 
 crossv_loo(x)
 }
