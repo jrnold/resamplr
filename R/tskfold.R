@@ -48,7 +48,9 @@ crossv_tskfold.grouped_df <- function(x, k = 5L, ...) {
 crossv_tskfold_ <- function(n, k = 5L) {
   folds <- partition(seq_len(n), as.integer(k), shuffle = FALSE)
   f <- function(i) {
-    tibble(train = list(folds[seq_len(i - 1L)]), test = list(folds[i]))
+    tibble(train = list(flatten_int(folds[seq_len(i - 1L)])),
+           test = list(flatten_int(folds[i])),
+           .id = i)
   }
   # test that k >= 2 earlier
   purrr::map_df(2:k, f)

@@ -29,4 +29,11 @@ local({
     expect_equal(nrow(x), k)
   })
 
+  test_that("crossv_kfold works when not shuffled", {
+    k <- 3
+    x <- crossv_kfold(dat, k = k, shuffle = FALSE)
+    expect_crossv_df(x)
+    expect_equal(nrow(x), k)
+  })
+
 })

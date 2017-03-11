@@ -37,9 +37,8 @@ permute.grouped_df <- function(x, k = 1L, stratify = TRUE, ...) {
     res <- summarise_(group_by_(map_df(idx, f), ".id"),
                       sample = ~ list(flatten_int(sample)))
   } else {
-    res <- map(permute_(length(idx), k = k),
-               function(i) flatten_int(idx[i]))
-    res[[".id"]] <- seq_len(k)
+    res <- mutate_(permute_(length(idx), k = k),
+                   sample = ~ map(sample, function(i) flatten_int(idx[i])))
   }
   to_resample_df(res, x)[, c("sample", ".id")]
 }

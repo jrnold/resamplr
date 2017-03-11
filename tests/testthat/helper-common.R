@@ -14,3 +14,12 @@ expect_crossv_df <- function(x, data = TRUE) {
     expect_true(all(map_lgl(x$test, is.resample)))
   }
 }
+
+expect_resample_df <- function(x, data = TRUE) {
+  expect_is(x, "data.frame")
+  expect_is(x$sample, "list")
+  expect_is(x$.id, "integer")
+  if (data) {
+    expect_true(all(map_lgl(x$sample, is.resample)))
+  }
+}

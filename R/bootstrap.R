@@ -65,13 +65,16 @@ bootstrap.grouped_df <- function(data, k = 1L,
   n <- nrow(data)
   idx <- group_indices_lst(data)
   # fill in weights if none exist
+  # split weights by groups for easier lookup
   if (is.null(weights)) {
-    weights <- rep(1, n)
+    # ensure that by default groups are not weighted
+    weights <- map(idx, function(i) {
+      rep(1 / length(i), length(i))
+    })
   } else {
     weights <- data[[weights]]
+    weights <- map(idx, ~ weights[.x])
   }
-  # split weights by groups for easier lookup
-  weights <- map(idx, ~ weights[.x])
   # calculate group level weights for easier lookup
   group_weights <- if (weight_groups) {
     purrr::map_dbl(weights, sum)
@@ -80,7 +83,7 @@ bootstrap.grouped_df <- function(data, k = 1L,
   }
   # sample by groups
   if (groups) {
-    grps <- bootstrap_(n_groups(data), k = k,weights = group_weights,
+    grps <- bootstrap_(n_groups(data), k = k, weights = group_weights,
                        bayes = bayes)
   } else {
     grps <- tibble(sample = purrr::rerun(k, seq_len(n_groups(data))),
@@ -88,23 +91,25 @@ bootstrap.grouped_df <- function(data, k = 1L,
   }
   # resample within a group
   f1 <- function(g, .id) {
-    grp_idx <- idx[g]
+    grp_idx <- idx[[g]]
+    # If stratified, then resample
     if (stratify) {
       if (weight_within) {
-        w <- weights[g]
+        w <- weights[[g]]
       } else {
         w <- rep(1, length(grp_idx))
       }
       bs <- bootstrap_(length(grp_idx), k = 1, weights = w, bayes = bayes)
       grp_idx <- grp_idx[bs[["sample"]][[1]]]
     }
-    tibble(idx = grp_idx, .group = rep(.id, length(grp_idx)))
+    tibble(sample = grp_idx, .group = rep(.id, length(grp_idx)))
   }
   # resample within all groups in a replicate and combine
   f2 <- function(s, .id) {
-    summarise_(map2_df(s, seq_along(s), f1),
-               sample = ~ flatten_int(sample),
-               .group = ~ flatten_int(.group),
+    res <- map2_df(s, seq_along(s), f1)
+    summarise_(res,
+               sample = ~ list(sample),
+               .group = ~ list(.group),
                .id = ~ .id)
   }
   to_resample_df(map2_df(grps[["sample"]], seq_along(grps[["sample"]]), f2),
