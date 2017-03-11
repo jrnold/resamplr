@@ -20,6 +20,6 @@ group_indices_lst <- function(data) {
 # convert resample data frame with index list column to one with resample
 # list column.
 to_resample_df <- function(x, .data) {
-  x[["sample"]] <- resample_lst(x[["sample"]], .data)
+  x[["sample"]] <- resample_lst(x[["sample"]], .data, check = FALSE)
   x
 }

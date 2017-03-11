@@ -53,8 +53,3 @@ jackknife.default <- function(x, p = 1L, ...) {
   res[[".id"]] <- seq_len(nrow(res))
   res
 }
-
-to_resample_df <- function(x, .data) {
-  x[["sample"]] <- resample_lst(x[["sample"]], .data)
-  x
-}
