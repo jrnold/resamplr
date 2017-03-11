@@ -38,11 +38,13 @@ crossv_kfold.grouped_df <- function(x, k = 5L, shuffle = TRUE,
   idx <- group_indices_lst(x)
   if (stratify) {
     f <- function(g) {
-      crossv_kfold_(length(g), k = k, shuffle = shuffle)
+      mutate_(crossv_kfold_(length(g), k = k, shuffle = shuffle),
+              train = ~ map(train, function(i) flatten_int(g[i])),
+              test = ~ map(test, function(i) flatten_int(g[i])))
     }
     res <- summarise_(group_by_(map_df(idx, f), ".id"),
-                      train = ~ list(flatten_int(idx[flatten_int(train)])),
-                      test = ~ list(flatten_int(idx[flatten_int(test)])))
+                      train = ~ list(flatten_int(train))
+                      test = ~ list(flatten_int(test)))
   } else {
     res <- mutate_(crossv_kfold_(length(idx), k, shuffle = shuffle),
                    train = ~ map(train, function(i) flatten_int(idx[i])),
