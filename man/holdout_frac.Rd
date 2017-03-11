@@ -4,7 +4,6 @@
 \alias{holdout_frac}
 \alias{holdout_frac.data.frame}
 \alias{holdout_frac.grouped_df}
-\alias{holdout_frac.default}
 \alias{holdout_n}
 \alias{holdout_n.data.frame}
 \alias{holdout_n.grouped_df}
@@ -12,18 +11,17 @@
 \usage{
 holdout_frac(x, ...)
 
-\method{holdout_frac}{data.frame}(x, p = 0.3, k = 1, shuffle = TRUE, ...)
+\method{holdout_frac}{data.frame}(x, size = 0.3, k = 1, shuffle = TRUE,
+  ...)
 
-\method{holdout_frac}{grouped_df}(x, p = p, k = k, shuffle = TRUE,
+\method{holdout_frac}{grouped_df}(x, size = 0.3, k = k, shuffle = TRUE,
   stratify = FALSE, ...)
-
-\method{holdout_frac}{default}(x, p = 0.3, k = 1L, shuffle = TRUE, ...)
 
 holdout_n(x, ...)
 
-\method{holdout_n}{data.frame}(x, n = 1L, k = 1L, shuffle = TRUE, ...)
+\method{holdout_n}{data.frame}(x, size = 1L, k = 1L, shuffle = TRUE, ...)
 
-\method{holdout_n}{grouped_df}(x, n = 1L, k = 1L, shuffle = TRUE,
+\method{holdout_n}{grouped_df}(x, size = 1L, k = 1L, shuffle = TRUE,
   stratify = FALSE, ...)
 }
 \arguments{
@@ -31,21 +29,20 @@ holdout_n(x, ...)
 
 \item{...}{Arguments passed to methods.}
 
-\item{p}{Fraction (proportion) of elements in the test set.}
+\item{size}{For \code{holdout_n}, the number of elements in the test set.
+For \code{holdout_frac}, the fraction of elements in test set.}
 
 \item{k}{Number of test/train splits to generate.}
 
 \item{shuffle}{If \code{TRUE}, the observations are randomly assigned to the
-test and training sets. If \code{FALSE}, then the last \code{p} or
-\code{n} of the observations are assigned to the test set, and
+test and training sets. If \code{FALSE}, then the last \code{size}
+elements are assigned to the test set, and
 the remainder of the observations are assigned to the training set.}
 
 \item{stratify}{If \code{TRUE}, then test-train splits are within each
 code group, so that the final test and train subsets have approximately
 equal proportions of each group. If \code{FALSE}, the the test-train splits
 splits groups into the testing and training sets.}
-
-\item{n}{Number of elements in the test set.}
 }
 \value{
 A data frame with \code{k} rows and columns
@@ -58,9 +55,9 @@ A data frame with \code{k} rows and columns
 }
 }
 \description{
-\code{holdout_frac} splits the data so that proportion \code{p} is in test
-set and \code{1 - p} is in the training set. Likewise, \code{holdout_n}
-splits the data so that \code{n} elements are in the test set and the
+\code{holdout_frac} splits the data so that proportion \code{size} is in test
+set and \code{1 - size} is in the training set. Likewise, \code{holdout_n}
+splits the data so that \code{size} elements are in the test set and the
 remainder are in the training set.
 }
 \examples{
