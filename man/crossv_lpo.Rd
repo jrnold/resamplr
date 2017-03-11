@@ -23,7 +23,7 @@ crossv_loo(x)
 \item{...}{Passed to methods}
 }
 \value{
-A data frame with \eqn{\binom{n}{p}}{n choose p} rows and the
+A data frame with \eqn{{n}\choose{p}}{n choose p} rows and the
 following columns:
 \describe{
 \item{train}{A list of \code{\link{resample}} objects. Training sets.}

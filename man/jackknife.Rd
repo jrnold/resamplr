@@ -21,7 +21,7 @@ jackknife, while \code{p > 1} is the delete-p jackknife.}
 \item{...}{Passed to methods}
 }
 \value{
-A data frame with \eqn{\binom{n}{p}}{n choose p} rows and the
+A data frame with \eqn{{n}\choose{p}}{n choose p} rows and the
 following columns:
 \describe{
 \item{sample}{A list of \code{\link{resample}} objects.}

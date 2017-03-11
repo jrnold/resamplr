@@ -6,7 +6,7 @@
 #' @param p The number of elements to delete; \code{p = 1} is the standard
 #'    jackknife, while \code{p > 1} is the delete-p jackknife.
 #' @param ... Passed to methods
-#' @return A data frame with \eqn{\binom{n}{p}}{n choose p} rows and the
+#' @return A data frame with \eqn{{n}\choose{p}}{n choose p} rows and the
 #' following columns:
 #' \describe{
 #' \item{sample}{A list of \code{\link{resample}} objects.}
