@@ -36,8 +36,8 @@ local({
     x <- holdout_n(dat, size = size, k = k, shuffle = FALSE)
     expect_crossv_df(x)
     expect_equal(nrow(x), k)
-    expect_identical(x$train[[1]], resample(dat, 1:8))
-    expect_identical(x$test[[1]], resample(dat, 9:10))
+    expect_identical(x$train[[1]], resample(dat, 3:10))
+    expect_identical(x$test[[1]], resample(dat, 1:2))
   })
 
   context("holdout_frac")

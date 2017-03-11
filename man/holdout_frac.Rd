@@ -12,17 +12,18 @@
 holdout_frac(x, ...)
 
 \method{holdout_frac}{data.frame}(x, size = 0.3, k = 1, shuffle = TRUE,
-  ...)
+  prob = NULL, ...)
 
 \method{holdout_frac}{grouped_df}(x, size = 0.3, k = k, shuffle = TRUE,
-  stratify = FALSE, ...)
+  stratify = FALSE, prob = NULL, ...)
 
 holdout_n(x, ...)
 
-\method{holdout_n}{data.frame}(x, size = 1L, k = 1L, shuffle = TRUE, ...)
+\method{holdout_n}{data.frame}(x, size = 1L, k = 1L, shuffle = TRUE,
+  prob = NULL, ...)
 
 \method{holdout_n}{grouped_df}(x, size = 1L, k = 1L, shuffle = TRUE,
-  stratify = FALSE, ...)
+  stratify = FALSE, prob = NULL, ...)
 }
 \arguments{
 \item{x}{A data frame}
@@ -35,9 +36,15 @@ For \code{holdout_frac}, the fraction of elements in test set.}
 \item{k}{Number of test/train splits to generate.}
 
 \item{shuffle}{If \code{TRUE}, the observations are randomly assigned to the
-test and training sets. If \code{FALSE}, then the last \code{size}
+test and training sets. If \code{FALSE}, then the \emph{first} \code{size}
 elements are assigned to the test set, and
 the remainder of the observations are assigned to the training set.}
+
+\item{prob}{Probability weight that an element is in the \code{test} set.
+If non-\code{NULL} this is numeric vector with \code{nrow(x)} row weights
+if \code{x} is a data frame or a grouped data frame and
+\code{stratify = TRUE}, or \code{n_groups(x)} group weights if \code{x} is
+a grouped data frame and \code{stratify = FALSE}.}
 
 \item{stratify}{If \code{TRUE}, then test-train splits are within each
 code group, so that the final test and train subsets have approximately
@@ -66,37 +73,37 @@ library("purrr")
 library("dplyr")
 
 # holdout three obs, repeat 10 times
-cv1 <- holdout_n(mtcars, n = 3, k = 10)
+cv1 <- holdout_n(mtcars, size = 3, k = 10)
 models <- map(cv1$train, ~ lm(mpg ~ wt, data = .))
 summary(map2_dbl(models, cv1$test, modelr::rmse))
 
 # holdout two groups at a time in the test set
 # repeat four times.
-cv2 <- holdout_n(group_by(mtcars, cyl), n = 2, k = 4)
+cv2 <- holdout_n(group_by(mtcars, cyl), size = 2, k = 4)
 models <- map(cv2$train, ~ lm(mpg ~ wt, data = .))
 summary(map2_dbl(models, cv2$test, modelr::rmse))
 
 # stratified holdout
 # holdout 1 obs each from each group. repeat 5 times.
-cv3 <- holdout_n(group_by(mtcars, am), n = 1, k = 5, stratified = TRUE)
+cv3 <- holdout_n(group_by(mtcars, am), size = 1, k = 5, stratified = TRUE)
 models <- map(cv3$train, ~ lm(mpg ~ wt, data = .))
 summary(map2_dbl(models, cv3$test, modelr::rmse))
 
 # Holdout fraction of the data
 
 # holdout 30\% of observations, repeat 10 times
-cv4 <- holdout_frac(mtcars, p = 0.3, k = 10)
+cv4 <- holdout_frac(mtcars, size = 0.3, k = 10)
 models <- map(cv4$train, ~ lm(mpg ~ wt, data = .))
 summary(map2_dbl(models, cv4$test, modelr::rmse))
 
 # holdout 30\% of groups at a time in the test set
-cv5 <- holdout_frac(group_by(mtcars, cyl), p = 0.3, k = 10)
+cv5 <- holdout_frac(group_by(mtcars, cyl), size = 0.3, k = 10)
 models <- map(cv5$train, ~ lm(mpg ~ wt, data = .))
 summary(map2_dbl(models, cv5$test, modelr::rmse))
 
 # stratified holdout
 # holdout 30\% of obs within each group.
-cv6 <- holdout_frac(group_by(mtcars, am), p = 0.3, k = 10, stratified = TRUE)
+cv6 <- holdout_frac(group_by(mtcars, am), size = 0.3, k = 10, stratified = TRUE)
 models <- map(cv6$train, ~ lm(mpg ~ wt, data = .))
 summary(map2_dbl(models, cv6$test, modelr::rmse))
 }
