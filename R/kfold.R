@@ -25,8 +25,7 @@ crossv_kfold <- function(x, k, ...) {
 #' @rdname crossv_kfold
 #' @export
 crossv_kfold.data.frame <- function(x, k = 5L, shuffle = TRUE, ...) {
-  idx <- seq_len(nrow(x))
-  to_crossv_df(crossv_kfold(idx, k, shuffle = shuffle), x)
+  to_crossv_df(crossv_kfold_(nrow(x), k = k, shuffle = shuffle), x)
 }
 
 #' @rdname crossv_kfold
@@ -38,37 +37,25 @@ crossv_kfold.grouped_df <- function(x, k = 5L, shuffle = TRUE,
   assert_that(is.flag(stratify))
   idx <- group_indices_lst(x)
   if (stratify) {
-    f <- function(i) crossv_kfold(i, k = k, shuffle = shuffle)
+    f <- function(g) {
+      crossv_kfold_(length(g), k = k, shuffle = shuffle)
+    }
     res <- summarise_(group_by_(map_df(idx, f), ".id"),
-                      train = ~ list(flatten_int(train)),
-                      test = ~ list(flatten_int(test)))
+                      train = ~ list(flatten_int(idx[flatten_int(train)])),
+                      test = ~ list(flatten_int(idx[flatten_int(test)])))
   } else {
-    res <- mutate_(crossv_kfold(idx, k, shuffle = shuffle),
-                   train = ~ map(train, flatten_int),
-                   test = ~ map(test, flatten_int))
+    res <- mutate_(crossv_kfold_(length(idx), k, shuffle = shuffle),
+                   train = ~ map(train, function(i) flatten_int(idx[i])),
+                   test = ~ map(test, function(i) flatten_int(idx[i])))
     res
   }
   to_crossv_df(res, x)[ , c("train", "test", ".id")]
 }
 
-#' @export
-#' @rdname crossv_kfold
-crossv_kfold.default <- function(x, k = 5L, shuffle = TRUE, ...) {
-  assert_that(is_vector(x))
-  assert_that(is.number(k) && k >= 2L && k <= length(x))
-  assert_that(is.flag(shuffle))
-  res <- crossv_kfold_(length(x), k = k, shuffle = shuffle)
-  f <- function(i) x[i]
-  res[["test"]] <- map(res[["test"]], f)
-  res[["train"]] <- map(res[["train"]], f)
-  res[[".id"]] <- seq_len(nrow(res))
-  res
-}
-
 crossv_kfold_ <- function(n, k = 5L, shuffle = TRUE, ...) {
   x <- seq_len(n)
   f <- function(i) {
-    tibble(train = list(setdiff(x, i)), test = list(i))
+    tibble(train = list(setdiff(x, i)), test = list(i), .id = i)
   }
   purrr::map_df(partition(x, as.integer(k), shuffle = shuffle), f)
 }

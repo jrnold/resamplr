@@ -27,8 +27,7 @@ crossv_tskfold <- function(x, k, ...) {
 #'    The ordering of the data frame is assmed to be meaningful.
 #' @export
 crossv_tskfold.data.frame <- function(x, k = 5L, ...) {
-  idx <- seq_len(nrow(x))
-  to_crossv_df(crossv_tskfold(idx, k), x)
+  to_crossv_df(crossv_tskfold_(nrow(x), k), x)
 }
 
 #' @describeIn crossv_tskfold The groups are split into folds. The
@@ -40,23 +39,10 @@ crossv_tskfold.data.frame <- function(x, k = 5L, ...) {
 #' @export
 crossv_tskfold.grouped_df <- function(x, k = 5L, ...) {
   idx <- group_indices_lst(x)
-  res <- mutate_(crossv_tskfold(idx, k),
-                 train = ~ map(train, flatten_int),
-                 test = ~ map(test, flatten_int))
+  res <- mutate_(crossv_tskfold_(length(idx), k),
+                 train = ~ map(train, function(i) flatten_int(idx[i])),
+                 test = ~ map(test, function(i) flatten_int(idx[i])))
   to_crossv_df(res, x)
-}
-
-#' @describeIn crossv_kfold The folds split the elements in the vector.
-#' @export
-crossv_tskfold.default <- function(x, k = 5L, ...) {
-  assert_that(is_vector(x))
-  assert_that(is.number(k) && k >= 2 && k <= length(x))
-  res <- crossv_tskfold_(length(x), k = k)
-  f <- function(i) x[i]
-  res[["test"]] <- map(res[["test"]], f)
-  res[["train"]] <- map(res[["train"]], f)
-  res[[".id"]] <- seq_len(nrow(res))
-  res
 }
 
 # work with index integers

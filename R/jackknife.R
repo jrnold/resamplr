@@ -24,35 +24,21 @@ jackknife <- function(x, p, ...) {
 #' @rdname jackknife
 #' @export
 jackknife.data.frame <- function(x, p = 1L, ...) {
-  idx <- seq_len(nrow(x))
-  res <- jackknife(idx, p = p)
-  to_resample_df(res, x)
+  to_resample_df(jackknife_(nrow(x), p = p), x)
 }
 
 #' @rdname jackknife
 #' @export
 jackknife.grouped_df <- function(x, p = 1L, ...) {
   idx <- group_indices_lst(x)
-  res <- mutate_(jackknife(idx, p = p),
-                 sample = ~ map(sample, flatten_int))
+  res <- mutate_(jackknife_(length(idx), p = p),
+                 sample = ~ map(sample, function(i) flatten_int(idx[i])))
   to_resample_df(res, x)
 }
 
-#' @export
-#' @importFrom dplyr bind_rows
-#' @importFrom purrr is_vector
-#' @rdname jackknife
-jackknife.default <- function(x, p = 1L, ...) {
-  assert_that(is_vector(x))
-  assert_that(is.number(p) && p >= 1)
-  p <- as.integer(p)
-  f <- function(i) x[i]
-  res <- tibble(sample = map(jackknife_(length(x), p = p), f))
-  res[[".id"]] <- seq_len(nrow(res))
-  res
-}
-
 jackknife_ <- function(n, p = 1L, ...) {
+  assert_that(is_number(n) && n >= 1)
+  assert_that(is.number(p) && p >= 1)
   idx <- seq_len(n)
   f <- function(i) setdiff(idx, i)
   if (p == 1) {
@@ -60,10 +46,5 @@ jackknife_ <- function(n, p = 1L, ...) {
   } else {
     res <- utils::combn(idx, p, FUN = f, simplify = FALSE)
   }
-  res
-}
-
-to_resample_df <- function(x, .data) {
-  x[["sample"]] <- resample_lst(x[["sample"]], .data)
-  x
+  tibble(sample = res, .id = seq_along(res))
 }
