@@ -55,7 +55,7 @@ crossv_kfold.grouped_df <- function(x, k = 5L, shuffle = TRUE,
 #' @rdname crossv_kfold
 crossv_kfold.default <- function(x, k = 5L, shuffle = TRUE, ...) {
   assert_that(is_vector(x))
-  assert_that(is.number(k) && k >= 1 && k <= length(x))
+  assert_that(is.number(k) && k >= 2L && k <= length(x))
   assert_that(is.flag(shuffle))
   res <- crossv_kfold_(length(x), k = k, shuffle = shuffle)
   f <- function(i) x[i]

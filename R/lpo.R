@@ -43,7 +43,7 @@ crossv_lpo.default <- function(x, p = 1L, ...) {
   assert_that(is.number(p) && p >= 1)
   p <- as.integer(p)
   f <- function(i) x[i]
-  res <- jackknife_(length(x), p = p)
+  res <- crossv_lpo_(length(x), p = p)
   res[["train"]] <- map(res[["train"]], f)
   res[["test"]] <- map(res[["test"]], f)
   res[[".id"]] <- seq_len(nrow(res))
