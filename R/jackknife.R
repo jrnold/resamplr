@@ -24,32 +24,27 @@ jackknife <- function(x, p, ...) {
 #' @rdname jackknife
 #' @export
 jackknife.data.frame <- function(x, p = 1L, ...) {
-  idx <- seq_len(nrow(x))
-  to_resample_df(jackknife(idx, p = p), x)
+  to_resample_df(jackknife_(nrow(x), p = p), x)
 }
 
 #' @rdname jackknife
 #' @export
 jackknife.grouped_df <- function(x, p = 1L, ...) {
   idx <- group_indices_lst(x)
-  res <- mutate_(jackknife(idx, p = p),
-                 sample = ~ map(sample, flatten_int))
+  res <- mutate_(jackknife_(length(idx), p = p),
+                 sample = ~ map(sample, function(i) flatten_int(idx[i])))
   to_resample_df(res, x)
 }
 
-#' @export
-#' @importFrom dplyr bind_rows
-#' @rdname jackknife
-jackknife.default <- function(x, p = 1L, ...) {
+jackknife_ <- function(n, p = 1L, ...) {
+  assert_that(is_number(n) && n >= 1)
   assert_that(is.number(p) && p >= 1)
-  f <- function(i) {
-    tibble(sample = list(setdiff(x, i)))
-  }
+  idx <- seq_len(n)
+  f <- function(i) setdiff(idx, i)
   if (p == 1) {
-    res <- map_df(x, f)
+    res <- map(idx, f)
   } else {
-    res <- bind_rows(utils::combn(x, p, FUN = f, simplify = FALSE))
+    res <- utils::combn(idx, p, FUN = f, simplify = FALSE)
   }
-  res[[".id"]] <- seq_len(nrow(res))
-  res
+  tibble(sample = res, .id = seq_along(res))
 }

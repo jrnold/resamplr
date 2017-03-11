@@ -21,35 +21,32 @@ crossv_lpo <- function(x, p, ...) {
 #' @rdname crossv_lpo
 #' @export
 crossv_lpo.data.frame <- function(x, p = 1L, ...) {
-  idx <- seq_len(nrow(x))
-  to_crossv_df(crossv_lpo(idx, p = p), x)
+  to_crossv_df(crossv_lpo_(nrow(x), p = p), x)
 }
 
 #' @rdname crossv_lpo
 #' @export
 crossv_lpo.grouped_df <- function(x, p = 1L, ...) {
   idx <- group_indices_lst(x)
-  res <- mutate_(crossv_lpo(idx, p = p),
-                 train = ~ map(train, flatten_int),
-                 test = ~ map(test, flatten_int))
+  res <- mutate_(crossv_lpo_(length(idx), p = p),
+                 train = ~ map(train, function(i) flatten_int(idx[i])),
+                 test = ~ map(test, function(i) flatten_int(idx[i])))
   to_crossv_df(res, x)
 }
 
-#' @export
-#' @importFrom dplyr bind_rows
-#' @rdname crossv_lpo
-crossv_lpo.default <- function(x, p = 1L, ...) {
+crossv_lpo_ <- function(n, p = 1L, ...) {
+  assert_that(is.number(n) && n >= 1)
   assert_that(is.number(p) && p >= 1)
+  p <- as.integer(p)
+  x <- seq_len(n)
   f <- function(i) {
-    tibble(train = list(setdiff(x, i)), test = list(i))
+    tibble(train = list(setdiff(x, i)), test = list(i), .id = i)
   }
   if (p == 1) {
-    res <- map_df(x, f)
+    map_df(x, f)
   } else {
-    res <- bind_rows(utils::combn(x, p, FUN = f, simplify = FALSE))
+    bind_rows(utils::combn(x, p, FUN = f, simplify = FALSE))
   }
-  res[[".id"]] <- seq_len(nrow(res))
-  res
 }
 
 #' @export

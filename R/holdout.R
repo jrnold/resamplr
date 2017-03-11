@@ -29,11 +29,8 @@ holdout_frac <- function(x, ...) {
 #' @export
 holdout_frac.data.frame <- function(x, p = 0.3, k = 1, shuffle = TRUE, ...) {
   assert_that(is.number(p) && p >= 0 && p <= 1)
-  assert_that(is.number(k) && k > 0)
-  assert_that(is.flag(shuffle))
-  idx <- seq_len(nrow(x))
-  res <- holdout_frac(idx, p = p, k = k, shuffle = shuffle, ...)
-  to_crossv_df(res, x)
+  n <- round(p * length(x))
+  holdout_n(x, n = n, k = k, shuffle = shuffle)
 }
 
 #' @rdname holdout_frac
@@ -43,28 +40,23 @@ holdout_frac.grouped_df <- function(x, p = p, k = k,
                                     stratify = FALSE,
                                     ...) {
   assert_that(is.number(p) && p >= 0 && p <= 1)
-  assert_that(is.number(k) && k > 0)
-  assert_that(is.flag(shuffle))
   assert_that(is.flag(stratify))
   idx <- group_indices_lst(x)
   if (stratify) {
-    # since n varies with group, need to
-    grp_sz <- round(purrr::map_int(idx, length) * p)
-    f <- function(.id) {
-      x <- purrr::map2_df(idx, grp_sz, function(i, n) {
-        holdout_n(i, n = n, k = 1L, shuffle = shuffle)
-      })
-      x[[".id"]] <- .id
-      x[["test"]] <- flatten_int(x[["test"]])
-      x[["train"]] <- flatten_int(x[["train"]])
-      x
+    f <- function(g) {
+      n <- p * length(g)
+      mutate_(holdout_n_(length(g), n = n, k = k, shuffle = shuffle),
+              train = ~ map(train, function(i) g[i]),
+              test = ~ map(test, function(i) g[i]))
     }
-    x <- purrr::map_df(seq_len(k), f)
+    res <- summarise_(group_by_(map_df(idx, f), ".id"),
+                      train = ~ list(flatten_int(train)),
+                      test = ~ list(flatten_int(test)))
+    to_crossv_df(res, x)
   } else {
     n <- round(p * length(idx))
     res <- holdout_n(x, n = n, k = k, stratify = FALSE, ...)
   }
-  to_crossv_df(res, x)
 }
 
 #' @rdname holdout_frac
@@ -83,11 +75,7 @@ holdout_n <- function(x, ...) {
 #' @rdname holdout_frac
 #' @export
 holdout_n.data.frame <- function(x, n = 1L, k = 1L, shuffle = TRUE, ...) {
-  assert_that(is.number(n) && n >= 0 && n <= nrow(x))
-  assert_that(is.number(k) && k > 0)
-  assert_that(is.flag(shuffle))
-  idx <- seq_len(nrow(x))
-  res <- holdout_n(idx, n = n, k = k, shuffle = shuffle, ...)
+  res <- holdout_n(nrow(x), n = n, k = k, shuffle = shuffle, ...)
   to_crossv_df(res, x)
 }
 
@@ -95,60 +83,40 @@ holdout_n.data.frame <- function(x, n = 1L, k = 1L, shuffle = TRUE, ...) {
 #' @export
 holdout_n.grouped_df <- function(x, n = 1L, k = 1L, shuffle = TRUE,
                                  stratify = FALSE, ...) {
-  assert_that(is.number(n) && n >= 0)
-  assert_that(is.number(k) && k >= 0)
-  assert_that(is.flag(shuffle))
   assert_that(is.flag(stratify))
   idx <- group_indices_lst(x)
   if (stratify) {
-    f <- function(.id) {
-      d <- purrr::map_df(idx, function(i) {
-        holdout_n(i, n = n, k = 1L, shuffle = shuffle)
-      })
-      tibble(
-        train = list(flatten_int(d[["train"]])),
-        test = list(flatten_int(d[["test"]])),
-        .id = .id)
+    f <- function(g) {
+      mutate_(holdout_n_(length(g), n = n, k = k, shuffle = shuffle),
+              train = ~ map(train, function(i) g[i]),
+              test = ~ map(test, function(i) g[i]))
     }
-    res <- purrr::map_df(seq_len(k), f)
+    res <- summarise_(group_by_(map_df(idx, f), ".id"),
+                      train = ~ list(flatten_int(train)),
+                      test = ~ list(flatten_int(test)))
   } else {
-    res <- dplyr::mutate_(holdout_n(idx, n = n, k = k, shuffle = shuffle),
-                         train = ~ map(train, flatten_int),
-                         test = ~ map(test, flatten_int))
+    res <- mutate_(holdout_n_(length(idx), n = n, k = k, shuffle = shuffle),
+                   train ~ map(train, function(i) flatten_int(idx[i])),
+                   test ~ map(test, function(i) flatten_int(idx[i])))
   }
   to_crossv_df(res, x)
 }
 
-holdout_n_ <- function(idx, n, shuffle = TRUE) {
-  if (shuffle) {
-    idx <- sample(idx, length(idx), replace = FALSE)
-  }
-  test_idx <- utils::tail(idx, n)
-  tibble(train = list(setdiff(idx, test_idx)), test = list(test_idx))
-}
-
-#' @rdname holdout_frac
-#' @importFrom purrr map_df
-#' @export
-holdout_n.default <- function(x, n, k = 1, shuffle = TRUE, ...) {
+holdout_n_ <- function(x, n = 1L, k = 1L, shuffle = TRUE) {
+  assert_that(is.number(x) && x >= 1)
+  assert_that(is.number(n) && n >= 0)
+  assert_that(is.number(n) && k >= 0)
+  assert_that(is.flag(shuffle))
   f <- function(i) {
-    res <- holdout_n_(x, n, shuffle = shuffle)
-    res[[".id"]] <- i
-    res
+    if (shuffle) {
+      idx <- sample.int(x, x, replace = FALSE)
+    } else {
+      idx <- seq_len(x)
+    }
+    test_idx <- utils::tail(idx, n)
+    tibble(train = list(setdiff(idx, test_idx)),
+           test = list(test_idx),
+           .id = i)
   }
   map_df(seq_len(k), f)
 }
-
-to_crossv_df <- function(x, data) {
-  x[["train"]] <- resample_lst(data, x[["train"]], check = FALSE)
-  x[["test"]] <- resample_lst(data, x[["test"]], check = FALSE)
-  x
-}
-
-# crossv_df <- function(.data, ...) {
-#   structure(.data, class = c("crossv_df", class(.data)))
-# }
-#
-# resample_df <- function(.data, ...) {
-#   structure(.data, class = c("resample_df", class(.data)))
-# }
