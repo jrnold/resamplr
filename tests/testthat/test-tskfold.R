@@ -17,5 +17,4 @@ local({
     expect_crossv_df(x)
     expect_equal(nrow(x), k - 1)
   })
-
 })

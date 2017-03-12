@@ -138,7 +138,7 @@ holdout_n.grouped_df <- function(x, size = 1L, k = 1L, shuffle = TRUE,
                    train ~ map(train, function(i) flatten_int(idx[i])),
                    test ~ map(test, function(i) flatten_int(idx[i])))
   }
-  to_crossv_df(res, x)[ , c("train", "test", ".id")]
+  to_crossv_df(res, x)[, c("train", "test", ".id")]
 }
 
 # using size for the name of the heldout set and n for the size of the

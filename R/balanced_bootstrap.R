@@ -60,7 +60,7 @@ balanced_bootstrap.grouped_df <- function(data, k = 1L, stratify = FALSE, ...) {
                    }),
                    sample = ~ map(sample, function(i) flatten_int(idx[i])))
   }
-  to_resample_df(res, data)[ , c("sample", ".group", ".id")]
+  to_resample_df(res, data)[, c("sample", ".group", ".id")]
 }
 
 balanced_bootstrap_ <- function(n, k = 1L) {

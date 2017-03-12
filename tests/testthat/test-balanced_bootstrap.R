@@ -14,7 +14,8 @@ local({
                      rep(seq_len(nrow(dat)), each = k))
   })
 
-  test_that("balanced_bootstrap.grouped_df(stratify = FALSE) works as expected", {
+  test_that(paste0("balanced_bootstrap.grouped_df(stratify = FALSE)",
+                   " works as expected"), {
     k <- 3
     x <- balanced_bootstrap(gdat, k, stratify = FALSE)
     expect_resample_df(x)
