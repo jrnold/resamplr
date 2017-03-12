@@ -4,20 +4,21 @@
 \alias{permute}
 \alias{permute.data.frame}
 \alias{permute.grouped_df}
-\title{Generate permutations samples}
+\title{Generate permutation samples}
 \usage{
 permute(x, ...)
 
 \method{permute}{data.frame}(x, k = 1L, ...)
 
-\method{permute}{grouped_df}(x, k = 1L, stratify = TRUE, ...)
+\method{permute}{grouped_df}(x, k = 1L, stratify = FALSE, ...)
 }
 \arguments{
 \item{x}{A data frame}
 
 \item{...}{Passed to methods}
 
-\item{k}{The number of permutations to generate.}
+\item{k}{The number of permutations to generate. If \code{k = Inf}, then
+the full set of permutations is generated.}
 
 \item{stratify}{If \code{TRUE}, the permute observations within each group.
 Otherwise permute the groups themselves.}
@@ -30,5 +31,5 @@ A data frame with \code{k} rows and the following columns:
 }
 }
 \description{
-Generate permutations samples
+Generate permutation samples
 }

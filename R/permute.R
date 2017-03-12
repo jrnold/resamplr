@@ -1,4 +1,4 @@
-#' Generate permutations samples
+#' Generate permutation samples
 #'
 #' @param x A data frame
 #' @param k The number of permutations to generate.
@@ -15,19 +15,19 @@ permute <- function(x, ...) {
   UseMethod("permute")
 }
 
-# Note: this code is largely redundant and the same as crossv_loo
-# It could be replaced by calling crossv_lpo, and then manipulating the returned
-# data frame.
-
 #' @rdname permute
 #' @export
 permute.data.frame <- function(x, k = 1L, ...) {
+  assert_that(is.number(k) && k >= 1)
   to_resample_df(permute_(nrow(x), k = k), x)
 }
 
 #' @rdname permute
 #' @export
-permute.grouped_df <- function(x, k = 1L, stratify = TRUE, ...) {
+permute.grouped_df <- function(x, k = 1L, stratify = FALSE, ...) {
+  assert_that(is.number(k) && k >= 1 && k < Inf)
+  # cannot do full permuatations
+  assert_that(is.flag(stratify))
   idx <- group_indices_lst(x)
   if (stratify) {
     f <- function(g) {
@@ -43,7 +43,13 @@ permute.grouped_df <- function(x, k = 1L, stratify = TRUE, ...) {
   to_resample_df(res, x)[, c("sample", ".id")]
 }
 
-permute_ <- function(n, k = 1L, ...) {
-  tibble(sample = purrr::rerun(k, sample.int(n, n, replace = FALSE)),
-         .id = seq_len(k))
+permute_ <- function(n, k = 1L, force_random = FALSE) {
+  # allow for full set of permutations if someone really wants it
+  # return full set of permutations if k >= n!
+  if (is.infinite(k) || (k >= factorial(n) && !force_random)) {
+    tibble(sample = combinat::permn(n), .id = seq_along(sample))
+  } else {
+    tibble(sample = purrr::rerun(k, sample.int(n, n, replace = FALSE)),
+           .id = seq_len(k))
+  }
 }
