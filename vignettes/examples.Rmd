@@ -1,0 +1,101 @@
+---
+title: "The resamplr package"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteIndexEntry{Examples}
+  %\VignetteEncoding{UTF-8}
+---
+
+This vignette contains some examples of cross-validation and bootstrapping with **resampler**.
+
+## Cross Validation
+
+These examples are taken from the examples in `cv.glm` in the **boot** package.
+
+Calculate leave-one-out and 6-fold cross-validation prediction error for a regression of mammal brain size on body size using the `mammals` data set. This 
+will use RMSE as the cost function.
+```{r}
+library("resamplr")
+data(mammals, package = "MASS")
+mammals_cvloo <- crossv_loo(mammals)
+mammals_cv6 <- crossv_kfold(mammals, k = 6)
+
+mammals_err <- function(train, test) {
+  mod <- glm(log(brain) ~ log(body), data = as.data.frame(train))
+  modelr::rmse(mod, as.data.frame(test))
+}
+
+map2_dbl(mammals_cvloo$train, mammals_cvloo$test, 
+         mammals_err) %>%
+  mean()
+
+map2_dbl(mammals_cv6$train, mammals_cv6$test, 
+         mammals_err) %>%
+  mean()
+
+```
+
+Consider a regression of whether prostate cancer had spread to lymph nodes (`r`) in prostate cancer patients on several predictors.
+
+We will calculate the out-of-sample fit using  leave-one-out cross validation and and 11-fold cross-validation prediction error for the `nodal` data set.  
+Since it a binary outcome, we'll use the proportion classified correctly,
+$$
+\frac{1}{n} \sum I(\vert y_i - \hat{p}_i \vert > 0),
+$$
+as a measure of fit.
+```{r}
+nodal_err <- function(train, test) {
+  mod <- glm(r ~ stage + xray + acid, binomial, data = as.data.frame(train))  
+  test <- as.data.frame(test)
+  p <- predict(mod, newdata = test, type = "response")
+  mean(abs(test$r - p) > 0.5)
+}
+```
+The expected fit from LOO-CV,
+```{r}
+nodal_cvloo <- crossv_loo(nodal)
+map2_dbl(nodal_cvloo$train, nodal_cvloo$test, nodal_err) %>%
+  mean()
+```
+and from 11-fold cross-validation,
+```{r}
+nodal_cv11 <- crossv_kfold(nodal, 11)
+map2_dbl(nodal_cv11$train, nodal_cv11$test, nodal_err) %>%
+  mean()
+```
+
+
+## Bootstrap
+
+The examples are taken from the examples in the `boot` function of the **boot** package.
+
+This is an ordinary bootstrap of the ratio of means using the `city` data
+```{r}
+bootstrap(city, k = 999) %>%
+  mutate(ratio_means = map_dbl(sample, function(d) {
+    d <- as.data.frame(d)
+    mean(d$x) / mean(d$u)
+  })) %>%
+  summarise_at(vars(ratio_means), funs(mean, sd))
+```
+
+A stratified bootstrap uses the `bootstrap` function, but requires a `grouped_df` object as input.
+The method `bootstrap.grouped_df` can resample groups (`groups = TRUE`), within groups (`stratify = TRUE`) or both. The default is a clustered bootstrap, resampling groups, but not rows within groups (`groups = TRUE, stratify = FALSE`).
+
+In this example we will look at the difference of means between the final two series in the `gravity` data.
+```{r}
+gravity %>%
+  filter(series %in% c("7", "8")) %>%
+  group_by(series) %>%
+  bootstrap(k = 999, stratify = TRUE, groups = FALSE) %>%
+  mutate(diff_means = map_dbl(sample, function(d) {
+    as.data.frame(d) %>%
+      group_by(series) %>%
+      summarise(g = mean(g)) %>%
+      summarise(diff_means = base::diff(g)) %>%
+      `[[`("diff_means")
+  })) %>%
+  summarise_at(vars(diff_means), funs(mean, sd))
+```
+
