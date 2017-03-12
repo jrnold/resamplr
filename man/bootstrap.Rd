@@ -42,7 +42,12 @@ group-level weight.}
 use observation level weights to sample observations within each group.}
 }
 \value{
-A \code{\link[modelr]{resample}} object.
+A data frame with \code{k} rows and columns:
+\describe{
+\item{\code{sample}}{A list of \code{\link{resample}} objects with
+with the bootstrap replicates.}
+\item{\code{.id}}{An integer vector with replicate ids}
+}
 }
 \description{
 Generate bootstrap replicates. In addition to the ordinary bootstrap,

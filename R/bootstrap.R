@@ -22,7 +22,12 @@
 #' @param weight_within If \code{TRUE} and \code{stratify = TRUE}, then
 #'    use observation level weights to sample observations within each group.
 #' @param bayes If \code{TRUE}, a Bayesian bootstrap is used.
-#' @return A \code{\link[modelr]{resample}} object.
+#' @return A data frame with \code{k} rows and columns:
+#' \describe{
+#' \item{\code{sample}}{A list of \code{\link{resample}} objects with
+#' with the bootstrap replicates.}
+#' \item{\code{.id}}{An integer vector with replicate ids}
+#' }
 #' @export
 bootstrap <- function(data, ...) {
   UseMethod("bootstrap")
@@ -62,7 +67,6 @@ bootstrap.grouped_df <- function(data, k = 1L,
   assert_that(is.null(weights) || is.string(weights))
   assert_that(is.flag(weight_groups))
   assert_that(is.flag(weight_within))
-  n <- nrow(data)
   idx <- group_indices_lst(data)
   # fill in weights if none exist
   # split weights by groups for easier lookup
