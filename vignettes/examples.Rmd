@@ -9,6 +9,15 @@ vignette: >
 
 This vignette contains some examples of cross-validation and bootstrapping with **resampler**.
 
+## Preliminaries
+
+```{r message=FALSE}
+library("tidyverse")
+library("broom")
+library("resamplr")
+```
+
+
 ## Cross Validation
 
 These examples are taken from the examples in `cv.glm` in the **boot** package.
@@ -16,7 +25,6 @@ These examples are taken from the examples in `cv.glm` in the **boot** package.
 Calculate leave-one-out and 6-fold cross-validation prediction error for a regression of mammal brain size on body size using the `mammals` data set. This 
 will use RMSE as the cost function.
 ```{r}
-library("resamplr")
 data(mammals, package = "MASS")
 mammals_cvloo <- crossv_loo(mammals)
 mammals_cv6 <- crossv_kfold(mammals, k = 6)
@@ -99,3 +107,27 @@ gravity %>%
   summarise_at(vars(diff_means), funs(mean, sd))
 ```
 
+
+Example from `car::Boot`:
+
+Run a regression of fertility on several socioeconomic measures for
+the 47 French-speaking provinces of Switzerland in around 1888.
+Use the ordinary non-parametric bootstrap, and calculate the standard errors
+of $\hat{\beta}$ and $\hat{\sigma}$.
+```{r}
+swiss_bs <- bootstrap(swiss, k = 200) %>%
+  mutate(mod = map(sample, ~ lm(Fertility ~ ., data = .x)))
+```
+
+Find the standard deviation for $\hat{\beta}$,
+```{r}
+map_df(swiss_bs$mod, broom::tidy) %>%
+  group_by(term) %>%
+  summarise(mean = mean(estimate), se = sd(estimate))
+```
+and for $\hat{\sigma}$,
+```{r}
+swiss_bs %>%
+  mutate(sigma = map_dbl(mod, ~ summary(.x)$sigma)) %>%
+  summarise_at(vars(sigma), funs(mean, sd))
+```
