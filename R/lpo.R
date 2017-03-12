@@ -14,6 +14,7 @@
 #' \item{.id}{Character vector. ID of the fold.}
 #' }
 #' @export
+#' @example inst/examples/ex-crossv_lpo.R
 crossv_lpo <- function(x, p, ...) {
   UseMethod("crossv_lpo")
 }

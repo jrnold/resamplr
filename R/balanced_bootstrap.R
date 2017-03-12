@@ -22,8 +22,8 @@
 #' \item{Davison, A.C., Hinkley, D.V., and Schechtman, E. 1986.
 #' "Efficient Bootstrap Simulation." \emph{Biometrika}.}
 #' }
-#'
 #' @export
+#' @example inst/examples/ex-balanced_bootstrap.R
 balanced_bootstrap <- function(data, ...) {
   UseMethod("balanced_bootstrap")
 }

@@ -42,6 +42,18 @@ appears \code{k} times.
 within groups (if \code{stratify = TRUE}).
 }}
 
+\examples{
+# example from modelr::bootstrap
+library("purrr")
+library("dplyr")
+boot <- balanced_bootstrap(mtcars, 100)
+
+models <- map(boot$sample, ~ lm(mpg ~ wt, data = .))
+tidied <- map_df(models, broom::tidy, .id = "id")
+
+hist(subset(tidied, term == "wt")$estimate)
+hist(subset(tidied, term == "(Intercept)")$estimate)
+}
 \references{
 \itemize{
 \item{Gleason, John R. 1988. "Algorithms for Balanced Bootstrap Simulations." \emph{The American Statistician}

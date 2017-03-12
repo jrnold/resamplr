@@ -17,8 +17,7 @@ permute(x, ...)
 
 \item{...}{Passed to methods}
 
-\item{k}{The number of permutations to generate. If \code{k = Inf}, then
-the full set of permutations is generated.}
+\item{k}{The number of permutations to generate.}
 
 \item{stratify}{If \code{TRUE}, the permute observations within each group.
 Otherwise permute the groups themselves.}

@@ -29,6 +29,7 @@
 #' \item{\code{.id}}{An integer vector with replicate ids}
 #' }
 #' @export
+#' @example inst/examples/ex-bootstrap.R
 bootstrap <- function(data, ...) {
   UseMethod("bootstrap")
 }

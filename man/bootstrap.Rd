@@ -66,3 +66,15 @@ bootstrapping within groups (stratified bootstrap) if
 \code{stratify = TRUE}.
 }}
 
+\examples{
+# example from modelr::bootstrap
+library("purrr")
+library("dplyr")
+boot <- balanced_bootstrap(mtcars, 100)
+
+models <- map(boot$sample, ~ lm(mpg ~ wt, data = .))
+tidied <- map_df(models, broom::tidy, .id = "id")
+
+hist(subset(tidied, term == "wt")$estimate)
+hist(subset(tidied, term == "(Intercept)")$estimate)
+}
