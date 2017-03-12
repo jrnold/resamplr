@@ -70,4 +70,14 @@ local({
     expect_equal(nrow(x), k)
   })
 
+  test_that("holdout_n.grouped_df stratify = TRUE, prob works as expected", {
+    size <- 2
+    k <- 2
+    prob <- runif(nrow(dat_grouped))
+    x <- holdout_n(dat_grouped, size = size, k = k, stratify = TRUE,
+                   prob = prob)
+    expect_crossv_df(x)
+    expect_equal(nrow(x), k)
+  })
+
 })

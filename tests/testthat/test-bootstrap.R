@@ -124,5 +124,4 @@ local({
     expect_is(x$.group, "list")
     expect_true(all(map_lgl(x$.group, is.integer)))
   })
-
 })
