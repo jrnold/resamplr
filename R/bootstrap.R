@@ -64,6 +64,8 @@ bootstrap.grouped_df <- function(data, k = 1L,
                                   bayes = FALSE, ...) {
   assert_that(is.flag(stratify))
   assert_that(is.flag(groups))
+  # One of these needs to be specified
+  assert_that(stratify || groups)
   assert_that(is.null(weights) || is.string(weights))
   assert_that(is.flag(weight_groups))
   assert_that(is.flag(weight_within))
