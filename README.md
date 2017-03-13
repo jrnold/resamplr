@@ -26,8 +26,8 @@ These functions are grouped data frame aware, with `data.frame` methods workin o
   - Leave-p-Out: `crossv_lpo()`. Grouped data frame method leaves $p$ groups out.
   - Time-series k-fold: `crossv_tskfold`. Grouped data frame method supports groupwise k-folds.
   
-
-
+- Jackknife (including delete-p Jackknife): `jackknife()`
+- Permutations: `permute()`
 
 
 ## Installation
