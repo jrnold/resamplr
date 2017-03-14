@@ -79,7 +79,7 @@ roll.grouped_df <- function(data,
   res <- mutate_(roll_(n, width = width, align = align, partial = partial,
                        indices = indices, from = from, to = to, by = by,
                        offsets = offsets),
-                 sample = ~ map(train, f))
+                 sample = ~ map(sample, f))
   to_resample_df(res, data)
 }
 
@@ -93,15 +93,16 @@ roll_ <- function(n,
                   by = 1L,
                   offsets = NULL) {
   # I don't think I need this function
-  offsets <- as.integer(offsets) %||% as.integer(switch(
+  offsets <- offsets %||% switch(
     align,
     right = seq(to = 0L, length.out = width),
     center = seq(to = floor(width / 2), length.out = width),
     left = seq(from = 0L, length.out = width)
-  ))
+  )
+  offsets <- as.integer(offsets)
   f <- function(i) {
     window <- i + offsets
-    inrange <- window >= 1 && window <= n
+    inrange <- window >= 1 & window <= n
     if (all(inrange) || (partial && (sum(inrange) >= partial))) {
       tibble(sample = list(window[inrange]), .id = i)
     } else {

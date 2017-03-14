@@ -25,4 +25,12 @@ local({
     expect_equal(nrow(x), k)
   })
 
+  test_that("permute returns full permutation if k > total permuations", {
+    k <- 10
+    dat <- tibble(a = 1:3)
+    x <- permute(dat, k)
+    expect_resample_df(x)
+    expect_equal(nrow(x), factorial(nrow(dat)))
+  })
+
 })
