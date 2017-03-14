@@ -3,8 +3,6 @@
 [![Travis-CI Build Status](https://travis-ci.org/jrnold/resamplr.svg?branch=master)](https://travis-ci.org/jrnold/resamplr)
 [![codecov](https://codecov.io/gh/jrnold/resamplr/branch/master/graph/badge.svg)](https://codecov.io/gh/jrnold/resamplr)
 
-**WORK IN PROGRESS**
-
 **resamplr** adds additional resampling functions for the **modelr** lazy resamping object `resample`.
 These functions are grouped data frame aware, with `data.frame` methods workin on rows, and `grouped_df` methods allowing for group-wise or stratified versions of the resampling/CV algorithms.
 
@@ -16,6 +14,7 @@ These functions are grouped data frame aware, with `data.frame` methods workin o
   - Cluster bootstrap: `bootstrap.grouped_df(data, groups = TRUE)`
   - Stratified bootstrap: `bootstrap.grouped_df(data, groups = FALSE, stratify = TRUE)`
   - Balanced bootstrap: `balanced_bootstrap(data, ...)`
+  - Time series (moving block) bootstrap: `tsbootstrap()`
   
 - Cross Validation
 
@@ -25,9 +24,11 @@ These functions are grouped data frame aware, with `data.frame` methods workin o
   - Leave-one-Out: `crossv_loo()`. Grouped data frame method leaves groups out.
   - Leave-p-Out: `crossv_lpo()`. Grouped data frame method leaves $p$ groups out.
   - Time-series k-fold: `crossv_tskfold`. Grouped data frame method supports groupwise k-folds.
+  - Time-series cross-validation `crossv_ts`
   
 - Jackknife (including delete-p Jackknife): `jackknife()`
 - Permutations: `permute()`
+- Rolling windows: `roll()`
 
 
 ## Installation
