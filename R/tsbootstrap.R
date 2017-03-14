@@ -39,56 +39,56 @@ tsbootstrap.data.frame <- function(data, k = 1L, size = 1L, ...) {
 #' @export
 tsbootstrap.grouped_df <- function(data, k = 1L, size = 1L, ...) {
   idx <- group_indices_lst(data)
+  f <- function(i) flatten_int(idx[i])
   res <- mutate_(tsbootstrap_(length(idx), k = k, size = size),
-                 sample = ~ map(sample, function(i) flatten_int(idx[i])))
+                 sample = ~ map(sample, f))
   to_resample_df(res, data)
 }
 
+# Fixed Moving Block Bootstrap from boot::tsboot
+# .tsboot_mbb <- function(n, m, size = 1, endcorr = TRUE) {
+#   mod <- function(i, n) {
+#     if (endcorr) 1 + (i - 1) %% n
+#     else i
+#   }
+#   endpt <- if (endcorr) {
+#     n
+#   } else {
+#     n - size + 1
+#   }
+#   nn <- ceiling(m / size)
+#   lens <- c(rep(size, nn - 1), 1 + (m - 1) %% size)
+#   st <- sample.int(endpt, nn, replace = TRUE)
+#   purrr::map2_int(st, lens, function(s, sz) {
+#     if (sz > 1) mod(seq(s, s + sz - 1L), n)
+#     else integer()
+#   })
+# }
 
 # Fixed Moving Block Bootstrap from boot::tsboot
-.tsboot_mbb <- function(n, m, size = 1, endcorr = TRUE) {
-  mod <- function(i, n) {
-    if (endcorr) 1 + (i - 1) %% n
-    else i
-  }
-  endpt <- if (endcorr) {
-    n
-  } else {
-    n - size + 1
-  }
-  nn <- ceiling(m / size)
-  lens <- c(rep(size, nn - 1), 1 + (m - 1) %% size)
-  st <- sample.int(endpt, nn, replace = TRUE)
-  purrr::map2_int(st, lens, function(s, sz) {
-    if (sz > 1) mod(seq(s, s + sz - 1L), n)
-    else integer()
-  })
-}
-
-# Fixed Moving Block Bootstrap from boot::tsboot
-.tsboot_geom <- function(n, m, size = 1) {
-  mod <- function(i, n) 1 + (i - 1) %% n
-  endpt <- n - size + 1
-  len_tot <- 0
-  lens <- NULL
-  while (len_tot < m) {
-    temp <- 1 + stats::rgeom(1, 1 / size)
-    temp <- pmin(temp, m - len_tot)
-    lens <- c(lens, temp)
-    len_tot <- len_tot + temp
-  }
-  st <- sample.int(endpt, length(lens), replace = TRUE)
-  purrr::map2_int(st, lens, function(s, sz) {
-    if (sz > 1) mod(seq.int(s, s + sz - 1L), n)
-    else integer()
-  })
-}
+# .tsboot_geom <- function(n, m, size = 1) {
+#   mod <- function(i, n) 1 + (i - 1) %% n
+#   endpt <- n - size + 1
+#   len_tot <- 0
+#   lens <- NULL
+#   while (len_tot < m) {
+#     temp <- 1 + stats::rgeom(1, 1 / size)
+#     temp <- pmin(temp, m - len_tot)
+#     lens <- c(lens, temp)
+#     len_tot <- len_tot + temp
+#   }
+#   st <- sample.int(endpt, length(lens), replace = TRUE)
+#   purrr::map2_int(st, lens, function(s, sz) {
+#     if (sz > 1) mod(seq.int(s, s + sz - 1L), n)
+#     else integer()
+#   })
+# }
 
 # MBB from forecast package
 # https://github.com/robjhyndman/forecast/blob/a57c996e809d17ed29f5a9e74d344b3ef4df3ed7/R/bootstrap.R#L44
 mbb <- function(n, size = 1L) {
   n_blocks <- floor(n / size) + 2L
-  res <- flatten_int(map(sample.int(n, n_blocks),
+  res <- flatten_int(map(sample.int(n - size + 1L, n_blocks),
                          function(i) i + seq.int(size) - 1L))
   # discard 0 to size - 1 values
   start <- sample.int(size, 1L)

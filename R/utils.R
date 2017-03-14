@@ -13,7 +13,7 @@ NULL
 #' @noRd
 group_indices_lst <- function(data) {
   g <- dplyr::group_indices(data)
-  split(seq_along(g), g)
+  unname(split(seq_along(g), g))
 }
 
 

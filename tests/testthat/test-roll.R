@@ -4,6 +4,8 @@ test_that("roll.grouped_df works as expected", {
   dat <- tibble(a = rep(1:5))
   expect_resample_df(roll(dat, 3L, align = "left", partial = TRUE),
                      list(1:3, 2:4, 3:5, 4:5, 5L))
+  expect_resample_df(roll(dat, 4L, align = "left", partial = TRUE),
+                     list(1:4, 2:5, 3:5, 4:5, 5L))
   expect_resample_df(roll(dat, 3L, align = "left", partial = FALSE),
                      list(1:3, 2:4, 3:5))
   expect_resample_df(roll(dat, 3L, align = "left", partial = 2),

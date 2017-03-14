@@ -9,11 +9,11 @@
 crossv_ts(data, ...)
 
 \method{crossv_ts}{data.frame}(data, horizon = 1L, test_size = 1L,
-  test_partial = FALSE, train_partial = TRUE, train_max = n,
+  test_partial = FALSE, train_partial = TRUE, train_size = n,
   test_start = NULL, from = 1L, to = n, by = 1L, ...)
 
 \method{crossv_ts}{grouped_df}(data, horizon = 1L, test_size = 1L,
-  test_partial = FALSE, train_partial = TRUE, train_max = n,
+  test_partial = FALSE, train_partial = TRUE, train_size = n,
   test_start = NULL, from = 1L, to = n, by = 1L, ...)
 }
 \arguments{
@@ -31,7 +31,7 @@ size of a test set.}
 
 \item{train_partial}{Same as \code{test_partial}, but for the training set.}
 
-\item{train_max}{The maximum size of the training set. This allows for a rolling window
+\item{train_size}{The maximum size of the training set. This allows for a rolling window
 training set, instead of using all obsservations from the start of the time series.}
 
 \item{test_start, from, to, by}{An integer vector of the starting index values of the test set.
