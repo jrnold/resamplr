@@ -39,12 +39,13 @@ tsbootstrap.data.frame <- function(data, k = 1L, size = 1L, ...) {
 #' @export
 tsbootstrap.grouped_df <- function(data, k = 1L, size = 1L, ...) {
   idx <- group_indices_lst(data)
-  f <- function(i) flatten_int(idx[i])
+  f <- function(i) flatten_int(idx[i])  # nolint
   res <- mutate_(tsbootstrap_(length(idx), k = k, size = size),
                  sample = ~ map(sample, f))
   to_resample_df(res, data)
 }
 
+# nolint start
 # Fixed Moving Block Bootstrap from boot::tsboot
 # .tsboot_mbb <- function(n, m, size = 1, endcorr = TRUE) {
 #   mod <- function(i, n) {
@@ -83,6 +84,7 @@ tsbootstrap.grouped_df <- function(data, k = 1L, size = 1L, ...) {
 #     else integer()
 #   })
 # }
+# nolint end
 
 # MBB from forecast package
 # https://github.com/robjhyndman/forecast/blob/a57c996e809d17ed29f5a9e74d344b3ef4df3ed7/R/bootstrap.R#L44

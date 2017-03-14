@@ -116,10 +116,10 @@ crossv_ts_ <- function(n,
   train_start <- pmax(train_end - train_size + 1L, 1L)
   train_len <- train_end - train_start + 1L
   # check the validity of these segments
-  keep_test <- {(test_len >= test_size) |
-      (test_partial & test_len >= test_partial)}
-  keep_train <- {(train_len >= train_size) |
-      (train_partial & train_len >= train_partial)}
+  keep_test <- (test_len >= test_size) |
+      (test_partial & test_len >= test_partial)
+  keep_train <- (train_len >= train_size) |
+      (train_partial & train_len >= train_partial)
   idx <- keep_test & keep_train
 
   f <- function(test_start, test_end, train_start, train_end) {

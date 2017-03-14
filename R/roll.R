@@ -75,7 +75,7 @@ roll.grouped_df <- function(data,
   assert_that(is.number(to) && to >= from && to <= n)
   assert_that(is.number(by) && by >= 1)
   assert_that(is.null(offsets) || is.integer(offsets))
-  f <- function(i) flatten_int(grps[i])
+  f <- function(i) flatten_int(grps[i]) # nolint
   res <- mutate_(roll_(n, width = width, align = align, partial = partial,
                        indices = indices, from = from, to = to, by = by,
                        offsets = offsets),
@@ -92,7 +92,6 @@ roll_ <- function(n,
                   to = n,
                   by = 1L,
                   offsets = NULL) {
-  # I don't think I need this function
   offsets <- offsets %||% switch(
     align,
     right = seq(to = 0L, length.out = width),
