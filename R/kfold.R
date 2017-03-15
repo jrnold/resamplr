@@ -15,6 +15,8 @@
 #' @param ... Arguments passed to methods
 #' @templateVar numrows \code{K} rows and
 #' @template return_crossv_df
+#' @seealso This function has more features than the \pkg{modelr} function
+#'   \code{\link[modelr]{crossv_kfold}}.
 #' @references
 #' \itemize{
 #' \item{Breiman, L., Friedman, J.H., Olshen, R.A. and Stone, C.J. (1984) Classification and Regression Trees. Wadsworth.}

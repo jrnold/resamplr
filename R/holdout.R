@@ -23,6 +23,8 @@
 #'   \code{stratify = TRUE}, or \code{n_groups(data)} group weights if \code{data} is
 #'   a grouped data frame and \code{stratify = FALSE}.
 #' @param ... Arguments passed to methods.
+#' @seealso This function is similar to the \pkg{modelr} function
+#'   \code{\link[modelr]{crossv_mc}}, but with more features.
 #' @templateVar numrows \code{K} rows and
 #' @template return_crossv_df
 #' @export

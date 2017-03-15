@@ -38,10 +38,9 @@ training set, instead of using all obsservations from the start of the time seri
 \code{NULL}, then these are generated from \code{seq(from, to, by)}.}
 }
 \value{
-A data frame \code{k} following columns:
+A data frame with \code{k} the following columns:
 \describe{
-\item{train}{A list of \code{\link{resample}} objects. Training sets.}
-\item{test}{A list of \code{\link{resample}} objects. Test sets.}
+\item{sample}{A list of \code{\link[modelr]{resample}} objects. Training sets.}
 \item{.id}{An integer vector of identifiers.}
 }
 }

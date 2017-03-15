@@ -25,6 +25,8 @@
 #'    having a geometric distribution with mean \code{size}).
 #' @param m Lengths of time-series replicates
 #' @param ... Arguments passed to methods
+#' @seealso The \pkg{boot} function \code{\link[boot]{tsboot}}, from which this
+#'   function is derived.
 #' @templateVar numrows \code{R} rows and
 #' @template return_resample_df
 #' @references

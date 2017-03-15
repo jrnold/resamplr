@@ -13,5 +13,5 @@ is.resample(x)
 \code{TRUE} or \code{FALSE}
 }
 \description{
-Checks whether an object inherits from \code{\link{resample}}.
+Checks whether an object inherits from \code{\link[modelr]{resample}}.
 }

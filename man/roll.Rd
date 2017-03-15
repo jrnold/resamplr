@@ -44,10 +44,10 @@ index. If \code{NULL}, the offsets are generated from the \code{width}
 and \code{align} arguments.}
 }
 \value{
-A data frame with rows equal to the number of windows and rows the following columns:
+A data frame with rows equal to the number of windows and the following columns:
 \describe{
-\item{train}{A list of \code{\link{resample}} objects. Training sets.}
-\item{test}{A list of \code{\link{resample}} objects. Test sets.}
+\item{train}{A list of \code{\link[modelr]{resample}} objects. Training sets.}
+\item{test}{A list of \code{\link[modelr]{resample}} objects. Test sets.}
 \item{.id}{An integer vector of identifiers}
 }
 }

@@ -9,6 +9,8 @@
 #' @param stratify If \code{TRUE}, resample within groups, otherwise,
 #'   resample by groups instead of rows.
 #' @templateVar numrows \code{R} rows and
+#' @seealso The \pkg{boot} function \code{\link[boot]{boot}} which is the
+#'   canonical R bootstrap implementation.
 #' @template return_resample_df
 #' @references
 #' \itemize{

@@ -42,10 +42,10 @@ group-level weight.}
 use observation level weights to sample observations within each group.}
 }
 \value{
-A data frame with \code{R} rows and rows the following columns:
+A data frame with \code{R} rows and the following columns:
 \describe{
-\item{train}{A list of \code{\link{resample}} objects. Training sets.}
-\item{test}{A list of \code{\link{resample}} objects. Test sets.}
+\item{train}{A list of \code{\link[modelr]{resample}} objects. Training sets.}
+\item{test}{A list of \code{\link[modelr]{resample}} objects. Test sets.}
 \item{.id}{An integer vector of identifiers}
 }
 }
@@ -83,4 +83,10 @@ hist(subset(tidied, term == "(Intercept)")$estimate)
 \item{Angelo Canty and Brian Ripley (2016). boot: Bootstrap R (S-Plus) Functions. R package version 1.3-18.}
 \item{Davison, A. C. & Hinkley, D. V. (1997) Bootstrap Methods and Their Applications. Cambridge University Press, Cambridge. ISBN 0-521-57391-2}
 }
+}
+\seealso{
+The \pkg{boot} function \code{\link[boot]{boot}} which is the
+  canonical R bootstrap implementation. This function produces slightly different
+  output and has more options than the \pkg{modelr} function
+  \code{\link[modelr]{bootstrap}}.
 }

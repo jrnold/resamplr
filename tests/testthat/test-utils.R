@@ -7,8 +7,9 @@ test_that("is.resample works as expected", {
 
 test_that("c.resample works as expected", {
   dat <- tibble(a = 1:10)
-  expect_identical(c(resample(dat, 1:2), resample(dat, 8:10)),
-                   resample(dat, c(1:2, 8:10)))
+  expect_identical(c(resample(dat, 1:2),
+                     resample(dat, 8:10)),
+                     resample(dat, c(1:2, 8:10)))
 })
 
 test_that("c.resample works with one object", {

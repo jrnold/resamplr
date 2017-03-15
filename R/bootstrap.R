@@ -21,6 +21,11 @@
 #'    group-level weight.
 #' @param weight_within If \code{TRUE} and \code{stratify = TRUE}, then
 #'    use observation level weights to sample observations within each group.
+#'
+#' @seealso The \pkg{boot} function \code{\link[boot]{boot}} which is the
+#'   canonical R bootstrap implementation. This function produces slightly different
+#'   output and has more options than the \pkg{modelr} function
+#'   \code{\link[modelr]{bootstrap}}.
 #' @param bayes If \code{TRUE}, a Bayesian bootstrap is used.
 #' @templateVar numrows \code{R} rows and
 #' @template return_resample_df

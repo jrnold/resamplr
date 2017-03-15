@@ -28,10 +28,9 @@ into folds, and those folds combined. If \code{FALSE}, groups are assigned
 into folds.}
 }
 \value{
-A data frame \code{K} rows and following columns:
+A data frame with \code{K} rows and the following columns:
 \describe{
-\item{train}{A list of \code{\link{resample}} objects. Training sets.}
-\item{test}{A list of \code{\link{resample}} objects. Test sets.}
+\item{sample}{A list of \code{\link[modelr]{resample}} objects. Training sets.}
 \item{.id}{An integer vector of identifiers.}
 }
 }
@@ -79,4 +78,8 @@ summary(map2_dbl(models, cv3$test, modelr::rmse))
 \item{Efron, B. (1986) How biased is the apparent error rate of a prediction rule? Journal of the American Statistical Association, 81, 461–470.}
 \item{Stone, M. (1974) Cross-validation choice and assessment of statistical predictions (with Discussion). Journal of the Royal Statistical Society, B, 36, 111–147.}
 }
+}
+\seealso{
+This function has more features than the \pkg{modelr} function
+  \code{\link[modelr]{crossv_kfold}}.
 }

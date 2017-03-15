@@ -1,0 +1,57 @@
+---
+output:
+  md_document:
+    variant: markdown_github
+---
+
+```{r, echo = FALSE}
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
+```
+
+# resamplr
+
+[![Travis-CI Build Status](https://travis-ci.org/jrnold/resamplr.svg?branch=master)](https://travis-ci.org/jrnold/resamplr)
+[![codecov](https://codecov.io/gh/jrnold/resamplr/branch/master/graph/badge.svg)](https://codecov.io/gh/jrnold/resamplr)
+
+The **resamplr** package provides functions that implement resampling methods including the bootstrap, jackknife, random test/train sets, k-fold cross-validation, leave-one-out and leave-p-out cross-validation, time-series cross validation, time-series k-fold cross validation, permutations, rolling windows.
+These functions generate data frames with `resample` objects that work with the modelling pipeline of [modelr](https://github.com/hadley/modelr) and the [tidyverse](http://tidyverse.org/).
+
+
+## Installation
+
+**resamplr** is not on CRAN. You can install the 
+development version with
+``` r
+# install.packages("devtools")
+devtools::install_github("jrnold/resamplr")
+```
+
+## Main Features
+
+The **resamplr** package includes functions to generate data frames of 
+lazy resample objects, as introduced in the [tidyverse](http://tidyverse.org/) [modelr](https://github.com/hadley/modelr) package. The `resample` class
+stores the a "pointer" to the original dataset and a vector of row indices.
+The object can be coerced to a dataframe with `as.data.frame` and the row indices with `as.integer`.
+
+```{r}
+rs <- resample(mtcars, 1:10)
+as.data.frame(rs)
+as.integer(rs)
+```
+
+While the **modelr** package contains a few functions with resampling methods (`crossv_kfold`, `crossv_mc`, and `bootstrap`), the **resamplr** package implements many more resampling methods including the following: 
+
+- boostrap
+  - bootstrap (weighted, Bayesian): `bootstrap`
+  - balanced bootstrap: `balanced_bootstrap`
+  - time-series bootstrap: `tsbootstrap`
+- cross-validation
+  - test-training pairs: `holdout_n`, `holdout_frac`
+  - k-fold cross-validation: `crossv_kfold`
+  - time-series cross-validation: `crossv_ts`
+  - leave-one-out and leave-p-out cross-validation: `crossv_lpo`, `crossv_loo`
+  - time-series k-fold cross-validation: `crossv_tskfold`
+- jackknife: `jackknife`
+- permutations: `permute`
+- rolling windows: `roll`
+

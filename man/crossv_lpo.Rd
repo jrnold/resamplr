@@ -23,10 +23,10 @@ crossv_loo(data)
 \item{...}{Passed to methods}
 }
 \value{
-A data frame with \eqn{{n}\choose{p}}{n choose p} rows and rows the following columns:
+A data frame with \eqn{{n}\choose{p}}{n choose p} rows and the following columns:
 \describe{
-\item{train}{A list of \code{\link{resample}} objects. Training sets.}
-\item{test}{A list of \code{\link{resample}} objects. Test sets.}
+\item{train}{A list of \code{\link[modelr]{resample}} objects. Training sets.}
+\item{test}{A list of \code{\link[modelr]{resample}} objects. Test sets.}
 \item{.id}{An integer vector of identifiers}
 }
 }

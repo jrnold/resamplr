@@ -20,10 +20,9 @@ crossv_tskfold(data, K, ...)
 \item{...}{Passed to methods}
 }
 \value{
-A data frame \code{K} following columns:
+A data frame with \code{K} the following columns:
 \describe{
-\item{train}{A list of \code{\link{resample}} objects. Training sets.}
-\item{test}{A list of \code{\link{resample}} objects. Test sets.}
+\item{sample}{A list of \code{\link[modelr]{resample}} objects. Training sets.}
 \item{.id}{An integer vector of identifiers.}
 }
 }

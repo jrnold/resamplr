@@ -36,10 +36,10 @@ lengths of \code{size}), "geom" (block resampling with block lengths
 having a geometric distribution with mean \code{size}).}
 }
 \value{
-A data frame with \code{R} rows and rows the following columns:
+A data frame with \code{R} rows and the following columns:
 \describe{
-\item{train}{A list of \code{\link{resample}} objects. Training sets.}
-\item{test}{A list of \code{\link{resample}} objects. Test sets.}
+\item{train}{A list of \code{\link[modelr]{resample}} objects. Training sets.}
+\item{test}{A list of \code{\link[modelr]{resample}} objects. Test sets.}
 \item{.id}{An integer vector of identifiers}
 }
 }
@@ -72,4 +72,8 @@ groups in the grouped data frame.
 \item{Politis, D.N. and Romano, J.P. (1994) "The stationary bootstrap. Journal of the American Statistical Association."}
 \item{Angelo Canty and Brian Ripley (2016). boot: Bootstrap R (S-Plus) Functions. R package version 1.3-18.}
 }
+}
+\seealso{
+The \pkg{boot} function \code{\link[boot]{tsboot}}, from which this
+  function is derived.
 }

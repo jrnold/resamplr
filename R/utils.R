@@ -36,12 +36,12 @@ replace_groups <- function(x, group_idx, f = identity, ...) {
 # convert resample data frame with index list column to one with resample
 # list column.
 to_resample_df <- function(x, .data) {
-  x[["sample"]] <- resample_lst(.data, x[["sample"]], check = FALSE)
+  x[["sample"]] <- resample_lst(.data, x[["sample"]])
   x
 }
 
 to_crossv_df <- function(x, .data) {
-  x[["train"]] <- resample_lst(.data, x[["train"]], check = FALSE)
-  x[["test"]] <- resample_lst(.data, x[["test"]], check = FALSE)
+  x[["train"]] <- resample_lst(.data, x[["train"]])
+  x[["test"]] <- resample_lst(.data, x[["test"]])
   x
 }

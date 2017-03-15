@@ -52,10 +52,9 @@ equal proportions of each group. If \code{FALSE}, the the test-train splits
 splits groups into the testing and training sets.}
 }
 \value{
-A data frame \code{K} rows and following columns:
+A data frame with \code{K} rows and the following columns:
 \describe{
-\item{train}{A list of \code{\link{resample}} objects. Training sets.}
-\item{test}{A list of \code{\link{resample}} objects. Test sets.}
+\item{sample}{A list of \code{\link[modelr]{resample}} objects. Training sets.}
 \item{.id}{An integer vector of identifiers.}
 }
 }
@@ -123,4 +122,8 @@ summary(map2_dbl(models, cv5$test, modelr::rmse))
 cv6 <- holdout_frac(group_by(mtcars, am), size = 0.3, K = 10, stratified = TRUE)
 models <- map(cv6$train, ~ lm(mpg ~ wt, data = .))
 summary(map2_dbl(models, cv6$test, modelr::rmse))
+}
+\seealso{
+This function is similar to the \pkg{modelr} function
+  \code{\link[modelr]{crossv_mc}}, but with more features.
 }
