@@ -15,6 +15,7 @@ This vignette contains some examples of cross-validation and bootstrapping with 
 library("tidyverse")
 library("broom")
 library("resamplr")
+library("boot")
 ```
 
 

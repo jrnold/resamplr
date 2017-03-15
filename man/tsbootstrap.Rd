@@ -75,5 +75,5 @@ groups in the grouped data frame.
 }
 \seealso{
 The \pkg{boot} function \code{\link[boot]{tsboot}}, from which this
-  function is derived.
+   function is derived.
 }
