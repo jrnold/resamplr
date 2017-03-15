@@ -1,3 +1,4 @@
+# examples from boot::tsboot
 lynx_fun <- function(x) {
   tsb <- as.data.frame(x)$y
   ar.fit <- ar(tsb, order.max = 25)

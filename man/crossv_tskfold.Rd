@@ -48,3 +48,9 @@ option is provided since the cases in which stratification can usually
 be rewritten to operate on the groups rather than within groups.
 }}
 
+\references{
+\itemize{
+\item{Scikit-learn v. 0.18.1. Cross-validation: evaluating estimator performance.
+   \href{http://scikit-learn.org/stable/modules/cross_validation.html#cross-validation}{URL}.}
+}
+}

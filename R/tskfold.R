@@ -13,6 +13,12 @@
 #' @param ... Passed to methods
 #' @templateVar numrows \code{K}
 #' @template return_crossv_df
+#'
+#' @references
+#' \itemize{
+#' \item{Scikit-learn v. 0.18.1. Cross-validation: evaluating estimator performance.
+#'    \href{http://scikit-learn.org/stable/modules/cross_validation.html#cross-validation}{URL}.}
+#' }
 #' @export
 crossv_tskfold <- function(data, K, ...) {
   UseMethod("crossv_tskfold")
