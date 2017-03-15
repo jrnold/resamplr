@@ -17,11 +17,11 @@ crossv_df(data, ...)
 
 \item{...}{Arguments passed to methods}
 
-\item{train}{A list of integer vectors, with the indices of the training set.
+\item{train}{A list of integer vectors or an integer vector, with the indices of the training set.
 If \code{train} is \code{NULL}, then the training set is the complement of
 the test set.}
 
-\item{test}{A list of integer vectors, with the indices of the test set.
+\item{test}{A list of integer vectors or an integer vector, with the indices of the test set.
 If \code{test} is \code{NULL}, then the test set is the complement of
 the training set.}
 }
@@ -37,3 +37,18 @@ indices of observations in the test and and training sets.
 sets by group.
 }}
 
+\examples{
+library("dplyr")
+
+# test-training pairs can be specified by test sets
+crossv_df(mtcars, train = list(1:5, 6:10))
+# or by training sets
+crossv_df(mtcars, train = list(1:20, 10:32))
+# or by both (and they don't need to partition the observations)
+crossv_df(mtcars,
+          train = list(1:20, 10:32),
+          test = list(21:32, 1:9))
+
+# with grouped data frames, the indices refer to groups
+crossv_df(group_by(mtcars, mpg), train = list(1L))$train
+}

@@ -101,10 +101,11 @@ mod <- function(i, n, endcorr) {
   # truncate to minimum length >= m
   lens <- lens[seq_len(purrr::detect_index(len_tot, ~ .x >= m))]
   st <- sample.int(endpt, length(lens), replace = TRUE)
-  utils::head(flatten_int(purrr::map2(st, lens, function(s, l) {
+  f <- function(s, l) {
     if (l >= 1) as.integer(mod(seq.int(s, s + l - 1L), n, TRUE))
     else integer()
-  })), m)
+  }
+  utils::head(flatten_int(purrr::map2(st, lens, f)), m)
 }
 
 tsbootstrap_ <- function(n, R = 1L, m = n, size = 1L, type = "fixed",

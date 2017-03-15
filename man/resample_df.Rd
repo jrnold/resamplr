@@ -17,7 +17,7 @@ resample_df(data, ...)
 
 \item{...}{Arguments passed to methods}
 
-\item{samples}{A list of integer vectors, with the indices in each subsample.}
+\item{samples}{A list of integer vectors or an integer vector, with the indices in each subsample.}
 }
 \value{
 A data frame with rows for each subsample and the following columns:
@@ -38,3 +38,11 @@ subsample.
 \item \code{grouped_df}: Generate subsamples of groups of grouped data frames.
 }}
 
+\examples{
+library("dplyr")
+# specify subsamples by a list of indices
+resample_df(mtcars, samples = c(1:5, 5:10, 15:20))
+resample_df(mtcars, samples = c(1:10, 1:15, 5:30))
+# with grouped data frames, indices refer to groups
+resample_df(group_by(mtcars, mpg), samples = list(c(1:2)))$sample
+}

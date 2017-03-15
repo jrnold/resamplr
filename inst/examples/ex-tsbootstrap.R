@@ -6,13 +6,13 @@ lynx_fun <- function(x) {
 }
 
 # the stationary bootstrap with mean block length 20
-tibble(y = log(lynx)) %>%
+lynx_1 <- tibble(y = log(lynx)) %>%
   tsbootstrap(R = 99, size = 20, type = "geom") %>%
-  mutate(order = map_dbl(sample, lynx_fun)) %>%
-  {summary(.$order)}
+  mutate(order = map_dbl(sample, lynx_fun))
+summary(lynx_1$order)
 
 # the fixed block bootstrap with length 20
-tibble(y = log(lynx)) %>%
+lynx_2 <- tibble(y = log(lynx)) %>%
   tsbootstrap(R = 99, size = 20, type = "fixed") %>%
-  mutate(order = map_dbl(sample, lynx_fun)) %>%
-  {summary(.$order)}
+  mutate(order = map_dbl(sample, lynx_fun))
+summary(lynx_2$order)
