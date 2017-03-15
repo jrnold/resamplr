@@ -9,11 +9,11 @@
 bootstrap(data, ...)
 
 \method{bootstrap}{data.frame}(data, R = 1L, weights = NULL,
-  bayes = FALSE, ...)
+  bayes = FALSE, m = NULL, ...)
 
 \method{bootstrap}{grouped_df}(data, R = 1L, stratify = FALSE,
-  groups = TRUE, weights = NULL, weight_groups = TRUE,
-  weight_within = TRUE, bayes = FALSE, ...)
+  groups = TRUE, weights = NULL, bayes = FALSE, weight_groups = TRUE,
+  weight_within = TRUE, ...)
 }
 \arguments{
 \item{data}{A data frame}
@@ -26,6 +26,8 @@ bootstrap(data, ...)
 in \code{data}.}
 
 \item{bayes}{If \code{TRUE}, a Bayesian bootstrap is used.}
+
+\item{m}{Number of observations in the replicates.}
 
 \item{stratify}{Resample within groups (stratified bootstrap)}
 
