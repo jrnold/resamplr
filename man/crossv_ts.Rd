@@ -4,7 +4,7 @@
 \alias{crossv_ts}
 \alias{crossv_ts.data.frame}
 \alias{crossv_ts.grouped_df}
-\title{Generate Time Series Cross Validation}
+\title{Generate cross-validated time-series test/train sets}
 \usage{
 crossv_ts(data, ...)
 
@@ -37,8 +37,31 @@ training set, instead of using all obsservations from the start of the time seri
 \item{test_start, from, to, by}{An integer vector of the starting index values of the test set.
 \code{NULL}, then these are generated from \code{seq(from, to, by)}.}
 }
+\value{
+A data frame \code{k} following columns:
+\describe{
+\item{train}{A list of \code{\link{resample}} objects. Training sets.}
+\item{test}{A list of \code{\link{resample}} objects. Test sets.}
+\item{.id}{An integer vector of identifiers.}
+}
+}
 \description{
-Also called "evaluation on a rolling forecasting origin"
+Generate test/train set for time series. Each training set consists of
+observations before the test set. This is also called "evaluation on a rolling
+forecasting origin".
+}
+\details{
+In time-series cross-validation the training set only uses observations
+that are prior to the test set. Suppose the time series has \eqn{n} observations,
+the training set has a maximum size of \eqn{r \leq n}{r <= n} and minimum size of \eqn{s \geq r}{s >= r}.
+and the test set has a maximum size of \eqn{p \leq n}{p <= n} and minimum size of \eqn{q \geq p}{q >= p}.
+For indices \eqn{i \in \{1, \dots, N\}}:
+\enumerate{
+\item{Select observations \eqn{i, \dots, \max{p, n}} for the test set.}
+\item{Select observations \eqn{\max{i - h - p}, \dots, i - h} for the training set.}
+\item{If the test set has a size of at least \code{q} and the training set
+      has a size of at least \code{r}.}
+}
 }
 \section{Methods (by class)}{
 \itemize{
@@ -50,8 +73,11 @@ the cross validation works on groups rather than rows.
 
 \references{
 \itemize{
+\item{Hyndman RJ (2017). \emph{forecast: Forecasting functions for time series and linear models}. R package version 8.0, \href{http://github.com/robjhyndman/forecast}{URL}.}
+\item{Hyndman RJ and Khandakar Y (2008). "Automatic time series forecasting: the forecast package for R." \emph{Journal of Statistical Software}. \href{http://www.jstatsoft.org/article/view/v027i03}{URL}.}
 \item{Rob J. Hyndman. \href{Cross-validation for time series}{http://robjhyndman.com/hyndsight/tscv/}. December 5, 2016.}
-
 \item{Rob J. Hyndman. \href{Time series cross-validation: an R example}{http://robjhyndman.com/hyndsight/tscvexample/}. August 26, 2011.}
+\item{Rob J. Hyndman and George Athanasopoulos. "Evaluating Forecast Accuracy." \href{https://www.otexts.org/fpp/2/5}{URL}.}
+\item{Max Kuhn. "Data splitting for Time Series." \emph{The caret Package}. 2016-11-29. \href{https://topepo.github.io/caret/data-splitting.html}{URL}.}
 }
 }

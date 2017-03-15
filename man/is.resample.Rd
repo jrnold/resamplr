@@ -13,6 +13,5 @@ is.resample(x)
 \code{TRUE} or \code{FALSE}
 }
 \description{
-Checks whether an object is an \code{\link{resample}}
-object.
+Checks whether an object inherits from \code{\link{resample}}.
 }

@@ -4,27 +4,27 @@
 \alias{crossv_tskfold}
 \alias{crossv_tskfold.data.frame}
 \alias{crossv_tskfold.grouped_df}
-\title{Generate cross-validated time-series k-fold test-training pairs}
+\title{Generate cross-validated time-series K-fold test-training pairs}
 \usage{
-crossv_tskfold(x, k, ...)
+crossv_tskfold(data, K, ...)
 
-\method{crossv_tskfold}{data.frame}(x, k = 5L, ...)
+\method{crossv_tskfold}{data.frame}(data, K = 5L, ...)
 
-\method{crossv_tskfold}{grouped_df}(x, k = 5L, ...)
+\method{crossv_tskfold}{grouped_df}(data, K = 5L, ...)
 }
 \arguments{
-\item{x}{A data frame or vector}
+\item{data}{A data frame or vector}
 
-\item{k}{The number of folds}
+\item{K}{The number of folds}
 
 \item{...}{Passed to methods}
 }
 \value{
-A data frame with \code{k} rows and the following columns:
+A data frame \code{K} following columns:
 \describe{
 \item{train}{A list of \code{\link{resample}} objects. Training sets.}
 \item{test}{A list of \code{\link{resample}} objects. Test sets.}
-\item{.id}{Character vector. ID of the fold.}
+\item{.id}{An integer vector of identifiers.}
 }
 }
 \description{
@@ -33,9 +33,9 @@ data. In each split, the indices are increasing, so only previous data
 are used to test future data.
 }
 \details{
-The data are split into \eqn{k \geq 2} folds, where for each
-\eqn{i \in 2:k}{i in 2:k}, the \eqn{i}-th fold is the test set
-and the \eqn{1:(i - 1)}-th folds are the training set.
+The data are split into \eqn{K \geq 2} folds, where for each
+\eqn{i \in 2:K}{i in 2:K}, the \eqn{i}-th fold is the test set
+and folds \eqn{1, ..., (i - 1)} folds are the training set.
 }
 \section{Methods (by class)}{
 \itemize{

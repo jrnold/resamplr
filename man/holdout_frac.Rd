@@ -7,33 +7,33 @@
 \alias{holdout_n}
 \alias{holdout_n.data.frame}
 \alias{holdout_n.grouped_df}
-\title{Generate cross-validation test-training pairs}
+\title{Generate K cross-validation test-training pairs}
 \usage{
-holdout_frac(x, ...)
+holdout_frac(data, ...)
 
-\method{holdout_frac}{data.frame}(x, size = 0.3, k = 1, shuffle = TRUE,
+\method{holdout_frac}{data.frame}(data, size = 0.3, K = 1L,
+  shuffle = TRUE, prob = NULL, ...)
+
+\method{holdout_frac}{grouped_df}(data, size = 0.3, K = 1L,
+  shuffle = TRUE, stratify = FALSE, prob = NULL, ...)
+
+holdout_n(data, ...)
+
+\method{holdout_n}{data.frame}(data, size = 1L, K = 1L, shuffle = TRUE,
   prob = NULL, ...)
 
-\method{holdout_frac}{grouped_df}(x, size = 0.3, k = k, shuffle = TRUE,
-  stratify = FALSE, prob = NULL, ...)
-
-holdout_n(x, ...)
-
-\method{holdout_n}{data.frame}(x, size = 1L, k = 1L, shuffle = TRUE,
-  prob = NULL, ...)
-
-\method{holdout_n}{grouped_df}(x, size = 1L, k = 1L, shuffle = TRUE,
+\method{holdout_n}{grouped_df}(data, size = 1L, K = 1L, shuffle = TRUE,
   stratify = FALSE, prob = NULL, ...)
 }
 \arguments{
-\item{x}{A data frame}
+\item{data}{A data frame}
 
 \item{...}{Arguments passed to methods.}
 
 \item{size}{For \code{holdout_n}, the number of elements in the test set.
 For \code{holdout_frac}, the fraction of elements in test set.}
 
-\item{k}{Number of test/train splits to generate.}
+\item{K}{Number of test/train splits to generate.}
 
 \item{shuffle}{If \code{TRUE}, the observations are randomly assigned to the
 test and training sets. If \code{FALSE}, then the \emph{first} \code{size}
@@ -41,9 +41,9 @@ elements are assigned to the test set, and
 the remainder of the observations are assigned to the training set.}
 
 \item{prob}{Probability weight that an element is in the \code{test} set.
-If non-\code{NULL} this is numeric vector with \code{nrow(x)} row weights
-if \code{x} is a data frame or a grouped data frame and
-\code{stratify = TRUE}, or \code{n_groups(x)} group weights if \code{x} is
+If non-\code{NULL} this is numeric vector with \code{nrow(data)} row weights
+if \code{data} is a data frame or a grouped data frame and
+\code{stratify = TRUE}, or \code{n_groups(data)} group weights if \code{data} is
 a grouped data frame and \code{stratify = FALSE}.}
 
 \item{stratify}{If \code{TRUE}, then test-train splits are within each
@@ -52,13 +52,11 @@ equal proportions of each group. If \code{FALSE}, the the test-train splits
 splits groups into the testing and training sets.}
 }
 \value{
-A data frame with \code{k} rows and columns
+A data frame \code{K} rows and following columns:
 \describe{
-\item{\code{train}}{A list of \code{\link{resample}} objects representing
-  the training sets}
-\item{\code{test}}{A list of \code{\link{resample}} objects representing the
-  test sets}
-\item{\code{.id}}{An integer vector of ids of the replicates}
+\item{train}{A list of \code{\link{resample}} objects. Training sets.}
+\item{test}{A list of \code{\link{resample}} objects. Test sets.}
+\item{.id}{An integer vector of identifiers.}
 }
 }
 \description{
@@ -67,6 +65,25 @@ set and \code{1 - size} is in the training set. Likewise, \code{holdout_n}
 splits the data so that \code{size} elements are in the test set and the
 remainder are in the training set.
 }
+\section{Methods (by class)}{
+\itemize{
+\item \code{data.frame}: Split rows in a data frame into test and training
+data sets.
+
+\item \code{grouped_df}: Splits within each group of a grouped data frame
+into test and training sets if \code{stratify = FALSE}. This ensures that the test and training
+sets will have approximately equal proportions of each group in the training
+and test sets. If \code{stratify = TRUE}, then the groups are split into test and training sets.
+
+\item \code{data.frame}: Split rows in a data frame into test and training
+data sets.
+
+\item \code{grouped_df}: Splits within each group of a grouped data frame
+into test and training sets if \code{stratify = FALSE}. This ensures that the test and training
+sets will have approximately equal proportions of each group in the training
+and test sets. If \code{stratify = TRUE}, then the groups are split into test and training sets.
+}}
+
 \examples{
 # Example originally from modelr::crossv_mc
 library("purrr")

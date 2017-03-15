@@ -4,48 +4,72 @@
 \alias{tsbootstrap}
 \alias{tsbootstrap.data.frame}
 \alias{tsbootstrap.grouped_df}
-\title{Generate time-series bootstraps replicates}
+\title{Generate time-series bootstrap replicates}
 \usage{
 tsbootstrap(data, ...)
 
-\method{tsbootstrap}{data.frame}(data, k = 1L, size = 1L, ...)
+\method{tsbootstrap}{data.frame}(data, R = 1L, size = 1L, m = nrow(data),
+  type = "fixed", ...)
 
-\method{tsbootstrap}{grouped_df}(data, k = 1L, size = 1L, ...)
+\method{tsbootstrap}{grouped_df}(data, R = 1L, size = 1L, type = "fixed",
+  m = dplyr::n_groups(data), ...)
 }
 \arguments{
 \item{data}{A data frame}
 
 \item{...}{Arguments passed to methods}
 
-\item{k}{Number of bootstrap replicates}
+\item{R}{Number of bootstrap replicates}
 
-\item{size}{Block length size}
+\item{size}{If sim is \code{"fixed"} then \code{size} is the fixed block
+length used in generating the replicate time series. If sim is
+\code{"geom"} then \code{size} is the mean of the geometric distribution
+used to generate the block lengths. \code{size} should be a positive
+integer less than the number of rows (\code{data.frame}) or groups
+\code{grouped_df} in \code{data}.}
+
+\item{m}{Lengths of time-series replicates}
+
+\item{type}{Type of simulation used to generate the replicate time series.
+The possible input values are "fixed" (block resampling with fixed block
+lengths of \code{size}), "geom" (block resampling with block lengths
+having a geometric distribution with mean \code{size}).}
+}
+\value{
+A data frame with \code{R} rows and rows the following columns:
+\describe{
+\item{train}{A list of \code{\link{resample}} objects. Training sets.}
+\item{test}{A list of \code{\link{resample}} objects. Test sets.}
+\item{.id}{An integer vector of identifiers}
+}
 }
 \description{
-Generate time-series bootstraps replicates
+Generate \code{R} bootstrap replicates for time series.
+The replicate time series can be generated using either fixed or random
+block lengths.
 }
 \details{
-Bergmeir et al. (2016) describe a moving block bootstrap (MBB) method.
-Suppose a time series of size \eqn{n} and a chosen block size of size \eqn{l}.
-Randomly sample \eqn{\lfloor n / l \rfloor + 2}{floor(n / l) + 2} blocks of
-size \eqn{l} and concatenate them into a single series
-Then randomly discard 0 to \eqn{l - 1} values from the start of the series,
-and truncate the series to length \eqn{n}. The later correction ensures that
-every value from the original series can be placed anywhere in the bootstrapped
-series.
+If \code{type} is \code{"fixed"} then each replicate time series is found
+by taking blocks of length \code{size}, from the original time series and
+putting them end-to-end until a new series of length \code{m} is created.
+When \code{type} is \code{"geom"}, a similar approach is taken except
+that the block lengths are sampled from a geometric distribution with mean
+\code{size}.
 }
 \section{Methods (by class)}{
 \itemize{
-\item \code{data.frame}: Method for data frames, sampling the rows of the data frame.
+\item \code{data.frame}: Generate time series replicates using blocks of
+rows in the data frame.
 
-\item \code{grouped_df}: Method for grouped data frames.
-This samples groups instead of rows.
+\item \code{grouped_df}: Generate time series replicates using blocks of
+groups in the grouped data frame.
 }}
 
 \references{
 \itemize{
 \item{Kunsch, H.R. (1989) The jackknife and the bootstrap for general stationary observations. \emph{Annals of Statistics}}
-\item{Lahiri, S., 2003. \emph{Resampling Methods for Dependent Data}. Springer}
-\item{Bergmeir, Christoph, Rob J. Hyndman, and Jose M. Benitz. 2016. "Bagging Exponential Smoothing Methods using STL Decomposition and Box-Cox Transformation." \emph{International Journal of Forecasting} \href{http://dx.doi.org/10.1016/j.ijforecast.2015.07.002}{doi:10.1016/j.ijforecast.2015.07.002}.}
+\item{Davison, A.C. and Hinkley, D.V. (1997) \emph{Bootstrap Methods and Their Application}. Cambridge University Press.}
+\item{Politis, D.N. and Romano, J.P. (1994) "The stationary bootstrap. Journal of the American Statistical Association."}
+\item{Angelo Canty and Brian Ripley (2016). boot: Bootstrap R (S-Plus) Functions. R package version 1.3-18.}
 }
 }

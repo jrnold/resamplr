@@ -38,8 +38,7 @@ resample_lst <- function(data, idx, check = TRUE) {
 
 #' Is it a resample object?
 #'
-#' Checks whether an object is an \code{\link{resample}}
-#' object.
+#' Checks whether an object inherits from \code{\link{resample}}.
 #'
 #' @param x An object
 #' @return \code{TRUE} or \code{FALSE}

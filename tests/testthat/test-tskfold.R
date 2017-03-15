@@ -5,16 +5,16 @@ local({
   gdat <- group_by(dat, a)
 
   test_that("crossv_tskfold.data.frame works as expected", {
-    k <- 4
-    x <- crossv_tskfold(dat, k)
+    K <- 4
+    x <- crossv_tskfold(dat, K)
     expect_crossv_df(x)
-    expect_equal(nrow(x), k - 1)
+    expect_equal(nrow(x), K - 1)
   })
 
   test_that("crossv_tskfold.grouped_df works as expected", {
-    k <- 4
-    x <- crossv_tskfold(gdat, k)
+    K <- 4
+    x <- crossv_tskfold(gdat, K)
     expect_crossv_df(x)
-    expect_equal(nrow(x), k - 1)
+    expect_equal(nrow(x), K - 1)
   })
 })

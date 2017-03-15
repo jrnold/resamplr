@@ -5,35 +5,35 @@ local({
   dat_grouped <- group_by(dat, a)
 
   test_that("crossv_kfold.data.frame works as expected", {
-    k <- 5
+    K <- 5
     n <- nrow(dat)
-    x <- crossv_kfold(dat, k = k)
+    x <- crossv_kfold(dat, K = K)
     expect_crossv_df(x)
-    expect_equal(nrow(x), k)
-    expect_true(all(map_int(x$train, ~ dim(.x)[1]) == 4 * (n / k)))
-    expect_true(all(map_int(x$test, ~ dim(.x)[1]) == n / k))
+    expect_equal(nrow(x), K)
+    expect_true(all(map_int(x$train, ~ dim(.x)[1]) == 4 * (n / K)))
+    expect_true(all(map_int(x$test, ~ dim(.x)[1]) == n / K))
   })
 
   test_that("crossv_kfold.data.frame works as expected", {
-    k <- 3
+    K <- 3
     n <- n_groups(dat)
-    x <- crossv_kfold(dat_grouped, k = k)
+    x <- crossv_kfold(dat_grouped, K = K)
     expect_crossv_df(x)
-    expect_equal(nrow(x), k)
+    expect_equal(nrow(x), K)
   })
 
   test_that("crossv_kfold.grouped_df stratify = TRUE works as expected", {
-    k <- 2
-    x <- crossv_kfold(dat_grouped, k = k, stratify = TRUE)
+    K <- 2
+    x <- crossv_kfold(dat_grouped, K = K, stratify = TRUE)
     expect_crossv_df(x)
-    expect_equal(nrow(x), k)
+    expect_equal(nrow(x), K)
   })
 
   test_that("crossv_kfold works when not shuffled", {
-    k <- 3
-    x <- crossv_kfold(dat, k = k, shuffle = FALSE)
+    K <- 3
+    x <- crossv_kfold(dat, K = K, shuffle = FALSE)
     expect_crossv_df(x)
-    expect_equal(nrow(x), k)
+    expect_equal(nrow(x), K)
   })
 
 })

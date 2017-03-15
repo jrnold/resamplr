@@ -8,10 +8,10 @@
 \usage{
 bootstrap(data, ...)
 
-\method{bootstrap}{data.frame}(data, k = 1L, weights = NULL,
+\method{bootstrap}{data.frame}(data, R = 1L, weights = NULL,
   bayes = FALSE, ...)
 
-\method{bootstrap}{grouped_df}(data, k = 1L, stratify = FALSE,
+\method{bootstrap}{grouped_df}(data, R = 1L, stratify = FALSE,
   groups = TRUE, weights = NULL, weight_groups = TRUE,
   weight_within = TRUE, bayes = FALSE, ...)
 }
@@ -20,7 +20,7 @@ bootstrap(data, ...)
 
 \item{...}{Passed to methods}
 
-\item{k}{Number of replicates to sample}
+\item{R}{Number of replicates to sample}
 
 \item{weights}{Observation level weights. This must be the name of a column
 in \code{data}.}
@@ -42,11 +42,11 @@ group-level weight.}
 use observation level weights to sample observations within each group.}
 }
 \value{
-A data frame with \code{k} rows and columns:
+A data frame with \code{R} rows and rows the following columns:
 \describe{
-\item{\code{sample}}{A list of \code{\link{resample}} objects with
-with the bootstrap replicates.}
-\item{\code{.id}}{An integer vector with replicate ids}
+\item{train}{A list of \code{\link{resample}} objects. Training sets.}
+\item{test}{A list of \code{\link{resample}} objects. Test sets.}
+\item{.id}{An integer vector of identifiers}
 }
 }
 \description{
@@ -70,11 +70,17 @@ bootstrapping within groups (stratified bootstrap) if
 # example from modelr::bootstrap
 library("purrr")
 library("dplyr")
-boot <- balanced_bootstrap(mtcars, 100)
+boot <- bootstrap(mtcars, 100)
 
 models <- map(boot$sample, ~ lm(mpg ~ wt, data = .))
 tidied <- map_df(models, broom::tidy, .id = "id")
 
 hist(subset(tidied, term == "wt")$estimate)
 hist(subset(tidied, term == "(Intercept)")$estimate)
+}
+\references{
+\itemize{
+\item{Angelo Canty and Brian Ripley (2016). boot: Bootstrap R (S-Plus) Functions. R package version 1.3-18.}
+\item{Davison, A. C. & Hinkley, D. V. (1997) Bootstrap Methods and Their Applications. Cambridge University Press, Cambridge. ISBN 0-521-57391-2}
+}
 }
