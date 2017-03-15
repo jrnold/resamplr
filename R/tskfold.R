@@ -28,6 +28,7 @@ crossv_tskfold <- function(data, K, ...) {
 #'    The ordering of the data frame is assmed to be meaningful.
 #' @export
 crossv_tskfold.data.frame <- function(data, K = 5L, ...) {
+  assert_that(is.number(K) && K >= 2)
   to_crossv_df(crossv_tskfold_(nrow(data), K), data)
 }
 
@@ -39,6 +40,7 @@ crossv_tskfold.data.frame <- function(data, K = 5L, ...) {
 #' @importFrom purrr map_df
 #' @export
 crossv_tskfold.grouped_df <- function(data, K = 5L, ...) {
+  assert_that(is.number(K) && K >= 2)
   idx <- group_indices_lst(data)
   res <- mutate_(crossv_tskfold_(length(idx), K),
                  train = ~ map(train, function(i) flatten_int(idx[i])),
