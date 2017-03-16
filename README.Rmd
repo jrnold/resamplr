@@ -34,6 +34,8 @@ stores the a "pointer" to the original dataset and a vector of row indices.
 The object can be coerced to a dataframe with `as.data.frame` and the row indices with `as.integer`.
 
 ```{r}
+library("modelr")
+library("resamplr")
 rs <- resample(mtcars, 1:10)
 as.data.frame(rs)
 as.integer(rs)
@@ -42,16 +44,19 @@ as.integer(rs)
 While the **modelr** package contains a few functions with resampling methods (`crossv_kfold`, `crossv_mc`, and `bootstrap`), the **resamplr** package implements many more resampling methods including the following: 
 
 - boostrap
-  - bootstrap (weighted, Bayesian): `bootstrap`
-  - balanced bootstrap: `balanced_bootstrap`
-  - time-series bootstrap: `tsbootstrap`
+
+    - bootstrap (weighted, Bayesian): `bootstrap`
+    - balanced bootstrap: `balanced_bootstrap`
+    - time-series bootstrap: `tsbootstrap`
+
 - cross-validation
-  - test-training pairs: `holdout_n`, `holdout_frac`
-  - k-fold cross-validation: `crossv_kfold`
-  - time-series cross-validation: `crossv_ts`
-  - leave-one-out and leave-p-out cross-validation: `crossv_lpo`, `crossv_loo`
-  - time-series k-fold cross-validation: `crossv_tskfold`
+
+    - test-training pairs: `holdout_n`, `holdout_frac`
+    - k-fold cross-validation: `crossv_kfold`
+    - time-series cross-validation: `crossv_ts`
+    - leave-one-out and leave-p-out cross-validation: `crossv_lpo`, `crossv_loo`
+    - time-series k-fold cross-validation: `crossv_tskfold`
+
 - jackknife: `jackknife`
 - permutations: `permute`
 - rolling windows: `roll`
-
