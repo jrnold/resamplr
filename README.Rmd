@@ -60,3 +60,6 @@ While the **modelr** package contains a few functions with resampling methods (`
 - jackknife: `jackknife`
 - permutations: `permute`
 - rolling windows: `roll`
+
+All resampling functions are implemented as generic functions with methods for data frames (`data.frame`) and grouped data frames (`grouped_df`).
+When used with grouped data frames, these functions allow either resampling groups instead of rows, or resample rows within each group (stratification), or both, depending on what is appropriate for the method.
