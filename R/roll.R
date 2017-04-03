@@ -8,23 +8,28 @@
 #'   then the subset of indexes that are in range are used.
 #'   A numeric argument to \code{partial} can be used to determine the minimal
 #'   window size for partial windows.
-#' @param width The window width
-#' @param align Is the window left-aligned, right-aligned, or centered?
-#' @param offsets numeric. If not-\code{NULL}, then the offsets of the window
-#'   indices relative to the reference index. If \code{NULL}, then the window
-#'   offsets are generated from the \code{width} and \code{align} arguments.
+#' @param width The window width.
+#' @param align Is the window left-aligned, right-aligned, or centered
+#'   relative to the reference index of the window.
+#' @param offsets An integer vector or \code{NULL}. If non-\code{NULL},
+#'   then it is the offsets of elements in the window relative to the
+#'   reference index of the window; \code{0} is the reference index, negative
+#'   numbers are indices before the index, while positive numbers are after the
+#'   index. If \code{NULL}, the offsets are generated from the \code{width}
+#'   and \code{align} arguments.
 #' @param indices,from,to,by The indices at which to generate windows. If
 #'   \code{indices} is non-\code{NULL}, then it is used. Otherwise, the indices
 #'   are generated from \code{seq(from, to, by)}.
 #' @param ... Arguments passed to methods
-#' @return A data frame
+#' @templateVar numrows rows equal to the number of windows and
+#' @template return_resample_df
 #' @export
 roll <- function(data, ...) {
   UseMethod("roll")
 }
 
 
-#' @describeIn roll Data frame method. This rows are assumed to be ordered.
+#' @describeIn roll Generate windows from the rows of the data frame.
 #' @export
 roll.data.frame <- function(data,
                             width = 1L,
@@ -52,8 +57,7 @@ roll.data.frame <- function(data,
 }
 
 
-#' @describeIn roll Grouped data frame method. The groups are assumed to be ordered, and
-#'   the cross validation works on groups rather than rows.
+#' @describeIn roll Generate windows from the groups of the data frame.
 #' @export
 roll.grouped_df <- function(data,
                   width = 1L,

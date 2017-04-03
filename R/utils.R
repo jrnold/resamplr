@@ -16,16 +16,32 @@ group_indices_lst <- function(data) {
   unname(split(seq_along(g), g))
 }
 
+#' Replace group indices with row indices
+#'
+#' Replace group indices with row indices and concatenate
+#' into an integer vector. Optionall apply a function to
+#' each group prior to concatenation (allowing for resampling)
+#' on each group.
+#'
+#' @param x An list of integer vector of group indices
+#' @param group_inx A list of integer vectors of the indices in
+#'   in each group.
+#' @param f A function to apply to each group prior to concatenation.
+#' @return A list of integer vectors of row indices
+#' @noRd
+replace_groups <- function(x, group_idx, f = identity, ...) {
+  map(x, function(g) flatten_int(map(group_idx[g], f, ...)))
+}
 
 # convert resample data frame with index list column to one with resample
 # list column.
 to_resample_df <- function(x, .data) {
-  x[["sample"]] <- resample_lst(.data, x[["sample"]], check = FALSE)
+  x[["sample"]] <- resample_lst(.data, x[["sample"]])
   x
 }
 
 to_crossv_df <- function(x, .data) {
-  x[["train"]] <- resample_lst(.data, x[["train"]], check = FALSE)
-  x[["test"]] <- resample_lst(.data, x[["test"]], check = FALSE)
+  x[["train"]] <- resample_lst(.data, x[["train"]])
+  x[["test"]] <- resample_lst(.data, x[["test"]])
   x
 }

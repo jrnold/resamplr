@@ -7,33 +7,33 @@
 \alias{holdout_n}
 \alias{holdout_n.data.frame}
 \alias{holdout_n.grouped_df}
-\title{Generate cross-validation test-training pairs}
+\title{Generate K cross-validation test-training pairs}
 \usage{
-holdout_frac(x, ...)
+holdout_frac(data, ...)
 
-\method{holdout_frac}{data.frame}(x, size = 0.3, k = 1, shuffle = TRUE,
+\method{holdout_frac}{data.frame}(data, size = 0.3, K = 1L,
+  shuffle = TRUE, prob = NULL, ...)
+
+\method{holdout_frac}{grouped_df}(data, size = 0.3, K = 1L,
+  shuffle = TRUE, stratify = FALSE, prob = NULL, ...)
+
+holdout_n(data, ...)
+
+\method{holdout_n}{data.frame}(data, size = 1L, K = 1L, shuffle = TRUE,
   prob = NULL, ...)
 
-\method{holdout_frac}{grouped_df}(x, size = 0.3, k = k, shuffle = TRUE,
-  stratify = FALSE, prob = NULL, ...)
-
-holdout_n(x, ...)
-
-\method{holdout_n}{data.frame}(x, size = 1L, k = 1L, shuffle = TRUE,
-  prob = NULL, ...)
-
-\method{holdout_n}{grouped_df}(x, size = 1L, k = 1L, shuffle = TRUE,
+\method{holdout_n}{grouped_df}(data, size = 1L, K = 1L, shuffle = TRUE,
   stratify = FALSE, prob = NULL, ...)
 }
 \arguments{
-\item{x}{A data frame}
+\item{data}{A data frame}
 
 \item{...}{Arguments passed to methods.}
 
 \item{size}{For \code{holdout_n}, the number of elements in the test set.
 For \code{holdout_frac}, the fraction of elements in test set.}
 
-\item{k}{Number of test/train splits to generate.}
+\item{K}{Number of test/train splits to generate.}
 
 \item{shuffle}{If \code{TRUE}, the observations are randomly assigned to the
 test and training sets. If \code{FALSE}, then the \emph{first} \code{size}
@@ -41,9 +41,9 @@ elements are assigned to the test set, and
 the remainder of the observations are assigned to the training set.}
 
 \item{prob}{Probability weight that an element is in the \code{test} set.
-If non-\code{NULL} this is numeric vector with \code{nrow(x)} row weights
-if \code{x} is a data frame or a grouped data frame and
-\code{stratify = TRUE}, or \code{n_groups(x)} group weights if \code{x} is
+If non-\code{NULL} this is numeric vector with \code{nrow(data)} row weights
+if \code{data} is a data frame or a grouped data frame and
+\code{stratify = TRUE}, or \code{n_groups(data)} group weights if \code{data} is
 a grouped data frame and \code{stratify = FALSE}.}
 
 \item{stratify}{If \code{TRUE}, then test-train splits are within each
@@ -52,13 +52,10 @@ equal proportions of each group. If \code{FALSE}, the the test-train splits
 splits groups into the testing and training sets.}
 }
 \value{
-A data frame with \code{k} rows and columns
+A data frame with \code{K} rows and the following columns:
 \describe{
-\item{\code{train}}{A list of \code{\link{resample}} objects representing
-  the training sets}
-\item{\code{test}}{A list of \code{\link{resample}} objects representing the
-  test sets}
-\item{\code{.id}}{An integer vector of ids of the replicates}
+\item{sample}{A list of \code{\link[modelr]{resample}} objects. Training sets.}
+\item{.id}{An integer vector of identifiers.}
 }
 }
 \description{
@@ -67,43 +64,66 @@ set and \code{1 - size} is in the training set. Likewise, \code{holdout_n}
 splits the data so that \code{size} elements are in the test set and the
 remainder are in the training set.
 }
+\section{Methods (by class)}{
+\itemize{
+\item \code{data.frame}: Split rows in a data frame into test and training
+data sets.
+
+\item \code{grouped_df}: Splits within each group of a grouped data frame
+into test and training sets if \code{stratify = FALSE}. This ensures that the test and training
+sets will have approximately equal proportions of each group in the training
+and test sets. If \code{stratify = TRUE}, then the groups are split into test and training sets.
+
+\item \code{data.frame}: Split rows in a data frame into test and training
+data sets.
+
+\item \code{grouped_df}: Splits within each group of a grouped data frame
+into test and training sets if \code{stratify = FALSE}. This ensures that the test and training
+sets will have approximately equal proportions of each group in the training
+and test sets. If \code{stratify = TRUE}, then the groups are split into test and training sets.
+}}
+
 \examples{
 # Example originally from modelr::crossv_mc
 library("purrr")
 library("dplyr")
 
 # holdout three obs, repeat 10 times
-cv1 <- holdout_n(mtcars, size = 3, k = 10)
+cv1 <- holdout_n(mtcars, size = 3, K = 10)
 models <- map(cv1$train, ~ lm(mpg ~ wt, data = .))
 summary(map2_dbl(models, cv1$test, modelr::rmse))
 
 # holdout two groups at a time in the test set
 # repeat four times.
-cv2 <- holdout_n(group_by(mtcars, cyl), size = 2, k = 4)
+cv2 <- holdout_n(group_by(mtcars, cyl), size = 2, K = 4)
 models <- map(cv2$train, ~ lm(mpg ~ wt, data = .))
 summary(map2_dbl(models, cv2$test, modelr::rmse))
 
 # stratified holdout
 # holdout 1 obs each from each group. repeat 5 times.
-cv3 <- holdout_n(group_by(mtcars, am), size = 1, k = 5, stratified = TRUE)
+cv3 <- holdout_n(group_by(mtcars, am), size = 1, K = 5, stratified = TRUE)
 models <- map(cv3$train, ~ lm(mpg ~ wt, data = .))
 summary(map2_dbl(models, cv3$test, modelr::rmse))
 
 # Holdout fraction of the data
 
 # holdout 30\% of observations, repeat 10 times
-cv4 <- holdout_frac(mtcars, size = 0.3, k = 10)
+cv4 <- holdout_frac(mtcars, size = 0.3, K = 10)
 models <- map(cv4$train, ~ lm(mpg ~ wt, data = .))
 summary(map2_dbl(models, cv4$test, modelr::rmse))
 
 # holdout 30\% of groups at a time in the test set
-cv5 <- holdout_frac(group_by(mtcars, cyl), size = 0.3, k = 10)
+cv5 <- holdout_frac(group_by(mtcars, cyl), size = 0.3, K = 10)
 models <- map(cv5$train, ~ lm(mpg ~ wt, data = .))
 summary(map2_dbl(models, cv5$test, modelr::rmse))
 
 # stratified holdout
 # holdout 30\% of obs within each group.
-cv6 <- holdout_frac(group_by(mtcars, am), size = 0.3, k = 10, stratified = TRUE)
+cv6 <- holdout_frac(group_by(mtcars, am), size = 0.3, K = 10, stratified = TRUE)
 models <- map(cv6$train, ~ lm(mpg ~ wt, data = .))
 summary(map2_dbl(models, cv6$test, modelr::rmse))
+}
+\seealso{
+This function is similar to the \pkg{modelr} function
+  \code{\link[modelr]{crossv_mc}}, but with more features.
 }

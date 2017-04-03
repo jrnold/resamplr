@@ -4,7 +4,7 @@ Title: Resampling methods
 Version: 0.0.1
 Authors@R: c(person("Jeffrey", "Arnold", role = c("aut", "cre"),
                     email = "jeffrey.arnold@gmail.com"),
-             person("Hadley", "Wickham", role = "ctb", 
+             person("Hadley", "Wickham", role = "ctb",
                     comment = "Some code extracted from the modelr package"),
              person("Angelo", "Canty", role = "ctb",
                     comment = "Some code extracted from the boot package"),
@@ -12,7 +12,7 @@ Authors@R: c(person("Jeffrey", "Arnold", role = c("aut", "cre"),
                     comment = "Some code extracted from the boot package"),
              person("Achim", "Zeileis", role = "ctb",
                     comment = "Some code extracted from rollapply in the zoo package"))
-Description: Resampling methods using the lazy resampler class in the 'modelr' package.
+Description: Additional resampling methods for the 'resampler' class in the 'modelr' package.
   Resampling and similar methods implemented include: bootstrap methods (simple bootstrap,
   weighted bootstrap, balanced bootstrap, moving-blocks bootstrap),
   test-training splits, cross-validation (leave-one-out, leave-p-out, 
@@ -32,6 +32,12 @@ Imports:
   purrr,
   stringr,
   tibble
-Suggests: 
+Suggests:
+  boot,
+  broom,
+  knitr,
+  MASS,
+  rmarkdown,
   testthat,
-  broom
+  tidyverse
+VignetteBuilder: knitr

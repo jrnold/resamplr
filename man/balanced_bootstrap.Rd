@@ -8,31 +8,31 @@
 \usage{
 balanced_bootstrap(data, ...)
 
-\method{balanced_bootstrap}{data.frame}(data, k = 1L, ...)
+\method{balanced_bootstrap}{data.frame}(data, R = 1L, ...)
 
-\method{balanced_bootstrap}{grouped_df}(data, k = 1L, stratify = FALSE, ...)
+\method{balanced_bootstrap}{grouped_df}(data, R = 1L, stratify = FALSE, ...)
 }
 \arguments{
 \item{data}{A data frame}
 
 \item{...}{Arguments passed to methods}
 
-\item{k}{Number of replicates}
+\item{R}{Number of replicates}
 
 \item{stratify}{If \code{TRUE}, resample within groups, otherwise,
 resample by groups instead of rows.}
 }
 \value{
-A data frame with \code{k} rows and columns:
+A data frame with \code{R} rows and the following columns:
 \describe{
-\item{\code{sample}}{A list of \code{\link{resample}} objects with
-with the bootstrap replicates.}
-\item{\code{.id}}{An integer vector with replicate ids}
+\item{train}{A list of \code{\link[modelr]{resample}} objects. Training sets.}
+\item{test}{A list of \code{\link[modelr]{resample}} objects. Test sets.}
+\item{.id}{An integer vector of identifiers}
 }
 }
 \description{
-A balanced bootstrap generates \code{k} replicates in which each element
-appears \code{k} times.
+A balanced bootstrap generates \code{R} replicates in which each element
+appears \code{R} times.
 }
 \section{Methods (by class)}{
 \itemize{
@@ -56,9 +56,14 @@ hist(subset(tidied, term == "(Intercept)")$estimate)
 }
 \references{
 \itemize{
-\item{Gleason, John R. 1988. "Algorithms for Balanced Bootstrap Simulations." \emph{The American Statistician}
+\item{Gleason, John 1988. "Algorithms for Balanced Bootstrap Simulations." \emph{The American Statistician}
 \href{https://dx.doi.org/10.2307/2685134}{doi:10.2307/2685134}.}
-\item{Davison, A.C., Hinkley, D.V., and Schechtman, E. 1986.
+\item{Davison, A.C., Hinkley, D. V., and Schechtman, E. 1986.
 "Efficient Bootstrap Simulation." \emph{Biometrika}.}
+\item{Angelo Canty and Brian Ripley (2016). boot: Bootstrap R (S-Plus) Functions. R package version 1.3-18.}
 }
+}
+\seealso{
+The \pkg{boot} function \code{\link[boot]{boot}} which is the
+  canonical R bootstrap implementation.
 }

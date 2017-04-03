@@ -4,17 +4,15 @@
 \alias{resample_lst}
 \title{Create a list of resample objects}
 \usage{
-resample_lst(data, idx, check = TRUE)
+resample_lst(data, idx)
 }
 \arguments{
 \item{data}{A data frame}
 
 \item{idx}{A list of integer vectors of indexes.}
-
-\item{check}{If \code{TRUE}, check that \code{idx} are valid.}
 }
 \value{
-A \code{list} of \code{\link{resample}} objects.
+A \code{list} of \code{\link[modelr]{resample}} objects.
 }
 \description{
 Create a list of resample objects

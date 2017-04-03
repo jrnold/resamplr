@@ -21,9 +21,10 @@ roll(data, ...)
 
 \item{...}{Arguments passed to methods}
 
-\item{width}{The window width}
+\item{width}{The window width.}
 
-\item{align}{Is the window left-aligned, right-aligned, or centered?}
+\item{align}{Is the window left-aligned, right-aligned, or centered
+relative to the reference index of the window.}
 
 \item{partial}{logical or numeric. If \code{FALSE} all indexes of a rolling
 window must be within the rows (or groups) of \code{data}. If \code{TRUE},
@@ -35,21 +36,28 @@ window size for partial windows.}
 \code{indices} is non-\code{NULL}, then it is used. Otherwise, the indices
 are generated from \code{seq(from, to, by)}.}
 
-\item{offsets}{numeric. If not-\code{NULL}, then the offsets of the window
-indices relative to the reference index. If \code{NULL}, then the window
-offsets are generated from the \code{width} and \code{align} arguments.}
+\item{offsets}{An integer vector or \code{NULL}. If non-\code{NULL},
+then it is the offsets of elements in the window relative to the
+reference index of the window; \code{0} is the reference index, negative
+numbers are indices before the index, while positive numbers are after the
+index. If \code{NULL}, the offsets are generated from the \code{width}
+and \code{align} arguments.}
 }
 \value{
-A data frame
+A data frame with rows equal to the number of windows and the following columns:
+\describe{
+\item{train}{A list of \code{\link[modelr]{resample}} objects. Training sets.}
+\item{test}{A list of \code{\link[modelr]{resample}} objects. Test sets.}
+\item{.id}{An integer vector of identifiers}
+}
 }
 \description{
 Generate resample objects of rolling windows over elements of a data frame.
 }
 \section{Methods (by class)}{
 \itemize{
-\item \code{data.frame}: Data frame method. This rows are assumed to be ordered.
+\item \code{data.frame}: Generate windows from the rows of the data frame.
 
-\item \code{grouped_df}: Grouped data frame method. The groups are assumed to be ordered, and
-the cross validation works on groups rather than rows.
+\item \code{grouped_df}: Generate windows from the groups of the data frame.
 }}
 

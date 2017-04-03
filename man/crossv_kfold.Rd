@@ -4,21 +4,21 @@
 \alias{crossv_kfold}
 \alias{crossv_kfold.data.frame}
 \alias{crossv_kfold.grouped_df}
-\title{Generate cross-validated k-fold test-training pairs}
+\title{Generate cross-validated K-fold test-training pairs}
 \usage{
-crossv_kfold(x, k, ...)
+crossv_kfold(data, K, ...)
 
-\method{crossv_kfold}{data.frame}(x, k = 5L, shuffle = TRUE, ...)
+\method{crossv_kfold}{data.frame}(data, K = 5L, shuffle = TRUE, ...)
 
-\method{crossv_kfold}{grouped_df}(x, k = 5L, shuffle = TRUE,
+\method{crossv_kfold}{grouped_df}(data, K = 5L, shuffle = TRUE,
   stratify = FALSE, ...)
 }
 \arguments{
-\item{x}{A data frame}
+\item{data}{A data frame}
 
-\item{k}{The number of folds}
+\item{K}{The number of folds}
 
-\item{...}{Passed to methods}
+\item{...}{Arguments passed to methods}
 
 \item{shuffle}{If \code{TRUE}, randomly assign observations to folds.
 Otherwise, observations are sequentially assigned to folds.}
@@ -28,36 +28,58 @@ into folds, and those folds combined. If \code{FALSE}, groups are assigned
 into folds.}
 }
 \value{
-A data frame with \code{k} rows and the following columns:
+A data frame with \code{K} rows and the following columns:
 \describe{
-\item{train}{A list of \code{\link{resample}} objects. Training sets.}
-\item{test}{A list of \code{\link{resample}} objects. Test sets.}
-\item{.id}{Character vector. ID of the fold.}
+\item{sample}{A list of \code{\link[modelr]{resample}} objects. Training sets.}
+\item{.id}{An integer vector of identifiers.}
 }
 }
 \description{
-Generate cross-validated k-fold test-training pairs. In addition to ordinary
-k-fold cross-validation, this supports stratified k-fold cross validation
-if \code{x} is a grouped data frame and \code{stratify = TRUE}, and
-Group k-fold if \code{x} is a grouped data frame and \code{stratify = FALSE}.
+Generate cross-validated K-fold test-training pairs. In addition to ordinary
+K-fold cross-validation, this supports stratified K-fold cross validation
+if \code{data} is a grouped data frame and \code{stratify = TRUE}, and
+Group K-fold if \code{data} is a grouped data frame and \code{stratify = FALSE}.
 }
+\section{Methods (by class)}{
+\itemize{
+\item \code{data.frame}: Splits rows in a data frame into folds.
+
+\item \code{grouped_df}: Partitions rows within each group of a grouped data frame
+into folds if \code{stratify = FALSE}. This ensures that the test and training
+sets will have approximately equal proportions of each group. If \code{stratify = TRUE},
+then the groups are partitioned into folds.
+}}
+
 \examples{
 # Example originally from modelr::crossv_mc
 library("purrr")
 library("dplyr")
 
 # 5-fold cross-validation
-cv1 <- crossv_kfold(mtcars, k = 5)
+cv1 <- crossv_kfold(mtcars, K = 5)
 models <- map(cv1$train, ~ lm(mpg ~ wt, data = .))
 summary(map2_dbl(models, cv1$test, modelr::rmse))
 
 # k-fold by group
-cv2 <- crossv_kfold(group_by(mtcars, cyl), k = 2)
+cv2 <- crossv_kfold(group_by(mtcars, cyl), K = 2)
 models <- map(cv2$train, ~ lm(mpg ~ wt, data = .))
 summary(map2_dbl(models, cv2$test, modelr::rmse))
 
 # stratified k-fold
-cv3 <- crossv_kfold(group_by(mtcars, am), k = 3, stratify = TRUE)
+cv3 <- crossv_kfold(group_by(mtcars, am), K = 3, stratify = TRUE)
 models <- map(cv3$train, ~ lm(mpg ~ wt, data = .))
 summary(map2_dbl(models, cv3$test, modelr::rmse))
+}
+\references{
+\itemize{
+\item{Breiman, L., Friedman, J.H., Olshen, R.A. and Stone, C.J. (1984) Classification and Regression Trees. Wadsworth.}
+\item{Burman, P. (1989) A comparative study of ordinary cross-validation, v-fold cross-validation and repeated learning-testing methods. Biometrika, 76, 503–514}
+\item{Davison, A.C. and Hinkley, D.V. (1997) Bootstrap Methods and Their Application. Cambridge University Press.}
+\item{Efron, B. (1986) How biased is the apparent error rate of a prediction rule? Journal of the American Statistical Association, 81, 461–470.}
+\item{Stone, M. (1974) Cross-validation choice and assessment of statistical predictions (with Discussion). Journal of the Royal Statistical Society, B, 36, 111–147.}
+}
+}
+\seealso{
+This function has more features than the \pkg{modelr} function
+  \code{\link[modelr]{crossv_kfold}}.
 }

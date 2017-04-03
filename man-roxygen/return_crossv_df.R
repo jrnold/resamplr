@@ -1,0 +1,5 @@
+#' @return A data frame with <%= numrows %> the following columns:
+#' \describe{
+#' \item{sample}{A list of \code{\link[modelr]{resample}} objects. Training sets.}
+#' \item{.id}{An integer vector of identifiers.}
+#' }
