@@ -44,7 +44,6 @@ crossv_tskfold.grouped_df <- function(x, k = 5L, ...) {
   to_crossv_df(res, x)
 }
 
-# work with index integers
 crossv_tskfold_ <- function(n, k = 5L) {
   folds <- partition(seq_len(n), as.integer(k), shuffle = FALSE)
   f <- function(i) {

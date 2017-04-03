@@ -5,9 +5,21 @@ Version: 0.0.1
 Authors@R: c(person("Jeffrey", "Arnold", role = c("aut", "cre"),
                     email = "jeffrey.arnold@gmail.com"),
              person("Hadley", "Wickham", role = "ctb", 
-                    comment = "Some code extracted from the modelr package"))
-Description: Resampling methods (bootstrap, cross-validation, rolling subsets,
-    permutations) using the resampler class in 'modelr'.
+                    comment = "Some code extracted from the modelr package"),
+             person("Angelo", "Canty", role = "ctb",
+                    comment = "Some code extracted from the boot package"),
+             person("Brian", "Ripley", role = "ctb",
+                    comment = "Some code extracted from the boot package"),
+             person("Achim", "Zeileis", role = "ctb",
+                    comment = "Some code extracted from rollapply in the zoo package"))
+Description: Resampling methods using the lazy resampler class in the 'modelr' package.
+  Resampling and similar methods implemented include: bootstrap methods (simple bootstrap,
+  weighted bootstrap, balanced bootstrap, moving-blocks bootstrap),
+  test-training splits, cross-validation (leave-one-out, leave-p-out, 
+  k-fold, time-series k-fold, time series rolling windows),
+  jackknife (delete-one and delete-p), permutations, and rolling windows.
+  These are implemented as generic functions which include a grouped data method
+  that implements group-wise or stratified versions of all the above.
 License: GPL-3
 Encoding: UTF-8
 LazyData: true
