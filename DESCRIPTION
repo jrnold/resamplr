@@ -5,7 +5,7 @@ Version: 0.0.1
 Authors@R: c(person("Jeffrey", "Arnold", role = c("aut", "cre"),
                     email = "jeffrey.arnold@gmail.com"),
              person("Hadley", "Wickham", role = "ctb",
-                    comment = "Some code extracted from the modelr package"),
+                    comment = "Code extracted from the modelr package"),
              person("Angelo", "Canty", role = "ctb",
                     comment = "Some code extracted from the boot package"),
              person("Brian", "Ripley", role = "ctb",
@@ -28,7 +28,6 @@ Imports:
   assertthat,
   combinat,
   dplyr,
-  modelr,
   purrr,
   stringr,
   tibble
@@ -37,6 +36,7 @@ Suggests:
   broom,
   knitr,
   MASS,
+  modelr,
   rmarkdown,
   testthat,
   tidyverse

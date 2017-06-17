@@ -1,4 +1,3 @@
-#' @importFrom modelr resample
 #' @importFrom tibble tibble as_tibble
 #' @importFrom purrr map flatten_int transpose %||%
 #' @importFrom assertthat assert_that is.number is.flag
@@ -19,7 +18,7 @@ group_indices_lst <- function(data) {
 #' Replace group indices with row indices
 #'
 #' Replace group indices with row indices and concatenate
-#' into an integer vector. Optionall apply a function to
+#' into an integer vector. Optionally apply a function to
 #' each group prior to concatenation (allowing for resampling)
 #' on each group.
 #'
@@ -44,4 +43,22 @@ to_crossv_df <- function(x, .data) {
   x[["train"]] <- resample_lst(.data, x[["train"]])
   x[["test"]] <- resample_lst(.data, x[["test"]])
   x
+}
+
+# copied from modelr
+#' @importFrom purrr reduce
+reduce_common <- function(x, msg = "Objects must be identical",
+                          operator = identical) {
+  reduce(x, function(.x, .y) {
+    if (!operator(.x, .y)) {
+      stop(msg, call. = FALSE)
+    }
+    .y
+  })
+}
+
+# copied from modelr
+big_mark <- function(x, ...) {
+  mark <- if (identical(getOption("OutDec"), ",")) "." else ","
+  formatC(x, big.mark = mark, ...)
 }
