@@ -62,3 +62,8 @@ big_mark <- function(x, ...) {
   mark <- if (identical(getOption("OutDec"), ",")) "." else ","
   formatC(x, big.mark = mark, ...)
 }
+
+#' @importFrom pryr inspect
+same_objects <- function(x, y) {
+  inspect(x)$address == inspect(y)$address
+}

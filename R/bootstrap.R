@@ -47,17 +47,12 @@ bootstrap.data.frame <- function(data,
                                  R = 1L,
                                  weights = NULL,
                                  bayes = FALSE,
-                                 m = NULL,
+                                 m = nrow(data),
                                  ...) {
-  assert_that(is.number(R) && R >= 1)
   if (!is.null(weights)) {
     assert_that(weights %in% names(data))
     weights <- data[[weights]]
-    assert_that(is.numeric(weights))
   }
-  assert_that(is.flag(bayes))
-  m <- m %||% nrow(data)
-  assert_that(is.number(m) && m >= 0)
   to_resample_df(bootstrap_(nrow(data), R = R, weights = weights,
                             bayes = bayes, m = m), data)
 }
@@ -80,7 +75,6 @@ bootstrap.grouped_df <- function(data,
                                  weight_groups = TRUE,
                                  weight_within = TRUE,
                                  ...) {
-  assert_that(is.number(R) && R >= 1)
   assert_that(is.flag(stratify))
   assert_that(is.flag(groups))
   # One of these needs to be specified
@@ -89,15 +83,13 @@ bootstrap.grouped_df <- function(data,
     # fill in weights if none exist
     assert_that(weights %in% names(data))
     weights <- data[[weights]]
-    assert_that(is.numeric(weights))
   }
-  assert_that(is.flag(bayes))
   assert_that(is.flag(weight_groups))
   assert_that(is.flag(weight_within))
   idx <- group_indices_lst(data)
   # split weights by group
   if (!is.null(weights)) {
-    weights <- map(idx, ~ weights[.x])
+    weights <- map(idx, function(.x) weights[.x])
   } else {
     # ensure each group's weights sum to 1
     weights <- map(idx, function(i) {
@@ -145,22 +137,31 @@ bootstrap.grouped_df <- function(data,
                  data)
 }
 
+bootstrap.default <- function(data,
+                              R = 1L,
+                              weights = NULL,
+                              bayes = FALSE,
+                              m = length(data),
+                              ...) {
+  assert_that(length(weights) == length(data))
+  n <- length(data)
+  out <- bootstrap_n(n, R = R, weights = weights, bayes = bayes, m = m)
+  out[["sample"]] <- map(out[["sample"]], function(i) data[i])
+  out
+}
 
-bootstrap_ <- function(n, R = 1L, weights = NULL, bayes = FALSE, m = n) {
+#' @export
+#' @rdname
+bootstrap_n <- function(n, R = 1L, weights = NULL, bayes = FALSE, m = n) {
+  assert_that(is.number(n) && n >= 1)
+  assert_that(is.number(R) && R >= 1)
+  assert_that(is.numeric(weights))
+  assert_that(is.flag(bayes))
+  assert_that(is.number(m) && m >= 1)
   # resample weights
   if (bayes) {
-    weights <- if (is.null(weights)) {
-      1
-    } else {
-      # allow other concentrations?
-      (weights / sum(weights)) * n
-    }
-    weights <- stats::rgamma(n, shape = weights)
+    weights <- stats::rgamma(n, shape = weights %||% 1)
   }
-  f <- function(i) {
-    tibble(sample = list(sample.int(n, size = m, replace = TRUE,
-                                    prob = weights)),
-           .id = i)
-  }
-  map_df(seq_len(R), f)
+  tibble(sample = rerun(R, sample.int(n, size = m, replace = TRUE, prob = weights)),
+         .id = seq_len(R))
 }
