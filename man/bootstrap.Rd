@@ -9,7 +9,7 @@
 bootstrap(data, ...)
 
 \method{bootstrap}{data.frame}(data, R = 1L, weights = NULL,
-  bayes = FALSE, m = NULL, ...)
+  bayes = FALSE, m = nrow(data), ...)
 
 \method{bootstrap}{grouped_df}(data, R = 1L, stratify = FALSE,
   groups = TRUE, weights = NULL, bayes = FALSE, weight_groups = TRUE,

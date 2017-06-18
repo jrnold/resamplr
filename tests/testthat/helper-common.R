@@ -33,3 +33,6 @@ expect_resample_df <- function(x, expected = NULL) {
   }
 }
 
+same_objects <- function(x, y) {
+  pryr::inspect(x)$address == inspect(y)$address
+}

@@ -63,7 +63,7 @@ bootstrap.data.frame <- function(data,
 #'   bootstrapping within groups (stratified bootstrap) if
 #'   \code{stratify = TRUE}.
 #' @importFrom assertthat is.string
-#' @importFrom purrr map2_df
+#' @importFrom purrr map2_df rerun
 #' @importFrom dplyr n_groups
 #' @export
 bootstrap.grouped_df <- function(data,
@@ -107,7 +107,7 @@ bootstrap.grouped_df <- function(data,
     grps <- bootstrap_(n_groups(data), R = R, weights = group_weights,
                        bayes = bayes)
   } else {
-    grps <- tibble(sample = purrr::rerun(R, seq_len(n_groups(data))),
+    grps <- tibble(sample = rerun(R, seq_len(n_groups(data))),
                    .id = seq_len(R))
   }
   # resample within a group

@@ -29,6 +29,7 @@ Imports:
   combinat,
   dplyr,
   purrr,
+  rlang,
   stringr,
   tibble
 Suggests:
@@ -37,6 +38,7 @@ Suggests:
   knitr,
   MASS,
   modelr,
+  pryr,
   rmarkdown,
   testthat,
   tidyverse

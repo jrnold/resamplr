@@ -114,6 +114,6 @@ tsbootstrap_ <- function(n, R = 1L, m = n, size = 1L, type = "fixed",
               geom = .tsboot_geom,
               fixed = .tsboot_mbb,
               stop("type = ", type, " is not recognized.", call. = FALSE))
-  tibble(sample = purrr::rerun(R, f(n, m = m, size = size, endcorr = endcorr)),
+  tibble(sample = rerun(R, f(n, m = m, size = size, endcorr = endcorr)),
          .id = seq_len(R))
 }

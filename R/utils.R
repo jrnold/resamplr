@@ -47,8 +47,7 @@ to_crossv_df <- function(x, .data) {
 
 # copied from modelr
 #' @importFrom purrr reduce
-reduce_common <- function(x, msg = "Objects must be identical",
-                          operator = identical) {
+reduce_common <- function(x, msg = "Objects must be identical", operator = identical) {
   reduce(x, function(.x, .y) {
     if (!operator(.x, .y)) {
       stop(msg, call. = FALSE)
@@ -63,7 +62,22 @@ big_mark <- function(x, ...) {
   formatC(x, big.mark = mark, ...)
 }
 
-#' @importFrom pryr inspect
-same_objects <- function(x, y) {
-  inspect(x)$address == inspect(y)$address
+#' Append class to an object
+#'
+#' Add a class to an object
+#' @param x object
+#' @param newclass Character. New class(es) to add
+#' @param after integer. location to add those classes.
+#'
+#' @noRd
+append_class <- function(x, newclass, after = 0) {
+  append_class(x, after = after) <- newclass
+  x
+}
+
+`append_class<-` <- function(x, value, after = 0) {
+  # use attr(x, "class") instead of class()
+  # because class() would unnecessarily add primitive types
+  class(x) <- append(attr(x, "class"), value, after = 0)
+  x
 }

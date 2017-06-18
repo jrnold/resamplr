@@ -1,4 +1,4 @@
-#' Generate cross-validation test-training sets manually
+#' Generate cross-validation test-training sets manuall
 #'
 #' Generate cross-validation test-training sets from manually specified
 #' indices of observations in the test and and training sets.
@@ -13,8 +13,8 @@
 #' @param ... Arguments passed to methods
 #' @example inst/examples/ex-crossv_df.R
 #' @export
-crossv_df <- function(data, ...) {
-  UseMethod("crossv_df")
+crossv_data <- function(data, ...) {
+  UseMethod("crossv_data")
 }
 
 #' @describeIn crossv_df Partition a data frame into test and training sets by row.
@@ -38,15 +38,6 @@ crossv_df.data.frame <- function(data, train = NULL, test = NULL, ...) {
 #' @export
 crossv_df.grouped_df <- function(data, train = NULL, test = NULL, ...) {
   assert_that(!is.null(train) || !is.null(test))
-  if (is.integer(test)) test <- list(test)
-  assert_that(is.null(test) ||
-                (is.list(test) && all(map_lgl(test, is.integer))))
-  if (is.integer(train)) test <- list(train)
-  assert_that(is.null(train) ||
-                (is.list(train) && all(map_lgl(train, is.integer))))
-  if (is.list(test) && is.list(train)) {
-    assert_that(length(train) == length(test))
-  }
   idx <- group_indices_lst(data)
   res <- mutate_(crossv_df_(length(idx), train, test),
                  train = ~ map(train, function(i) flatten_int(idx[i])),

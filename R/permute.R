@@ -54,7 +54,7 @@ permute_ <- function(n, R = 1L, force_random = FALSE) {
   if (is.infinite(R) || (R >= factorial(n) && !force_random)) {
     tibble(sample = combinat::permn(n), .id = seq_along(sample))
   } else {
-    tibble(sample = purrr::rerun(R, sample.int(n, n, replace = FALSE)),
+    tibble(sample = rerun(R, sample.int(n, n, replace = FALSE)),
            .id = seq_len(R))
   }
 }

@@ -1,18 +1,14 @@
-# --- From modelr
-
-# copied from modelr
-#' A "lazy" resample.
+#' A "lazy" resample object
 #'
-#' Often you will resample a dataset hundreds or thousands of times. Storing
-#' the complete resample each time would be very inefficient so this class
+#' Often you will resample a dataset many times, as in cross-validation or bootstrapping.
+#' Copying and storing the complete resample each time is both time-consuming and memory intensive.
+#' However, all that is needed for the resample
+#' The \code{resample}
 #' instead stores a "pointer" to the original dataset, and a vector of row
-#' indexes. To turn this into a regular data frame, call \code{as.data.frame},
-#' to extract the indices, use \code{as.integer}.
+#' indexes.
 #'
-#' @param data The data frame
-#' @param idx A vector of integer indexes indicating which rows have
-#'   been selected. These values should lie between 1 and \code{nrow(data)}
-#'   but they are not checked by this function in the interests of performance.
+#' @param data An object. This can be any object for which a \code{[} method is defined.
+#' @param idx A vector of integer indexes. For efficiency, this function does not check whether these indices are valid.
 #' @examples
 #' r <- resample(mtcars, 1:10)
 #' as.integer(r)
@@ -21,14 +17,13 @@
 #' # check that the data part of r is identical to orig data
 #' identical(r, mtcars)
 #' @export
-resample <- function(data, idx) {
-  if (!is.data.frame(data)) {
-    stop("`data` must be a data frame.", call. = FALSE)
-  }
-  if (!is.integer(idx)) {
-    stop("`idx` must be an integer vector.", call. = FALSE)
-  }
+resample <- function(data, idx, ...) {
+  UseMethod("resample")
+}
 
+#' @export
+resample.default <- function(data, idx, ...) {
+  assert_that(is.integer(idx))
   structure(
     list(
       data = data,
@@ -38,7 +33,11 @@ resample <- function(data, idx) {
   )
 }
 
-# copied from modelr
+#' @export
+resample.data.frame <- function(data, idx, ...) {
+  append_class(resample(data, idx), "resample_df")
+}
+
 #' @export
 print.resample <- function(x, ...) {
   n <- length(x$idx)
@@ -47,39 +46,72 @@ print.resample <- function(x, ...) {
   } else {
     id10 <- x$idx
   }
-
-  cat("<", obj_sum.resample(x), "> ", paste(id10, collapse = ", "), "\n",
+  cat("<", obj_sum(x), "> ", paste(id10, collapse = ", "), "\n",
       sep = ""
   )
 }
 
-# copied from modelr
 #' @export
 as.integer.resample <- function(x, ...) {
-  x$idx
+  as.integer(x$idx)
+}
+
+# TODO: should I let this work with character indices?
+# or be opinionated and allow only integer indices.
+# I could convert character to integer in the resample stage?
+
+#' @export
+as.character.resample <- function(x, ...) {
+  as.character(x$idx)
+}
+
+#' @export
+collect.resample <- function(x, ...) {
+  x$data[x$idx, ...]
+}
+
+#' @importFrom dplyr collect
+#' @export
+collect.resample_df <- function(x, ...) {
+  x$data[x$idx, ..., drop = FALSE]
 }
 
 # copied from modelr
 #' @export
-as.data.frame.resample <- function(x, ...) {
-  x$data[x$idx, , drop = FALSE]
+as.data.frame.resample_df <- collect.resample_df
+
+#' @export
+length.resample <- function(x, ...) {
+  length(x$idx)
 }
 
-# copied from modelr
 #' @export
-dim.resample <- function(x, ...) {
+dim.resample_df <- function(x, ...) {
   c(length(x$idx), ncol(x$data))
 }
+
+# nrow and ncol only make sense for tbl like objects
+#' @export
+nrow.resample_df <- function(x, ...) length(x$idx)
+
+#' @export
+ncol.resample_df <- function(x, ...) ncol(x$data)
+
+#' @export
+names.resample <- function(x, ...) names(x$data)
+
+#' @export
+colnames.resample <- function(x, ...) colnames(x$data)
+
 
 # copied from modelr
 #' @importFrom tibble obj_sum
 #' @method obj_sum resample
 #' @export
 obj_sum.resample <- function(x, ...) {
-  paste0("resample [", big_mark(nrow(x)), " x ", big_mark(ncol(x)), "]")
+  paste0("resample ", length(x), " from ", obj_sum(x$data), "]")
 }
 
-# ----
 
 #' Create a list of resample objects
 #'
@@ -110,7 +142,6 @@ assertthat::on_failure(is_resample_lst) <- function(call, env) {
   paste0("All elements of ", deparse(call$x), " must inherit from class `resample`")
 }
 
-
 #' @export
 #' @importFrom purrr map_lgl is_integer compact
 c.resample <- function(...) {
@@ -122,11 +153,9 @@ c.resample <- function(...) {
     stop("Can only concatenate `resample` and `integer` objects",
          call. = FALSE)
   }
-  reduce_common(compact(map(x, "data")),
-                msg = "All elements of `x` must have identical `data`")
+  # remove check for efficiency - don't be stupid with it
+  # reduce_common(compact(map(x, "data")),
+  #               msg = "All elements of `x` must have identical `data`")
   # This can work even if earlier checks are failed
-  # as long as all objects have as.integer methods.
-  # However, it seems safer to be stricter and force the user to ensure
-  # that all objects are resample or integer
   resample(x[[1]][["data"]], flatten_int(map(x, as.integer)))
 }

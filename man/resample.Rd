@@ -2,20 +2,20 @@
 % Please edit documentation in R/resample.R
 \name{resample}
 \alias{resample}
-\title{A "lazy" resample.}
+\title{A "lazy" resample object}
 \usage{
-resample(data, idx)
+resample(data, idx, ...)
 }
 \arguments{
-\item{data}{The data frame}
+\item{data}{An object. This can be any object for which a \code{[} method is defined.}
 
-\item{idx}{A vector of integer indexes indicating which rows have
-been selected. These values should lie between 1 and \code{nrow(data)}
-but they are not checked by this function in the interests of performance.}
+\item{idx}{A vector of integer indexes. For efficiency, this function does not check whether these indices are valid.}
 }
 \description{
-Often you will resample a dataset hundreds or thousands of times. Storing
-the complete resample each time would be very inefficient so this class
+Often you will resample a dataset many times, as in cross-validation or bootstrapping.
+Copying and storing the complete resample each time is both time-consuming and memory intensive.
+However, all that is needed for the resample
+The \code{resample}
 instead stores a "pointer" to the original dataset, and a vector of row
 indexes. To turn this into a regular data frame, call \code{as.data.frame},
 to extract the indices, use \code{as.integer}.
