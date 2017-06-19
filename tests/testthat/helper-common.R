@@ -23,7 +23,7 @@ expect_crossv_df <- function(x, test = NULL, train = NULL) {
   }
 }
 
-expect_resample_df <- function(x, expected = NULL) {
+expect_resample_dataframe <- function(x, expected = NULL) {
   expect_is(x, "data.frame")
   expect_is(x$sample, "list")
   expect_is(x$.id, "integer")

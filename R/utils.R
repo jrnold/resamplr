@@ -32,19 +32,6 @@ replace_groups <- function(x, group_idx, f = identity, ...) {
   map(x, function(g) flatten_int(map(group_idx[g], f, ...)))
 }
 
-# convert resample data frame with index list column to one with resample
-# list column.
-to_resample_df <- function(x, .data) {
-  x[["sample"]] <- resample_lst(.data, x[["sample"]])
-  x
-}
-
-to_crossv_df <- function(x, .data) {
-  x[["train"]] <- resample_lst(.data, x[["train"]])
-  x[["test"]] <- resample_lst(.data, x[["test"]])
-  x
-}
-
 # copied from modelr
 #' @importFrom purrr reduce
 reduce_common <- function(x, msg = "Objects must be identical", operator = identical) {
@@ -71,13 +58,19 @@ big_mark <- function(x, ...) {
 #'
 #' @noRd
 append_class <- function(x, newclass, after = 0) {
-  append_class(x, after = after) <- newclass
+  # use attr(x, "class") instead of class()
+  # because class() would unnecessarily add primitive types
+  class(x) <- append(attr(x, "class"), newclass, after = after)
   x
 }
 
-`append_class<-` <- function(x, value, after = 0) {
-  # use attr(x, "class") instead of class()
-  # because class() would unnecessarily add primitive types
-  class(x) <- append(attr(x, "class"), value, after = 0)
-  x
+# coerce to a list of indices
+idx_list <- function(x) {
+  if (is.integer(x) || is.character(x)) {
+    # if a single valid vector - then use
+    list(x)
+  } else {
+    # otherwise, coerce to a list
+    rlang::as_list(x)
+  }
 }

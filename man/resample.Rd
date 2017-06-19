@@ -2,14 +2,25 @@
 % Please edit documentation in R/resample.R
 \name{resample}
 \alias{resample}
+\alias{as.integer.resample}
+\alias{collect.resample}
+\alias{length.resample}
 \title{A "lazy" resample object}
 \usage{
 resample(data, idx, ...)
+
+\method{as.integer}{resample}(x, ...)
+
+\method{collect}{resample}(x, ...)
+
+\method{length}{resample}(x, ...)
 }
 \arguments{
 \item{data}{An object. This can be any object for which a \code{[} method is defined.}
 
 \item{idx}{A vector of integer indexes. For efficiency, this function does not check whether these indices are valid.}
+
+\item{...}{Other arguments}
 }
 \description{
 Often you will resample a dataset many times, as in cross-validation or bootstrapping.
@@ -17,9 +28,18 @@ Copying and storing the complete resample each time is both time-consuming and m
 However, all that is needed for the resample
 The \code{resample}
 instead stores a "pointer" to the original dataset, and a vector of row
-indexes. To turn this into a regular data frame, call \code{as.data.frame},
-to extract the indices, use \code{as.integer}.
+indexes.
 }
+\section{Methods (by class)}{
+\itemize{
+\item \code{resample}: Return the indexes as an integer vector.
+
+\item \code{resample}: Subset the data and return the results.
+The return value  should have same type as \code{x$data}.
+
+\item \code{resample}: The length of the indexes.
+}}
+
 \examples{
 r <- resample(mtcars, 1:10)
 as.integer(r)
