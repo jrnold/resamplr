@@ -3,6 +3,10 @@ library("modelr")
 library("dplyr")
 library("purrr")
 
+make_label <- function(object, label = NULL) {
+  label %||% rlang::expr_label(substitute(object))
+}
+
 expect_resample_lst <- function(x) {
   expect_true(is_resample_lst(x))
 }
@@ -33,6 +37,14 @@ expect_resample_dataframe <- function(x, expected = NULL) {
   }
 }
 
-same_objects <- function(x, y) {
-  pryr::inspect(x)$address == inspect(y)$address
+expect_same_address <- function(object, expected, info = NULL, label = NULL, expected.label = NULL) {
+  lab_obj <- make_label(object, label)
+  lab_exp <- make_label(expected, expected.label)
+  addr_obj <- pryr::inspect(object)$address
+  addr_exp <- pryr::inspect(expected)$address
+  expect(addr_obj == addr_exp,
+         sprintf("%s and %s have different addresses. %s, %s",
+                 lab_obj, lab_exp, addr_obj, addr_exp))
+  invisible(object)
 }
+

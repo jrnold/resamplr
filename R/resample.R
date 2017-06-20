@@ -24,7 +24,8 @@ resample <- function(data, idx, ...) {
 
 #' @export
 resample.default <- function(data, idx, ...) {
-  assert_that(is.integer(idx))
+  assert_that(is.integer(idx) || is.character(idx) || is.numeric(idx))
+  if (is.numeric(idx)) idx <- as.integer(idx)
   structure(
     list(
       data = data,
@@ -37,6 +38,13 @@ resample.default <- function(data, idx, ...) {
 #' @export
 resample.data.frame <- function(data, idx, ...) {
   append_class(resample.default(data, idx), "resample_df")
+}
+
+#' @importFrom tibble obj_sum
+#' @method obj_sum resample
+#' @export
+obj_sum.resample <- function(x, ...) {
+  paste0("resample of ", paste0(class(x$data), collapse = "/"), " [", length(x$idx), "]")
 }
 
 #' @export
@@ -72,7 +80,7 @@ as.character.resample <- function(x, ...) {
 #'   The return value  should have same type as \code{x$data}.
 #' @export
 collect.resample <- function(x, ...) {
-  if (dim(x$data) > 1) {
+  if (length(dim(x$data)) > 1) {
     x$data[x$idx, ...]
   } else {
     x$data[x$idx]
@@ -93,6 +101,7 @@ as.data.frame.resample_df <- collect.resample_df
 #' @export
 length.resample <- function(x, ...) {
   length(x$idx)
+  # NOTE: this may not be a good idea as it may screw up processing the individual elements if a resample object is treated as a list
 }
 
 #' @describeIn resample_df Length of the \code{idx} element, whhen \code{data} element is a data frame.
@@ -110,25 +119,6 @@ nrow.resample_df <- function(x, ...) length(x$idx)
 #' @export
 ncol.resample_df <- function(x, ...) ncol(x$data)
 
-#' @importFrom tibble obj_sum
-#' @method obj_sum resample
-#' @export
-obj_sum.resample <- function(x, ...) {
-  paste0("resample ", length(x), " from ", obj_sum(x$data), "]")
-}
-
-#' Create a list of resample objects
-#'
-#' @param data A data frame
-#' @param idx A list of integer vectors of indexes.
-#' @seealso \code{\link{resample}} generates a single resample object.
-#' @return A \code{list} of \code{\link[modelr]{resample}} objects.
-#' @export
-#' @examples
-#' resample_lst(mtcars, list(1:3, 4:6, 7:10))
-resample_lst <- function(data, idx) {
-  map(idx_list(idx), resample, data = data)
-}
 
 #' Is it a resample object?
 #'
@@ -164,7 +154,20 @@ c.resample <- function(...) {
     }
   }
   # don't use flatten_int to still allow case of character indexes
-  resample(x[[1]][["data"]], idx = purrr::flatten(map(x, f)))
+  resample(x[[1]][["data"]], idx = purrr::as_vector(map(x, f)))
+}
+
+#' Create a list of resample objects
+#'
+#' @param data A data frame
+#' @param idx A list of integer vectors of indexes.
+#' @seealso \code{\link{resample}} generates a single resample object.
+#' @return A \code{list} of \code{\link[modelr]{resample}} objects.
+#' @export
+#' @examples
+#' resample_lst(mtcars, list(1:3, 4:6, 7:10))
+resample_lst <- function(data, idx) {
+  map(idx_list(idx), resample, data = data)
 }
 
 # check if all elements in a list are resample objects

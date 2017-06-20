@@ -66,7 +66,7 @@ append_class <- function(x, newclass, after = 0) {
 
 # coerce to a list of indices
 idx_list <- function(x) {
-  if (is.integer(x) || is.character(x)) {
+  if (is.integer(x) || is.character(x) || is.numeric(x)) {
     # if a single valid vector - then use
     list(x)
   } else {
