@@ -1,127 +1,49 @@
-context("bootstrap")
+context("bootstrap.data.frame")
+
+expect_bootstrap <- function(x, R) {
+  expect_resample_df(x)
+  expect_equal(nrow(x), R)
+}
 
 local({
-  dat <- tibble(a = rep(1:3, 4))
+  n <- 4
+  dat <- tibble(a = rep(1:3, n),
+                w = runif(length(a)))
   gdat <- group_by(dat, a)
 
-  test_that("bootstrap works as expected", {
-    R <- 2
-    x <- bootstrap(dat, R)
-    expect_resample_df(x)
-    expect_equal(nrow(x), R)
+  test_that("bootstrap.data.frame works as expected", {
+    .args <- cross_n(list(data = list(dat),
+                     R = c(1L, 2L),
+                     bayes = c(TRUE, FALSE),
+                     weights = list(character(), "w")))
+    for (.a in .args) {
+      if (!length(.a$weights)) .a$weights <- NULL
+      out <- invoke(bootstrap, .a)
+      expect_bootstrap(out, .a$R)
+    }
   })
 
-  test_that("bootstrap bayes = TRUE, works as expected", {
-    R <- 2
-    x <- bootstrap(dat, R, bayes = TRUE)
-    expect_resample_df(x)
-    expect_equal(nrow(x), R)
-  })
-
-  test_that("bootstrap with weights argworks as expected", {
-    R <- 2
-    x <- bootstrap(dat, R = R, weight = "a")
-    expect_resample_df(x)
-    expect_equal(nrow(x), R)
-  })
-
-  test_that("bootstrap with weights arg, bayes = TRUE, works as expected", {
-    R <- 2
-    x <- bootstrap(dat, R = R, weight = "a", bayes = TRUE)
-    expect_resample_df(x)
-    expect_equal(nrow(x), R)
-  })
-
-  test_that("bootstrap.grouped_df(stratify = FALSE) works as expected", {
-    R <- 2
-    x <- bootstrap(gdat, R, stratify = FALSE, groups = TRUE,
-                   weight_groups = FALSE)
-    expect_resample_df(x)
-    expect_equal(nrow(x), R)
-    expect_is(x$.group, "list")
-    expect_true(all(map_lgl(x$.group, is.integer)))
-  })
-
-  test_that(paste0("bootstrap.grouped_df(stratify = TRUE, groups = FALSE)",
-                   " works as expected"), {
-    R <- 2
-    x <- bootstrap(gdat, R, stratify = TRUE, groups = FALSE)
-    expect_resample_df(x)
-    expect_equal(nrow(x), R)
-    expect_is(x$.group, "list")
-    expect_true(all(map_lgl(x$.group, is.integer)))
-  })
-
-  test_that(paste0("bootstrap.grouped_df(stratify = FALSE, ",
-                   "weight_groups = TRUE) works as expected"), {
-    R <- 2
-    x <- bootstrap(gdat, R, stratify = FALSE, groups = TRUE,
-                   weight_groups = TRUE)
-    expect_resample_df(x)
-    expect_equal(nrow(x), R)
-    expect_is(x$.group, "list")
-    expect_true(all(map_lgl(x$.group, is.integer)))
-  })
-
-  test_that(paste0("bootstrap.grouped_df(stratify = FALSE, bayes = TRUE), ",
-                   "works as expected"), {
-    R <- 2
-    x <- bootstrap(gdat, R, stratify = FALSE, bayes = TRUE, weights = NULL)
-    expect_resample_df(x)
-    expect_equal(nrow(x), R)
-    expect_is(x$.group, "list")
-    expect_true(all(map_lgl(x$.group, is.integer)))
-  })
-
-  test_that(paste0("bootstrap.grouped_df(stratify = FALSE, bayes = TRUE, ",
-                   "weights), works as expected"), {
-    R <- 2
-    x <- bootstrap(gdat, R, stratify = FALSE, bayes = TRUE, weights = "a")
-    expect_resample_df(x)
-    expect_equal(nrow(x), R)
-    expect_is(x$.group, "list")
-    expect_true(all(map_lgl(x$.group, is.integer)))
+  test_that("bootstrap.grouped_df works as expected", {
+    .args <- cross_n(list(data = list(gdat),
+                          R = c(1L, 2L),
+                          bayes = c(TRUE, FALSE),
+                          weights = list(character(), "w"),
+                          groups = c(TRUE, FALSE),
+                          stratify = c(TRUE, FALSE),
+                          weight_groups = c(TRUE, FALSE),
+                          weight_within = c(TRUE, FALSE)
+    ))
+    for (.a in .args) {
+      if (!length(.a$weights)) .a$weights <- NULL
+      if (!.a$groups) {
+        expect_error(invoke(bootstrap, .a))
+      } else {
+        out <- invoke(bootstrap, .a)
+        expect_bootstrap(out, .a$R)
+      }
+    }
   })
 
 
-  test_that(paste0("bootstrap.grouped_df(stratify = TRUE) ",
-                   "works as expected"), {
-    R <- 2
-    x <- bootstrap(gdat, R, stratify = TRUE)
-    expect_resample_df(x)
-    expect_equal(nrow(x), R)
-    expect_is(x$.group, "list")
-    expect_true(all(map_lgl(x$.group, is.integer)))
-  })
 
-  test_that(paste0("bootstrap.grouped_df(stratify = TRUE, ",
-                   "weight_within = fALSE) works as expected"), {
-    R <- 2
-    x <- bootstrap(gdat, R, stratify = TRUE, weights = "a", groups = FALSE,
-                   weight_within = FALSE)
-    expect_resample_df(x)
-    expect_equal(nrow(x), R)
-    expect_is(x$.group, "list")
-    expect_true(all(map_lgl(x$.group, is.integer)))
-  })
-
-  test_that(paste0("bootstrap.grouped_df(stratify = TRUE, bayes = TRUE), ",
-                   "works as expected"), {
-    R <- 2
-    x <- bootstrap(gdat, R, stratify = TRUE, bayes = TRUE, weights = NULL)
-    expect_resample_df(x)
-    expect_equal(nrow(x), R)
-    expect_is(x$.group, "list")
-    expect_true(all(map_lgl(x$.group, is.integer)))
-  })
-
-  test_that(paste0("bootstrap.grouped_df(stratify = TRUE, bayes = TRUE, ",
-                   "weights), works as expected"), {
-    R <- 2
-    x <- bootstrap(gdat, R, stratify = TRUE, bayes = TRUE, weights = "a")
-    expect_resample_df(x)
-    expect_equal(nrow(x), R)
-    expect_is(x$.group, "list")
-    expect_true(all(map_lgl(x$.group, is.integer)))
-  })
 })
