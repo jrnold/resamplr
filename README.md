@@ -23,11 +23,6 @@ The **resamplr** package includes functions to generate data frames of lazy resa
 ``` r
 library("modelr")
 library("resamplr")
-#> 
-#> Attaching package: 'resamplr'
-#> The following objects are masked from 'package:modelr':
-#> 
-#>     bootstrap, crossv_kfold
 rs <- resample(mtcars, 1:10)
 as.data.frame(rs)
 #>                    mpg cyl  disp  hp drat    wt  qsec vs am gear carb

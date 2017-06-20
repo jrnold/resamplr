@@ -4,17 +4,22 @@ Title: Resampling methods
 Version: 0.0.1
 Authors@R: c(person("Jeffrey", "Arnold", role = c("aut", "cre"),
                     email = "jeffrey.arnold@gmail.com"),
-             person("Hadley", "Wickham", role = "ctb", 
-                    comment = "Some code and examples extracted from the modelr package"),
-             person("R Core team", role = "ctb",
-                    comment = "Some code and examples extracted from the boot package"))
-Description: Provides functions that implement resampling methods,
-  including the bootstrap, jackknife, random test/train sets,
-  k-fold cross-validation, leave-one-out and leave-p-out cross-validation,
-  time-series cross validation, time-series k-fold cross validation,
-  permutations, rolling windows. These functions generate data frames
-  with `resample` objects that work with the modelling pipeline of `modelr`
-  and the `tidyverse`.
+             person("Hadley", "Wickham", role = "ctb",
+                    comment = "Some code extracted from the modelr package"),
+             person("Angelo", "Canty", role = "ctb",
+                    comment = "Some code extracted from the boot package"),
+             person("Brian", "Ripley", role = "ctb",
+                    comment = "Some code extracted from the boot package"),
+             person("Achim", "Zeileis", role = "ctb",
+                    comment = "Some code extracted from rollapply in the zoo package"))
+Description: Additional resampling methods for the 'resampler' class in the 'modelr' package.
+  Resampling and similar methods implemented include: bootstrap methods (simple bootstrap,
+  weighted bootstrap, balanced bootstrap, moving-blocks bootstrap),
+  test-training splits, cross-validation (leave-one-out, leave-p-out, 
+  k-fold, time-series k-fold, time series rolling windows),
+  jackknife (delete-one and delete-p), permutations, and rolling windows.
+  These are implemented as generic functions which include a grouped data method
+  that implements group-wise or stratified versions of all the above.
 License: GPL-3
 Encoding: UTF-8
 LazyData: true
