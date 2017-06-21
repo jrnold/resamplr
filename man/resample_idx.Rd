@@ -2,25 +2,16 @@
 % Please edit documentation in R/resample_idx.R
 \name{resample_idx}
 \alias{resample_idx}
-\alias{resample_idx.default}
-\alias{resample_idx.grouped_df}
-\alias{resample_idx.grouped_df}
 \title{Generate subsamples from indices}
 \usage{
-resample_idx(data, ...)
-
-\method{resample_idx}{default}(data, samples, ...)
-
-\method{resample_idx}{grouped_df}(data, samples, ...)
-
-\method{resample_idx}{grouped_df}(data, samples, ...)
+resample_idx(data, idx, ...)
 }
 \arguments{
 \item{data}{An object}
 
-\item{...}{Arguments passed to methods}
+\item{idx}{A list of integer vectors or an integer vector, with the indices in each subsample.}
 
-\item{samples}{A list of integer vectors or an integer vector, with the indices in each subsample.}
+\item{...}{Arguments passed to methods}
 }
 \value{
 A data frame with rows for each subsample and the following columns:
@@ -33,15 +24,6 @@ A data frame with rows for each subsample and the following columns:
 Generate subsamples from manually specified indices of observations in each
 subsample.
 }
-\section{Methods (by class)}{
-\itemize{
-\item \code{default}: Generate subsamples of rows of data frames.
-
-\item \code{grouped_df}: Generate subsamples of groups of grouped data frames.
-
-\item \code{grouped_df}: Generate subsamples of groups of grouped data frames.
-}}
-
 \examples{
 resample(mtcars, 1:10)
 }

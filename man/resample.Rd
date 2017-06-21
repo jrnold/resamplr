@@ -3,17 +3,17 @@
 \name{resample}
 \alias{resample}
 \alias{as.integer.resample}
-\alias{collect.resample}
-\alias{length.resample}
+\alias{as.character.resample}
+\alias{c.resample}
 \title{A "lazy" resample object}
 \usage{
 resample(data, idx, ...)
 
 \method{as.integer}{resample}(x, ...)
 
-\method{collect}{resample}(x, ...)
+\method{as.character}{resample}(x, ...)
 
-\method{length}{resample}(x, ...)
+\method{c}{resample}(...)
 }
 \arguments{
 \item{data}{An object. This can be any object for which a \code{[} method is defined.}
@@ -21,6 +21,8 @@ resample(data, idx, ...)
 \item{idx}{A vector of integer indexes. For efficiency, this function does not check whether these indices are valid.}
 
 \item{...}{Other arguments}
+
+\item{x}{An object.}
 }
 \description{
 Often you will resample a dataset many times, as in cross-validation or bootstrapping.
@@ -34,10 +36,15 @@ indexes.
 \itemize{
 \item \code{resample}: Return the indexes as an integer vector.
 
-\item \code{resample}: Subset the data and return the results.
-The return value  should have same type as \code{x$data}.
+\item \code{resample}: Return the indexes as a character vector.
 
-\item \code{resample}: The length of the indexes.
+\item \code{resample}: Concatenate \code{resample} and index objects into a
+single \code{resample} objects. The \code{data} element of the first
+object is used as the data for the returned obejct, with the \code{data}
+elements of other resample objects neither used nor checked.
+The elements of \code{...} must be \code{resample} objects, or
+\code{integer}, \code{numberic}, or \code{character} vectors, which are
+treated as indexes.
 }}
 
 \examples{

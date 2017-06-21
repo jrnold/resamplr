@@ -9,6 +9,8 @@
 #'
 #' @param data An object. This can be any object for which a \code{[} method is defined.
 #' @param idx A vector of integer indexes. For efficiency, this function does not check whether these indices are valid.
+#'
+#' @param x An object.
 #' @param ... Other arguments
 #' @examples
 #' r <- resample(mtcars, 1:10)
@@ -40,11 +42,17 @@ resample.data.frame <- function(data, idx, ...) {
   append_class(resample.default(data, idx), "resample_df")
 }
 
+#' @export
+resample.resample <- function(data, idx, ...) {
+  resample(data[["data"]], data[["idx"]][idx])
+}
+
+
 #' @importFrom tibble obj_sum
-#' @method obj_sum resample
 #' @export
 obj_sum.resample <- function(x, ...) {
-  paste0("resample of ", paste0(class(x$data), collapse = "/"), " [", length(x$idx), "]")
+  paste0("resample of ", paste0(class(x$data), collapse = "/"),
+         " [", length(x$idx), "]")
 }
 
 #' @export
@@ -70,13 +78,13 @@ as.integer.resample <- function(x, ...) {
 # or be opinionated and allow only integer indices.
 # I could convert character to integer in the resample stage?
 
-#' @describeIn resmple Return the indexes as a character vector.
+#' @describeIn resample Return the indexes as a character vector.
 #' @export
 as.character.resample <- function(x, ...) {
   as.character(x$idx)
 }
 
-#' @describeIn resample Subset the data and return the results.
+#' @describeIn collect Subset the data and return the results.
 #'   The return value  should have same type as \code{x$data}.
 #' @export
 collect.resample <- function(x, ...) {
@@ -93,32 +101,21 @@ collect.resample_df <- function(x, ...) {
   x$data[x$idx, ..., drop = FALSE]
 }
 
-# copied from modelr
 #' @export
 as.data.frame.resample_df <- collect.resample_df
 
-#' @describeIn resample The length of the indexes.
-#' @export
-length.resample <- function(x, ...) {
-  length(x$idx)
-  # NOTE: this may not be a good idea as it may screw up processing the individual elements if a resample object is treated as a list
-}
-
-#' @describeIn resample_df Length of the \code{idx} element, whhen \code{data} element is a data frame.
 #' @export
 dim.resample_df <- function(x, ...) {
   c(length(x$idx), ncol(x$data))
 }
 
 # nrow and ncol only make sense for tbl like objects
-#' @describeIn resample Length of the \code{idx} element, whhen \code{data} element is a data frame.
+
 #' @export
 nrow.resample_df <- function(x, ...) length(x$idx)
 
-#' @describeIn resample Number of columns in the \code{data} element.
 #' @export
 ncol.resample_df <- function(x, ...) ncol(x$data)
-
 
 #' Is it a resample object?
 #'
@@ -129,10 +126,13 @@ ncol.resample_df <- function(x, ...) ncol(x$data)
 #' @export
 is_resample <- function(x) inherits(x, "resample")
 
-#' @describeIn resample_df Concatenate \code{resample} and index objects into a single \code{resample} objects. The \code{data} element of the first object is used as the data for the returned obejct, with the \code{data} elements of other
-#' resample objects neither used nor checked.
-#' The elements of \code{...} must be \code{resample} objects, or \code{integer},
-#' \code{numberic}, or \code{character} vectors, which are treated as indexes.
+#' @describeIn resample Concatenate \code{resample} and index objects into a
+#'   single \code{resample} objects. The \code{data} element of the first
+#'   object is used as the data for the returned obejct, with the \code{data}
+#'   elements of other resample objects neither used nor checked.
+#'   The elements of \code{...} must be \code{resample} objects, or
+#'   \code{integer}, \code{numberic}, or \code{character} vectors, which are
+#'   treated as indexes.
 #' @export
 #' @importFrom purrr map_lgl is_integer compact
 c.resample <- function(...) {

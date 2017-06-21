@@ -19,6 +19,17 @@ test_that("resample with non-data frame data works", {
   expect_identical(x[["data"]], foo)
 })
 
+test_that("resample.resample works as expected", {
+  foo <- tibble(a = 1:10)
+  idx1 <- 2:8
+  idx2 <- 1:2
+  x <- resample(resample(foo, idx1), idx2)
+  expect_is(x, "resample")
+  expect_identical(x[["idx"]], idx1[idx2])
+  expect_same_address(x[["data"]], foo)
+  expect_identical(x[["data"]], foo)
+})
+
 test_that("resample works with character indexes", {
   data <- list(a = 1, b = 3, c = "foo")
   idx <- c("a", "c")
@@ -73,12 +84,6 @@ test_that("collect.resample_df returns the subset of the data", {
   idx <- c(1, 5)
   expect_identical(collect(resample(data, idx)),
                    tibble(a = c(2, 10)))
-})
-
-test_that("length.resample works as expected", {
-  data <- tibble(a = 1:10)
-  idx <- 1:3
-  expect_identical(length(resample(data, idx)), 3L)
 })
 
 test_that("nrow.resample_df works as expected", {

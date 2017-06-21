@@ -48,3 +48,18 @@ expect_same_address <- function(object, expected, info = NULL, label = NULL, exp
   invisible(object)
 }
 
+expect_all_same_address <- function(object, expected, info = NULL,
+                                    label = NULL, expected.label = NULL) {
+  lab_obj <- make_label(object, label)
+  lab_exp <- make_label(expected, expected.label)
+  addr_exp <- pryr::inspect(expected)$address
+  addr_obj <- map_chr(object, function(.x) pryr::inspect(.x)$address)
+  comp <- addr_obj == addr_exp
+  expect(all(comp),
+         sprintf(paste0("Not all elements in %s have the same address as ",
+                        "%s (%s):\n Addresses in %s: %s"),
+                 lab_obj, lab_exp, addr_exp, lab_obj,
+                 paste0(addr_obj, collapse = ",")))
+  invisible(object)
+}
+
