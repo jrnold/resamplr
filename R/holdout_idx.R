@@ -35,16 +35,9 @@ holdout_idx.default <- function(data, train, test, ...) {
 #'    sets by group.
 #' @export
 holdout_idx.grouped_df <- function(data, train, test, ...) {
-  idx <- group_indices_lst(data)
-  f <- function(i) flatten_int(idx[i])
-  holdout_idx.default(data, train = map(train, f), test = map(test, f))
+  gidx <- group_indices_lst(data)
+  tibble(train = resample_lst(data, flatten_group_idx_lst(train, gidx)),
+         test = resample_lst(data, flatten_group_idx_lst(test, gidx)),
+         .id = seq_along(train))
 }
 
-#' @describeIn holdout_idx For \code{resmple} objects, the \code{train} and \code{test} indexes refer to index of the elements in the \code{data$idx} vector; not the values in that vector
-#' @export
-holdout_idx.resample <- function(data, train, test, ...) {
-  # indexes have to refer to the index of elements in the `idx` element
-  f <- function(i) purrr::flatten(data$idx[i])
-  holdout_idx.default(data = data$data, train = map(train, f),
-                      test = map(test, f))
-}

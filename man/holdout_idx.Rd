@@ -3,14 +3,11 @@
 \name{holdout_idx}
 \alias{holdout_idx}
 \alias{holdout_idx.grouped_df}
-\alias{holdout_idx.resample}
 \title{Generate cross-validation test-training sets manuall}
 \usage{
 holdout_idx(data, train, test, ...)
 
 \method{holdout_idx}{grouped_df}(data, train, test, ...)
-
-\method{holdout_idx}{resample}(data, train, test, ...)
 }
 \arguments{
 \item{data}{A data frame}
@@ -36,8 +33,6 @@ indices of observations in the test and and training sets.
 \itemize{
 \item \code{grouped_df}: Partition a grouped data frame into test and training
 sets by group.
-
-\item \code{resample}: For \code{resmple} objects, the \code{train} and \code{test} indexes refer to index of the elements in the \code{data$idx} vector; not the values in that vector
 }}
 
 \examples{

@@ -16,23 +16,11 @@ resample_idx <- function(data, idx, ...) {
 
 #' @export
 resample_idx.default <- function(data, idx, ...) {
-  idx <- idx_list(idx)
   tibble(sample = resample_lst(data, idx), .id = seq_along(idx))
 }
 
 #' @export
 resample_idx.grouped_df <- function(data, idx, ...) {
-  idx <- idx_list(idx)
-  gidx <- group_indices_lst(data)
-  idxs <- map(idx, function(.g) flatten_int(gidx[.g]))
+  idxs <- flatten_group_idx_lst(idx, group_indices_lst(data))
   tibble(sample = resample_lst(data, idxs), .id = seq_along(idx))
-}
-
-#' @export
-resample_idx.resample <- function(data, idx, ...) {
-  idx <- idx_list(idx)
-  tibble(
-    sample = resample_lst(data, idx),
-    .id = seq_along(idx)
-  )
 }
