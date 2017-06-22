@@ -73,13 +73,13 @@ test_that("as.character.resample returns indexes", {
   expect_identical(as.character(resample(data, idx)), idx)
 })
 
-test_that("collect.resample returns the subset of the data", {
+test_that("collect.resample works with chracter indexes and non-data frames", {
   idx <- c("a", "c")
   data <- list(a = 1, b = 2, c = 3)
   expect_identical(collect(resample(data, idx)), list(a = 1, c = 3))
 })
 
-test_that("collect.resample_df returns the subset of the data", {
+test_that("collect.resample_df works with data-frames", {
   data <- tibble(a = 1:10 * 2)
   idx <- c(1, 5)
   expect_identical(collect(resample(data, idx)),

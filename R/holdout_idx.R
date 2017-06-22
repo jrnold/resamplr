@@ -22,22 +22,19 @@ holdout_idx <- function(data, train, test, ...) {
 #   x %||% map(y, function(.y) setdiff(idx, .y))
 # }
 
-#' @describeIn holdout_idx
 #' @export
 holdout_idx.default <- function(data, train, test, ...) {
-  tibble(data = data,
-         train = resample_lst(data, train),
+  tibble(train = resample_lst(data, train),
          test = resample_lst(data, test),
          .id = seq_along(train))
 }
 
-#' @describeIn holdout_idx Partition a grouped data frame into test and training
-#'    sets by group.
 #' @export
 holdout_idx.grouped_df <- function(data, train, test, ...) {
   gidx <- group_indices_lst(data)
-  tibble(train = resample_lst(data, flatten_group_idx_lst(train, gidx)),
-         test = resample_lst(data, flatten_group_idx_lst(test, gidx)),
-         .id = seq_along(train))
+  holdout_idx.default(
+    data = data,
+    train = flatten_group_idx_lst(train, gidx),
+    test = flatten_group_idx_lst(test, gidx)
+  )
 }
-
