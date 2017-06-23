@@ -6,8 +6,6 @@
 #' @param data An object
 #' @param idx A list of integer vectors or an integer vector, with the indices in each subsample.
 #' @param ... Arguments passed to methods
-#' @templateVar numrows rows for each subsample and
-#' @template return_resample
 #' @example inst/examples/ex-resample.R
 #' @export
 resample_idx <- function(data, idx, ...) {

@@ -11,11 +11,10 @@
 #'   If \code{test} is \code{NULL}, then the test set is the complement of
 #'   the training set.
 #' @param ... Arguments passed to methods
-#' @example inst/examples/ex-holdout_idx.R
-#' @template return_holdout
+#' @example inst/examples/ex-crossv_idx.R
 #' @export
-holdout_idx <- function(data, train, test, ...) {
-  UseMethod("holdout_idx")
+crossv_idx <- function(data, train, test, ...) {
+  UseMethod("crossv_idx")
 }
 
 # fill_test_train <- function(x, y, idx) {
@@ -23,18 +22,14 @@ holdout_idx <- function(data, train, test, ...) {
 # }
 
 #' @export
-holdout_idx.default <- function(data, train, test, ...) {
-  tibble(train = resample_lst(data, train),
-         test = resample_lst(data, test),
-         .id = seq_along(train))
+crossv_idx.default <- function(data, train, test, ...) {
+  # TODO allow for null train and
+  tibble(train = resample_lst(data, train, ...),
+         test = resample_lst(data, test, ...))
 }
 
 #' @export
-holdout_idx.grouped_df <- function(data, train, test, ...) {
-  gidx <- group_indices_lst(data)
-  holdout_idx.default(
-    data = data,
-    train = flatten_group_idx_lst(train, gidx),
-    test = flatten_group_idx_lst(test, gidx)
-  )
+crossv_idx.grouped_df <- function(data, train, test, groups = TRUE, ...) {
+  tibble(train = resample_lst(data, train, groups = groups),
+         test = resample_lst(data, test, groups = groups))
 }

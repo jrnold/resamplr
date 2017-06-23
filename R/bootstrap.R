@@ -28,8 +28,6 @@
 #'   output and has more options than the \pkg{modelr} function
 #'   \code{\link[modelr]{bootstrap}}.
 #' @param bayes If \code{TRUE}, a Bayesian bootstrap is used.
-#' @templateVar numrows \code{R} rows and
-#' @template return_resample_df
 #' @references
 #' \itemize{
 #' \item{Angelo Canty and Brian Ripley (2016). boot: Bootstrap R (S-Plus) Functions. R package version 1.3-18.}
@@ -49,91 +47,11 @@ bootstrap.default <- function(data,
                                  m = NULL,
                                  replace = TRUE,
                                  ...) {
-  out <- bootstrap_(length(data), R = R, weights = weights, bayes = bayes,
+  out <- bootstrap_(resample_idx_len(data), R = R, weights = weights,
+                    bayes = bayes,
                     m = m, replace = replace)
   out[["sample"]] <- resample_lst(data, out[["sample"]])
   out
-}
-
-
-#' @export
-bootstrap.data.frame <- function(data,
-                                  R = 1L,
-                                  weights = NULL,
-                                  bayes = FALSE,
-                                  m = NULL,
-                                  replace = TRUE,
-                                  ...) {
-  out <- bootstrap_(nrow(data), R = R, weights = weights, bayes = bayes,
-                    m = m, replace = replace)
-  out[["sample"]] <- resample_lst(data, out[["sample"]])
-  out
-}
-
-
-#' @describeIn bootstrap Bootstraps a grouped data data frame. Allows for
-#'   bootstrapping groups (clustered bootstrap) if \code{groups = TRUE}, and
-#'   bootstrapping within groups (stratified bootstrap) if
-#'   \code{stratify = TRUE}.
-#' @importFrom assertthat is.string
-#' @importFrom purrr map2_df
-#' @importFrom dplyr n_groups
-#' @export
-bootstrap.grouped_df <- function(data,
-                                 R = 1L,
-                                 weights = NULL,
-                                 bayes = FALSE,
-                                 by_group = FALSE,
-                                 within = TRUE,
-                                 weights_group = NULL,
-                                 weights_within = NULL,
-                                 m_group = NULL,
-                                 m_within = NULL,
-                                 replace_group = NULL,
-                                 replace_within = NULL,
-                                 ...) {
-  # One of these needs to be specified
-  assert_that(between || within)
-  assert_that(is.flag(between))
-  assert_that(is.flag(within))
-  assert_that(is.flag(weight_between))
-  assert_that(is.flag(weight_within))
-  assert_that(is.null(weight_between) || is.number(weight_between))
-  assert_that(is.null(weight_within) || is.number(weight_within))
-
-  # fill in weights if none exist
-  if (!is.null(weights)) {
-    assert_that(weights %in% names(data))
-    assert_that(is.numeric(data[["weights"]]))
-    weights <- data[[weights]]
-  }
-
-  # get group indices
-  gidx <- group_indices_lst(data)
-
-  if (between) {
-    # ...
-    out <- bootstrap_(n_groups(data), R = R, weights = weights_group,
-                      bayes = bayes)
-    if (within) {
-      f <- function(.group, .id) {
-        idxs <- gidx[[.group]]
-        bootstrap.default(length(groups), R = 1,
-                          weights = weights_within[[.group]],
-                          replace = replace_within,
-                          m = m_within[[.group]])
-      }
-    } else {
-      out <-
-        tibble(sample =
-                 resample_lst(data,
-                              flatten_group_idx_lst(out[["sample"]], gidx)),
-               .id = seq_len(R))
-    }
-  } else {
-    # ...
-  }
-
 }
 
 #' @importFrom purrr rerun
@@ -155,7 +73,36 @@ bootstrap_ <- function(n, R = 1L, weights = NULL, bayes = FALSE, m = NULL,
     }
     tibble(sample = map(weights, f))
   } else {
-    tibble(sample = rerun(sample.int(n, size = m, replace = replace,
-                                     prob = weights)))
+    tibble(sample = rerun(R, sample.int(n, size = m, replace = replace,
+                                        prob = weights)))
   }
 }
+
+#' @export
+bootstrap.grouped_df <- function(data, ...) {
+  stop("bootstrap.grouped_df is not implemented yet")
+}
+
+# bootstrap_group_1 <- function(indices) {
+#   G <- length(indices)
+#   # get groups
+#   if (groups) {
+#     grps <- bootstrap_(G, R = 1)[["sample"]]
+#   } else {
+#     grps <- seq_len(n_groups(data))
+#   }
+#   # expand group indices
+#   idx <- map(grps, function(i) indices[[i]])
+#   .group <- map2_int(seq_along(idx), len(idx), rep.int)
+#   # resample within groups
+#   if (within) {
+#     idx <- map(idx, function(.x) .x[bootstrap_(length(.x))[["sample"]]])
+#   }
+#   tibble(sample = list(flatten(idx)),
+#          .group = list(.group))
+# }
+#
+# bootstrap_groups_ <- function(n, R = 1L, groups = TRUE, within = FALSE) {
+#   indices <- attr(x, "indices")
+#   rerun(R, bootstrap_group_1)
+# }

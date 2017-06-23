@@ -79,7 +79,9 @@ idx_list <- function(x) {
 # @param idx: a vector or list of indexes in which each element
 #    is group index
 #' @importFrom purrr as_vector
-flatten_group_idx <- function(idx, groups) as_vector(groups[idx])
+flatten_group_idx <- function(idx, groups) {
+  as_vector(groups[idx])
+}
 
 flatten_group_idx_lst <- function(idx, groups) {
   map(idx_list(idx), flatten_group_idx, groups = groups)

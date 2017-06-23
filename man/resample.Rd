@@ -4,6 +4,7 @@
 \alias{resample}
 \alias{as.integer.resample}
 \alias{as.character.resample}
+\alias{collect.resample}
 \alias{c.resample}
 \title{A "lazy" resample object}
 \usage{
@@ -12,6 +13,8 @@ resample(data, idx, ...)
 \method{as.integer}{resample}(x, ...)
 
 \method{as.character}{resample}(x, ...)
+
+\method{collect}{resample}(x, ...)
 
 \method{c}{resample}(...)
 }
@@ -32,11 +35,19 @@ The \code{resample}
 instead stores a "pointer" to the original dataset, and a vector of row
 indexes.
 }
+\details{
+The only case when \code{resample} is not lazy, is when \code{data} is itself
+a \code{resample} object, the new \code{resample} object uses \code{data\$data},
+and the \code{idx} indices of \code{data\$idx}.
+}
 \section{Methods (by class)}{
 \itemize{
 \item \code{resample}: Return the indexes as an integer vector.
 
 \item \code{resample}: Return the indexes as a character vector.
+
+\item \code{resample}: Subset the data and return the results.
+The return value  should have same type as \code{x$data}.
 
 \item \code{resample}: Concatenate \code{resample} and index objects into a
 single \code{resample} objects. The \code{data} element of the first
@@ -47,11 +58,3 @@ The elements of \code{...} must be \code{resample} objects, or
 treated as indexes.
 }}
 
-\examples{
-r <- resample(mtcars, 1:10)
-as.integer(r)
-as.data.frame(r)
-dim(r)
-# check that the data part of r is identical to orig data
-identical(r, mtcars)
-}

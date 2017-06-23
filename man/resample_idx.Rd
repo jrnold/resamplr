@@ -13,13 +13,6 @@ resample_idx(data, idx, ...)
 
 \item{...}{Arguments passed to methods}
 }
-\value{
-A data frame with rows for each subsample and the following columns:
-\describe{
-\item{sample}{A list of \code{\link[modelr]{resample}} objects. Training sets.}
-\item{.id}{An integer vector of identifiers.}
-}
-}
 \description{
 Generate subsamples from manually specified indices of observations in each
 subsample.
