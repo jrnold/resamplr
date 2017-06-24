@@ -250,7 +250,7 @@ resample_extract.matrix <- function(x, i, margin = 1L, ...) {
 #' @rdname resampler-internal
 #' @importFrom purrr invoke
 #' @export
-resample_extract.array <- function(x, margin = 1L, ...) {
+resample_extract.array <- function(x, i, margin = 1L, ...) {
   d <- dim(x)
   d[margin] <- i
   invoke(`[`, c(list(x = x), as.list(d), list(drop = FALSE)))

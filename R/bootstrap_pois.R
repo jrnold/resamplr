@@ -20,6 +20,7 @@ bootstrap_pois.grouped_df <- function(data, R = 1L, lambda = 1, ...) {
 
 
 #' @importFrom stats rpois
+#' @importFrom purrr map2
 bootstrap_pois_1 <- function(n, lambda = 1) {
   flatten_int(map2(seq_len(n), rpois(n, lambda), rep.int))
 }
