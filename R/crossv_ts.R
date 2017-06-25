@@ -124,7 +124,9 @@ crossv_ts_ <- function(n,
   keep_train <- (train_len >= train_size) |
       (train_partial & train_len >= train_partial)
   idx <- keep_test & keep_train
-  pmap_df(list(test_start = test_start[idx], test_end = test_end[idx],
-               train_start = train_start[idx], train_end = train_end[idx]),
+  pmap_df(list(test_start = test_start[idx],
+               test_end = test_end[idx],
+               train_start = train_start[idx],
+               train_end = train_end[idx]),
           crossv_ts_1)
 }
