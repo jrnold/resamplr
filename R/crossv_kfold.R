@@ -26,36 +26,21 @@
 #' @export
 #' @example inst/examples/ex-crossv_kfold.R
 crossv_kfold <- function(data, K, ...) {
-  UseMethod("crossv_kfold")
-}
-
-#' @export
-crossv_kfold.default <- function(data, K = 5L, shuffle = TRUE, ...) {
-  out <- crossv_kfold(resample_idx_len(data), K = K, shuffle = shuffle)
+  data <- as_quosure(data)
+  out <- crossv_kfold_n(idx_len(data), K = K, ...)
   for (i in c("test", "train")) {
     out[[i]] <- resample_lst(data, out[[i]])
   }
   out
 }
 
-#' @export
-crossv_kfold.grouped_df <- function(data, K = 5L, shuffle = TRUE, ...) {
-  out <- crossv_kfold(resample_idx_len(data, groups = TRUE),
-                      K = K, shuffle = shuffle)
-  for (i in c("test", "train")) {
-    out[[i]] <- resample_lst(data, out[[i]], groups = TRUE)
-  }
-  out
-}
-
-crossv_kfold_1fold <- function(idx, test) {
-  tibble(train = list(setdiff(idx, test)), test = list(test))
-}
-
+#' @rdname crossv_kfold
 #' @importFrom purrr map_df
-crossv_kfold_ <- function(n, K = 5L, shuffle = TRUE) {
-  folds <- partition(seq_len(n), as.integer(K), shuffle = shuffle)
-  map_df(folds, crossv_kfold_1fold)
+crossv_kfold_n <- function(n, K = 5L, shuffle = TRUE) {
+  idx <- seq_len(n)
+  test <- partition(idx, as.integer(K), shuffle = shuffle)
+  train <- map(test, setdiff, x = idx)
+  tibble(train = train, test = test)
 }
 
 #' Partition a vector

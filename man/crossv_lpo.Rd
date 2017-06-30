@@ -2,13 +2,13 @@
 % Please edit documentation in R/crossv_lpo.R
 \name{crossv_lpo}
 \alias{crossv_lpo}
-\alias{crossv_lpo.grouped_df}
+\alias{crossv_loo_n}
 \alias{crossv_loo}
 \title{Generate cross-validated leave-p-out test/training pairs}
 \usage{
-crossv_lpo(data, p, ...)
+crossv_lpo(data, p = 1L, ...)
 
-\method{crossv_lpo}{grouped_df}(data, p = 1L, ...)
+crossv_loo_n(n, ...)
 
 crossv_loo(data, ...)
 }
@@ -24,26 +24,6 @@ Generate cross-validated leave-one-out or leave-p-out test/training pairs.
 The function \code{leave-p-out} generates leave-p-out test/training pairs,
 while the function \code{leave-one-out} convenience function for the
 common case of leave-one-out cross-validation, \code{p = 1}.
-}
-\section{Methods (by class)}{
-\itemize{
-\item \code{grouped_df}: Generate test/train sets by leaving groups out.
-}}
-
-\examples{
-# Example originally from modelr::crossv_mc
-library("purrr")
-library("dplyr")
-
-# LOO cross-validation
-cv1 <- crossv_loo(mtcars)
-models <- map(cv1$train, ~ lm(mpg ~ wt, data = .))
-summary(map2_dbl(models, cv1$test, modelr::rmse))
-
-# Leave-p-Out cross-validation with p = 2
-cv2 <- crossv_lpo(mtcars, p = 2)
-models <- map(cv2$train, ~ lm(mpg ~ wt, data = .))
-summary(map2_dbl(models, cv2$test, modelr::rmse))
 }
 \references{
 \itemize{

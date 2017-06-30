@@ -11,48 +11,40 @@
 #'
 #' @inherit crossv_kfold references
 #' @export
-#' @example inst/examples/ex-crossv_lpo.R
-crossv_lpo <- function(data, p, ...) {
-  UseMethod("crossv_lpo")
-}
-
-#' @export
-crossv_lpo.default <- function(data, p = 1L, ...) {
-  out <- crossv_lpo_(resample_idx_len(data), p = p)
+crossv_lpo <- function(data, p = 1L, ...) {
+  data <- as_quosure(data)
+  out <- crossv_lpo_n(idx_len(data), p = p, ...)
   for (i in c("test", "train")) {
-    out[[i]] <- resample_lst(data, out[[i]], ...)
+    out[[i]] <- resample_lst(data, out[[i]])
   }
   out
 }
 
-#' @describeIn crossv_lpo Generate test/train sets by leaving groups out.
 #' @export
-crossv_lpo.grouped_df <- function(data, p = 1L, ...) {
-  out <- crossv_lpo_(resample_idx_len(data, groups = TRUE), p = p)
-  out[[".test_groups"]] <- out[["test"]]
-  for (i in c("test", "train")) {
-    out[[i]] <- resample_lst(data, out[[i]], groups = TRUE)
-  }
-  out
-}
-
 #' @importFrom purrr map_df
 #' @importFrom dplyr bind_rows
 #' @importFrom utils combn
-crossv_lpo_ <- function(n, p = 1L, ...) {
+crossv_lpo_n <- function(n, p = 1L, ...) {
   assert_that(is.number(n) && n >= 1)
   assert_that(is.number(p) && p >= 1)
   idx <- seq_len(n)
-  f <- function(i) tibble(train = setdiff(idx, i), test = i)
   if (p == 1) {
-    map_df(idx, f)
+    test <- as.list(idx)
   } else {
-    bind_rows(combn(idx, p, FUN = f, simplify = FALSE))
+    test <- combn(idx, p, simplify = FALSE)
   }
+  train <- map(test, base::setdiff, x = idx)
+  tibble(train = train, test = test)
+}
+
+#' @rdname crossv_lpo
+#' @export
+crossv_loo_n <- function(n, ...) {
+  crossv_lpo_n(n, p = 1L, ...)
 }
 
 #' @rdname crossv_lpo
 #' @export
 crossv_loo <- function(data, ...) {
-  crossv_lpo(data, p = 1L, ...)
+  crossv_lpo(as_quosure(data), p = 1L, ...)
 }

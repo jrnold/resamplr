@@ -1,0 +1,115 @@
+---
+title: "Lazy resampling with quosval"
+author: "Jeffrey Arnold"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Lazy resampling with quosval}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r}
+library("resamplr")
+library("purrr")
+```
+
+# Lazy-resampling objects
+
+
+```{r}
+smpl <- resample(~ mtcars, 1:5)
+
+# Retrieve original data
+smpl$data
+# Retrieve sample
+smpl$sample
+# Retrieve indices
+smpl$idx
+# Get the unevaluated quosure 
+smpl$quo
+```
+
+The function `resample` is a wrapper around `Resample$new`,
+```{r}
+resample(~ mtcars, 1:5)
+```
+
+The function `resample_lst` creates a list of `resample` objects,
+```{r}
+resample_lst(~ mtcars, list(1:5, 5:10))
+```
+
+
+
+# Bootstrapping
+
+To implement rsampling methods, such as bootstrapping and cross-validation, all that is needed are functions to generate the indexes.
+
+For example, to implement a simple non-parameteric bootstrap, sample the indexes
+```{r}
+idx <- rerun(100, sample(nrow(mtcars), replace = TRUE))
+```
+and then create a list of `resample` objects
+```{r}
+boot <- resample_lst(~ mtcars, idx)
+```
+
+Then the list of resample objects can be used in a model,
+```{r}
+models <- map(boot, ~ lm(mpg ~ wt, data = .$sample))
+tidied <- map_df(models, broom::tidy)
+hist(subset(tidied, term == "wt")$estimate)
+hist(subset(tidied, term == "(Intercept)")$estimate)
+```
+
+```{r}
+boot <- bootstrap(~ mtcars, 100)
+models <- map(boot$sample, ~ lm(mpg ~ wt, data = .$sample))
+tidied <- map_df(models, broom::tidy)
+hist(subset(tidied, term == "wt")$estimate)
+hist(subset(tidied, term == "(Intercept)")$estimate)
+```
+
+
+# Cross-Validation
+
+The function `crossv_idx` creates a data frame with resample objects for the `test` and `train` splits in cross-validation.
+```{r}
+idx <- seq_len(nrow(mtcars))
+cv1 <- crossv_idx(~ mtcars,
+           train = map(idx, setdiff, x = idx),
+           test = as.list(idx))
+cv1$train[[1]]
+cv1$test[[1]]                                 
+```
+
+K-fold cross validation
+```{r}
+crossv_kfold(~ mtcars, K = 5)
+crossv_kfold(~ mtcars, K = 10)
+```
+
+Leave-one-out cross validation
+```{r}
+crossv_loo(~ mtcars)
+crossv_lpo(~ mtcars, p = 2)
+crossv_lpo_n(32, p = 3)
+```
+
+
+
+# Customization
+
+
+
+# Comparison to other R packages
+
+The **modelr** package introduced the idea of "lazy" resampling
+and storing the results in "tidy" data frames.
+The **resample** objects in that package are a list with `data` and `idx` elements. 
+It relies on R's copy-on-modidy semantics to not copy the data element.
+
+The recommended **boot** package is the standard R implementation of bootstrapping methods.
+The machine learning packages **caret**
+

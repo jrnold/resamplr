@@ -2,25 +2,31 @@
 % Please edit documentation in R/bootstrap.R
 \name{bootstrap}
 \alias{bootstrap}
+\alias{bootstrap_n}
 \title{Generate bootstrap replicates}
 \usage{
-bootstrap(data, ...)
+bootstrap(data, R = 1L, n = NULL, extractor = NULL, ...)
+
+bootstrap_n(n, R = 1L, weights = NULL, bayes = FALSE, m = NULL,
+  replace = TRUE)
 }
 \arguments{
 \item{data}{A data frame}
 
+\item{R}{Number of replicates to sample}
+
 \item{...}{Passed to methods}
 
-\item{R}{Number of replicates to sample}
+\item{weights}{Observation level weights. This must be the name of a column
+in \code{data}.}
+
+\item{bayes}{If \code{TRUE}, a Bayesian bootstrap is used.}
 
 \item{m}{Number of observations in the replicates.}
 
 \item{stratify}{Resample within groups (stratified bootstrap)}
 
 \item{groups}{Resample groups (clustered bootstrap)}
-
-\item{weights}{Observation level weights. This must be the name of a column
-in \code{data}.}
 
 \item{weight_groups}{If \code{TRUE} and \code{groups = TRUE},
 then sample groups using group-level weights.
@@ -31,8 +37,6 @@ group-level weight.}
 
 \item{weight_within}{If \code{TRUE} and \code{stratify = TRUE}, then
 use observation level weights to sample observations within each group.}
-
-\item{bayes}{If \code{TRUE}, a Bayesian bootstrap is used.}
 }
 \description{
 Generate bootstrap replicates. In addition to the ordinary bootstrap,

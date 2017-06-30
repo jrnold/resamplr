@@ -2,9 +2,12 @@
 % Please edit documentation in R/crossv_kfold.R
 \name{crossv_kfold}
 \alias{crossv_kfold}
+\alias{crossv_kfold_n}
 \title{Generate cross-validated K-fold test-training pairs}
 \usage{
 crossv_kfold(data, K, ...)
+
+crossv_kfold_n(n, K = 5L, shuffle = TRUE)
 }
 \arguments{
 \item{data}{A data frame}

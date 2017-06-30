@@ -30,6 +30,7 @@ Imports:
   dplyr,
   purrr,
   rlang,
+  R6,
   stringr,
   tibble
 Suggests:
