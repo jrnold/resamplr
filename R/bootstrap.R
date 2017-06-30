@@ -83,26 +83,30 @@ bootstrap.grouped_df <- function(data, ...) {
   stop("bootstrap.grouped_df is not implemented yet")
 }
 
-# bootstrap_group_1 <- function(indices) {
-#   G <- length(indices)
-#   # get groups
-#   if (groups) {
-#     grps <- bootstrap_(G, R = 1)[["sample"]]
-#   } else {
-#     grps <- seq_len(n_groups(data))
-#   }
-#   # expand group indices
-#   idx <- map(grps, function(i) indices[[i]])
-#   .group <- map2_int(seq_along(idx), len(idx), rep.int)
-#   # resample within groups
-#   if (within) {
-#     idx <- map(idx, function(.x) .x[bootstrap_(length(.x))[["sample"]]])
-#   }
-#   tibble(sample = list(flatten(idx)),
-#          .group = list(.group))
-# }
-#
-# bootstrap_groups_ <- function(n, R = 1L, groups = TRUE, within = FALSE) {
-#   indices <- attr(x, "indices")
-#   rerun(R, bootstrap_group_1)
-# }
+bootstrap_groups_1 <- function(indices, by_group = TRUE, within = FALSE,
+                               by_group_opts = list(weights = NULL, bayes = FALSE, m = NULL, replace = TRUE),
+                               within_opts = list(weights = NULL, bayes = FALSE, m = NULL, replace = TRUE)) {
+  G <- length(indices)
+  # get groups
+  if (by_group) {
+    grps <- flatten(invoke(bootstrap_, by_group_opts, n = G, R = 1)[["sample"]])
+  } else {
+    grps <- seq_len(n_groups(data))
+  }
+  # expand group indices
+  idx <- map(grps, function(i) indices[[i]])
+  .group <- flatten_int(map2(seq_along(idx), map_int(idx, length), rep.int))
+  # resample within groups
+  if (within) {
+    idx <- map(idx, function(.x) {
+      .i <- invoke(bootstrap_, within_opts, n = length(.x), R = 1L)[["sample"]][[1]]
+      .x[.i]
+    })
+  }
+  tibble(sample = list(flatten(idx)),
+         .group = list(.group))
+}
+
+bootstrap_groups_ <- function(idx, R = 1L, by_group = TRUE, within = FALSE) {
+  bind_cols(rerun(R, bootstrap_groups_1(idx, by_group = by_group, within = within)))
+}
