@@ -57,7 +57,7 @@ crossv_tskfold_1fold <- function(i, folds, test_min, test_max,
 
 #' @importFrom purrr compact
 crossv_tskfold_ <- function(n, K = 5L,
-                            train_min = 1L, train_max = KL,
+                            train_min = 1L, train_max = K,
                             test_min = 1L, test_max = 1L) {
   folds <- partition(seq_len(n), as.integer(K), shuffle = FALSE)
   map_df(seq_len(n), folds = folds,

@@ -53,7 +53,7 @@ permute.grouped_df <- function(data, R = 1L, groups = TRUE, within = 0,
   }
   todf <- function(.x) tibble(sample = flatten_int(.x))
   if (within > 0) {
-    flatten(map(grp_permn, permute_within_all_groups, R = within))
+    flatten(map(grps_permn, permute_within_all_groups, R = within))
   } else {
     tibble(sample = map(grps_permn, todf))
   }
