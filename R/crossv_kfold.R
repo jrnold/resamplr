@@ -5,13 +5,10 @@
 #' if \code{data} is a grouped data frame and \code{stratify = TRUE}, and
 #' Group K-fold if \code{data} is a grouped data frame and \code{stratify = FALSE}.
 #'
-#' @param data A data frame
-#' @param K The number of folds
-#' @param shuffle If \code{TRUE}, randomly assign observations to folds.
-#'   Otherwise, observations are sequentially assigned to folds.
-#' @param stratify If \code{TRUE}, within each group observations are split
-#'   into folds, and those folds combined. If \code{FALSE}, groups are assigned
-#'   into folds.
+#' @param expr A quosureish object
+#' @param K An integer scalar. The number of folds
+#' @param shuffle A logical scalar. If \code{TRUE}, then the eleents are randomly shuffled prior to partitioning into folds.
+#' @param n Number of elements to sample from.
 #' @param ... Arguments passed to methods
 #' @seealso This function has more features than the \pkg{modelr} function
 #'   \code{\link[modelr]{crossv_kfold}}.
@@ -24,12 +21,11 @@
 #' \item{Stone, M. (1974) Cross-validation choice and assessment of statistical predictions (with Discussion). Journal of the Royal Statistical Society, B, 36, 111–147.}
 #' }
 #' @export
-#' @example inst/examples/ex-crossv_kfold.R
-crossv_kfold <- function(data, K, ...) {
-  data <- as_quosure(data)
-  out <- crossv_kfold_n(idx_len(data), K = K, ...)
+crossv_kfold <- function(expr, K, ...) {
+  data <- as_quosure(expr)
+  out <- crossv_kfold_n(idx_len(expr), K = K, ...)
   for (i in c("test", "train")) {
-    out[[i]] <- resample_lst(data, out[[i]])
+    out[[i]] <- lazy_sample_lst(expr, out[[i]])
   }
   out
 }
@@ -49,8 +45,9 @@ crossv_kfold_n <- function(n, K = 5L, shuffle = TRUE) {
 #' values of \code{x} prior to partitioning.
 #'
 #' @param x A vector
-#' @param K int The number of partitions
-#' @param shuffle logical.
+#' @param K An integer scalar. The number of partitions.
+#' @param n Number of elements to sample from.
+#' @param shuffle A logical scalar. If \code{TRUE}, then randomly shuffle the elements prior to partitioning.
 #' @return A length \code{K} list of vectors of the same type as \code{x}
 #' @noRd
 partition <- function(x, K, shuffle = TRUE) {

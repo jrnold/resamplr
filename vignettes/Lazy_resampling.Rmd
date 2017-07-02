@@ -1,43 +1,75 @@
 ---
-title: "Lazy resampling with quosval"
+title: "Lazy sampling"
 author: "Jeffrey Arnold"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Lazy resampling with quosval}
+  %\VignetteIndexEntry{Lazy sampling}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
 
+Computationally intensive methods such as cross-validation and bootstrapping can require drawing hundreds or thousands of samples.
+Computing these samples would be both time and space 
+
+The **quosval** package provides an alternative, with the `lazy_sample` object.
+The `lazy_sample` stores an unevaluated expression with the object to sample from and an the indexes, and lazily computes the sample from these when needed.
+The unevaluated expression is stored as a [quosure](http://rlang.tidyverse.org/reference/quosure.html).
+
+# Prerequisites
+
+First, load the packages that will be used below:
 ```{r}
+library("tidyverse")
 library("resamplr")
-library("purrr")
 ```
 
 # Lazy-resampling objects
 
-
+The function `lazy_sample` creates a lazy sample object.
+Its arguments are a quosure or a one-sided formula, and the values of the index to extract.
 ```{r}
-smpl <- resample(~ mtcars, 1:5)
-
-# Retrieve original data
-smpl$data
-# Retrieve sample
-smpl$sample
-# Retrieve indices
+smpl <- lazy_sample(~ mtcars, 1:5)
+smpl
+```
+The indexes and the unevaulated expression are accessible as `idx` and `quo`, respectively.
+```{r}
 smpl$idx
-# Get the unevaluated quosure 
 smpl$quo
 ```
 
-The function `resample` is a wrapper around `Resample$new`,
+The sample is accessible as `sample`,
 ```{r}
-resample(~ mtcars, 1:5)
+smpl$sample
+```
+Although `$sample` appears to be just another element in the `reample` object, it is an *active binding* and its value is re-computed everytime it is accessed.
+
+The `lazy_sample` class is an [R6 class](https://cran.r-project.org/web/packages/R6/vignettes/Introduction.html).
+R6 classes are provided by the **R6** packages and are a lighter-weight alternative to R's reference class.
+The lazy_sample class was implemented as an R6 class because it supports [active bindings](http://adv-r.had.co.nz/Environments.html#binding).
+
+The function, `lazy_sample_lst`, creates a list of `lazy_sample` objects:
+```{r}
+lazy_sample_lst(~ mtcars, list(1:5, 5:10))
 ```
 
-The function `resample_lst` creates a list of `resample` objects,
+To implement rsampling methods, such as bootstrapping and cross-validation, all that is needed are functions to generate the indexes.
+
+For example a simple non-parametric bootstrap implement can be implemented as follows,
 ```{r}
-resample_lst(~ mtcars, list(1:5, 5:10))
+idx <- rerun(100, sample(nrow(mtcars), replace = TRUE))
+samples <- lazy_sample_lst(~ mtcars, idx)
+```
+The **resamplr** package already includes many common resampling algorithms.
+For example, the function `bootstrap` implements 
+non-parametric the bootstrap above, along with options for weighing, Bayesian bootstrap, and subsampling.
+
+```{r}
+models <- map(samples, ~ lm(mpg ~ wt, data = .$sample))
+tidied <- map_df(models, broom::tidy)
+ggplot(tidied, aes(x = estimate)) +
+  geom_histogram() +
+  facet_wrap(~ term, ncol = 1, scales = "free_x")
 ```
 
 
@@ -45,36 +77,19 @@ resample_lst(~ mtcars, list(1:5, 5:10))
 # Bootstrapping
 
 To implement rsampling methods, such as bootstrapping and cross-validation, all that is needed are functions to generate the indexes.
-
-For example, to implement a simple non-parameteric bootstrap, sample the indexes
 ```{r}
-idx <- rerun(100, sample(nrow(mtcars), replace = TRUE))
-```
-and then create a list of `resample` objects
-```{r}
-boot <- resample_lst(~ mtcars, idx)
-```
-
-Then the list of resample objects can be used in a model,
-```{r}
-models <- map(boot, ~ lm(mpg ~ wt, data = .$sample))
-tidied <- map_df(models, broom::tidy)
-hist(subset(tidied, term == "wt")$estimate)
-hist(subset(tidied, term == "(Intercept)")$estimate)
-```
-
-```{r}
-boot <- bootstrap(~ mtcars, 100)
+boot <- bootstrap(~ mtcars, R = 1000)
 models <- map(boot$sample, ~ lm(mpg ~ wt, data = .$sample))
 tidied <- map_df(models, broom::tidy)
-hist(subset(tidied, term == "wt")$estimate)
-hist(subset(tidied, term == "(Intercept)")$estimate)
+ggplot(tidied, aes(x = estimate)) +
+  geom_histogram() +
+  facet_wrap(~ term, ncol = 1, scales = "free_x")
 ```
 
 
 # Cross-Validation
 
-The function `crossv_idx` creates a data frame with resample objects for the `test` and `train` splits in cross-validation.
+The function `crossv_idx` creates a data frame with lazy sample objects for the `test` and `train` splits in cross-validation.
 ```{r}
 idx <- seq_len(nrow(mtcars))
 cv1 <- crossv_idx(~ mtcars,
@@ -90,26 +105,35 @@ crossv_kfold(~ mtcars, K = 5)
 crossv_kfold(~ mtcars, K = 10)
 ```
 
-Leave-one-out cross validation
+Leave-one-out and leave-p-out cross validation functions:
 ```{r}
 crossv_loo(~ mtcars)
 crossv_lpo(~ mtcars, p = 2)
 crossv_lpo_n(32, p = 3)
 ```
 
-
-
-# Customization
-
+Monte-carlo cross-validation. 
+Cross-validation with 10 samples with 30% in the test test.
+```{r}
+crossv_mc(~ mtcars, frac = 0.3, K = 10)
+```
+Cross-validation with 10 samples with 5 observations in the test test.
+```{r}
+crossv_mc(~ mtcars, n = 5, K = 10)
+```
 
 
 # Comparison to other R packages
 
 The **modelr** package introduced the idea of "lazy" resampling
 and storing the results in "tidy" data frames.
-The **resample** objects in that package are a list with `data` and `idx` elements. 
+The `resample` objects in that package are a list with `data` and `idx` elements. 
 It relies on R's copy-on-modidy semantics to not copy the data element.
 
-The recommended **boot** package is the standard R implementation of bootstrapping methods.
-The machine learning packages **caret**
+The recommended **boot** package is the standard R implementation of bootstrapping methods. The machine learning packages **caret** and
+**rmlr** implement several cross-validation and bootstrapping methods.
+
+```{r}
+
+```
 

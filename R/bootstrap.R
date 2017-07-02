@@ -6,51 +6,51 @@
 #' grouped data frame and \code{groups = TRUE}), and stratified bootstrap
 #' (if \code{data} is grouped data frame and \code{stratify = TRUE}).
 #'
-#' @param data A data frame
+#' @param expr A quosure
 #' @param R Number of replicates to sample
-#' @param m Number of observations in the replicates.
-#' @param ... Passed to methods
-#' @param stratify Resample within groups (stratified bootstrap)
-#' @param groups Resample groups (clustered bootstrap)
-#' @param weights Observation level weights. This must be the name of a column
-#'    in \code{data}.
-#' @param weight_groups If \code{TRUE} and \code{groups = TRUE},
-#'    then sample groups using group-level weights.
-#'    If \code{weights} is \code{NULL}, then weight groups by the number
-#'    of observations in each. If \code{weights}, is not-\code{NULL}, then
-#'    use the sum of the observation level weights in each group as the
-#'    group-level weight.
-#' @param weight_within If \code{TRUE} and \code{stratify = TRUE}, then
-#'    use observation level weights to sample observations within each group.
+#' @param n Number of elements to sample from. If \code{NULL}, then
+#'   \code{n = len_idx(expr)}.
+#' @param m Number of observations in the replicates. This can be set to values \code{m != n} for sub-sampling or oversampling.
+#' @param extractor See \code{\link{lazy_sample}}.
 #'
+#'
+#' @param replace Logical scalar. If \code{TRUE}, then sample with replacement, otherwise sample without replacement.
+#' @param weights Observation level weights to use for a weighted bootstrap. If \code{bayesian = TRUE}, then the sum of these weights will adjust the concentration of the Dirichlet prior.
 #' @seealso The \pkg{boot} function \code{\link[boot]{boot}} which is the
-#'   canonical R bootstrap implementation. This function produces slightly different
-#'   output and has more options than the \pkg{modelr} function
-#'   \code{\link[modelr]{bootstrap}}.
-#' @param bayes If \code{TRUE}, a Bayesian bootstrap is used.
+#'   canonical R bootstrap implementation.
+#'   The \pkg{modelr} function \code{\link[modelr]{bootstrap}} also implements a lazy bootstrap.
+#' @family boot
+#' @param bayesian If \code{TRUE}, a Bayesian bootstrap is used.
 #' @references
 #' \itemize{
 #' \item{Angelo Canty and Brian Ripley (2016). boot: Bootstrap R (S-Plus) Functions. R package version 1.3-18.}
 #' \item{Davison, A. C. & Hinkley, D. V. (1997) Bootstrap Methods and Their Applications. Cambridge University Press, Cambridge. ISBN 0-521-57391-2}
 #' }
 #' @export
-#' @example inst/examples/ex-bootstrap.R
-bootstrap <- function(data,
+bootstrap <- function(expr,
                       R = 1L,
+                      weights = NULL,
+                      bayesian = FALSE,
+                      m = NULL,
+                      replace = TRUE,
                       n = NULL,
-                      extractor = NULL,
-                      ...) {
-  data <- as_quosure(data)
-  n <- n %||% idx_len(data)
-  out <- bootstrap_n(n, R = R, ...)
-  out[["sample"]] <- resample_lst(data, out[["sample"]],
-                                  extractor = extractor)
+                      extractor = NULL) {
+  expr <- as_quosure(expr)
+  n <- n %||% idx_len(expr)
+  if (rlang::is_character(weights)) {
+    weights <- (eval_tidy(expr))[[weights]]
+  } else if (rlang::is_symbol(weights)) {
+    weights <- `$`(eval_tidy(expr), weights)
+  }
+  out <- bootstrap_n(n, R = R, weights = weights, bayesian = bayesian,
+                     replace = replace, m = m)
+  out[["sample"]] <- lazy_sample_lst(expr, out[["sample"]], extractor = extractor)
   out
 }
 
 
-
 #' @rdname bootstrap
+#' @family bootstrapping functions
 #' @export
 #' @importFrom purrr rerun
 #' @importFrom assertthat assert_that is.flag is.number
@@ -58,17 +58,24 @@ bootstrap <- function(data,
 bootstrap_n <- function(n,
                         R = 1L,
                         weights = NULL,
-                        bayes = FALSE,
+                        bayesian = FALSE,
                         m = NULL,
                         replace = TRUE) {
-  assert_that(is.number(n))
-  assert_that(is.number(R))
-  assert_that(is.flag(bayes))
-  assert_that(is.null(weights) || is.numeric(weights))
-  m <- m %||% n
-  assert_that(is.number(m))
+  n <- as.integer(n)
+  assert_that(is_pos_scalar_integer(n))
+  R <- as.integer(R)
+  assert_that(is_pos_scalar_integer(n))
+  assert_that(is.flag(bayesian))
+  if (!is.null(weights)) {
+    assert_that(is.numeric(weights))
+    assert_that(length(weights) %in% c(1, n))
+    assert_that(all(weights >= 0))
+  }
+  m <- as.integer(m %||% n)
+  assert_that(is_pos_scalar_integer(m))
+
   # resample weights
-  if (bayes) {
+  if (bayesian) {
     # a Dirichlet sample can be created by drawing indep gamma
     # don't need to normalize these to sum to 1 since sample.int doesn't care
     weights <- rerun(R, stats::rgamma(n, shape = weights %||% 1))

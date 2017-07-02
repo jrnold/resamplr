@@ -2,23 +2,37 @@
 % Please edit documentation in R/crossv.R
 \name{crossv_idx}
 \alias{crossv_idx}
-\title{Generate cross-validation test-training sets manually}
+\title{Generate cross-validation test-training sets}
 \usage{
-crossv_idx(data, train, test, ...)
+crossv_idx(expr, train, test, extractor = NULL)
 }
 \arguments{
-\item{data}{A data frame}
+\item{expr}{A quosure}
 
-\item{train}{A list of integer vectors or an integer vector, with the indices of the training set.
-If \code{train} is \code{NULL}, then the training set is the complement
-the test set.}
+\item{train}{A list of integer or character vectors}
 
-\item{test}{A list of integer vectors or an integer vector, with the indices of the test set.
-If \code{test} is \code{NULL}, then the test set is the complement of
-the training set.}
+\item{test}{A list of integer or character vector}
 
-\item{...}{Arguments passed to methods}
+\item{extractor}{See \code{\link{lazy_sample}}.}
 }
 \description{
-Generate cross-validation test-training sets from manually specified indices of observations in the test and and training sets.
+Generate cross-validation test/training pairs by specifying the indices
+in the elements in the test and training sets.
+This function provides a manual method for generating data frames with
+with cross-validation \code{resample} objects, while other functions,
+such as \code{\link{crossv_kfold}}, algorithmically handle generate the
+indexes in the test- and training sets.
+}
+\references{
+\itemize{
+\item{Breiman, L., Friedman, J.H., Olshen, R.A. and Stone, C.J. (1984) Classification and Regression Trees. Wadsworth.}
+\item{Burman, P. (1989) A comparative study of ordinary cross-validation, v-fold cross-validation and repeated learning-testing methods. Biometrika, 76, 503–514}
+\item{Davison, A.C. and Hinkley, D.V. (1997) Bootstrap Methods and Their Application. Cambridge University Press.}
+\item{Efron, B. (1986) How biased is the apparent error rate of a prediction rule? Journal of the American Statistical Association, 81, 461–470.}
+\item{Stone, M. (1974) Cross-validation choice and assessment of statistical predictions (with Discussion). Journal of the Royal Statistical Society, B, 36, 111–147.}
+}
+}
+\seealso{
+Other cross-validation functions: \code{\link{crossv_lpo}},
+  \code{\link{crossv_mc}}
 }

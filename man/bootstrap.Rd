@@ -5,38 +5,29 @@
 \alias{bootstrap_n}
 \title{Generate bootstrap replicates}
 \usage{
-bootstrap(data, R = 1L, n = NULL, extractor = NULL, ...)
+bootstrap(expr, R = 1L, weights = NULL, bayesian = FALSE, m = NULL,
+  replace = TRUE, n = NULL, extractor = NULL)
 
-bootstrap_n(n, R = 1L, weights = NULL, bayes = FALSE, m = NULL,
+bootstrap_n(n, R = 1L, weights = NULL, bayesian = FALSE, m = NULL,
   replace = TRUE)
 }
 \arguments{
-\item{data}{A data frame}
+\item{expr}{A quosure}
 
 \item{R}{Number of replicates to sample}
 
-\item{...}{Passed to methods}
+\item{weights}{Observation level weights to use for a weighted bootstrap. If \code{bayesian = TRUE}, then the sum of these weights will adjust the concentration of the Dirichlet prior.}
 
-\item{weights}{Observation level weights. This must be the name of a column
-in \code{data}.}
+\item{bayesian}{If \code{TRUE}, a Bayesian bootstrap is used.}
 
-\item{bayes}{If \code{TRUE}, a Bayesian bootstrap is used.}
+\item{m}{Number of observations in the replicates. This can be set to values \code{m != n} for sub-sampling or oversampling.}
 
-\item{m}{Number of observations in the replicates.}
+\item{replace}{Logical scalar. If \code{TRUE}, then sample with replacement, otherwise sample without replacement.}
 
-\item{stratify}{Resample within groups (stratified bootstrap)}
+\item{n}{Number of elements to sample from. If \code{NULL}, then
+\code{n = len_idx(expr)}.}
 
-\item{groups}{Resample groups (clustered bootstrap)}
-
-\item{weight_groups}{If \code{TRUE} and \code{groups = TRUE},
-then sample groups using group-level weights.
-If \code{weights} is \code{NULL}, then weight groups by the number
-of observations in each. If \code{weights}, is not-\code{NULL}, then
-use the sum of the observation level weights in each group as the
-group-level weight.}
-
-\item{weight_within}{If \code{TRUE} and \code{stratify = TRUE}, then
-use observation level weights to sample observations within each group.}
+\item{extractor}{See \code{\link{lazy_sample}}.}
 }
 \description{
 Generate bootstrap replicates. In addition to the ordinary bootstrap,
@@ -44,18 +35,6 @@ it supports weighted bootstrap (\code{weights}),
 Bayesian bootstrap (\code{bayes}), cluster bootstrap (if \code{data} is a
 grouped data frame and \code{groups = TRUE}), and stratified bootstrap
 (if \code{data} is grouped data frame and \code{stratify = TRUE}).
-}
-\examples{
-# example from modelr::bootstrap
-library("purrr")
-library("dplyr")
-boot <- bootstrap(mtcars, 100)
-
-models <- map(boot$sample, ~ lm(mpg ~ wt, data = .))
-tidied <- map_df(models, broom::tidy, .id = "id")
-
-hist(subset(tidied, term == "wt")$estimate)
-hist(subset(tidied, term == "(Intercept)")$estimate)
 }
 \references{
 \itemize{
@@ -65,7 +44,6 @@ hist(subset(tidied, term == "(Intercept)")$estimate)
 }
 \seealso{
 The \pkg{boot} function \code{\link[boot]{boot}} which is the
-  canonical R bootstrap implementation. This function produces slightly different
-  output and has more options than the \pkg{modelr} function
-  \code{\link[modelr]{bootstrap}}.
+  canonical R bootstrap implementation.
+  The \pkg{modelr} function \code{\link[modelr]{bootstrap}} also implements a lazy bootstrap.
 }

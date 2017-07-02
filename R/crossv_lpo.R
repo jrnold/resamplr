@@ -1,32 +1,41 @@
 #' Generate cross-validated leave-p-out test/training pairs
 #'
-#' Generate cross-validated leave-one-out or leave-p-out test/training pairs.
-#' The function \code{leave-p-out} generates leave-p-out test/training pairs,
-#' while the function \code{leave-one-out} convenience function for the
+#' Generate cross-validated leave-one-out or leave-p-out
+#' test/training pairs.
+#'
+#' The function \code{leave-p-out} generates leave-p-out test/training pairs,  while the function \code{leave-one-out} convenience function for the
 #' common case of leave-one-out cross-validation, \code{p = 1}.
 #'
-#' @param data A data frame or vector
-#' @param p The number of elements to include in the test set.
-#' @param ... Passed to methods
+#' The function
 #'
+#' @param expr A \code{quosure} or one-sided formula specifying the data to be sampled from.
+#' @param n The number of elements in the data to sample from. If \code{NULL}, then the number of elements in \code{idx_len(expr)} is used.
+#' @param p The number of elements to include in the test set. For example, specify \code{p = 1} for leave-one-out cross validation.
+#' @param ... Arguments passed to \code{\link{crossv_lpo_n}}.
+#' @param extractor See \code{\link{lazy_sample}}.
+#' @family cross-validation functions
 #' @inherit crossv_kfold references
 #' @export
-crossv_lpo <- function(data, p = 1L, ...) {
-  data <- as_quosure(data)
-  out <- crossv_lpo_n(idx_len(data), p = p, ...)
+crossv_lpo <- function(expr, p = 1L, n = NULL, extractor = NULL) {
+  expr <- as_quosure(expr)
+  n <- n %||% idx_len(expr)
+  out <- crossv_lpo_n(n, p = p)
   for (i in c("test", "train")) {
-    out[[i]] <- resample_lst(data, out[[i]])
+    out[[i]] <- lazy_sample_lst(expr, out[[i]], extractor = extractor)
   }
   out
 }
 
+#' @rdname crossv_lpo
 #' @export
 #' @importFrom purrr map_df
 #' @importFrom dplyr bind_rows
 #' @importFrom utils combn
-crossv_lpo_n <- function(n, p = 1L, ...) {
-  assert_that(is.number(n) && n >= 1)
-  assert_that(is.number(p) && p >= 1)
+crossv_lpo_n <- function(n, p = 1L) {
+  n <- as.integer(n)
+  assert_that(is_pos_scalar_integer(n))
+  p <- as.integer(p)
+  assert_that(is_pos_scalar_integer(p))
   idx <- seq_len(n)
   if (p == 1) {
     test <- as.list(idx)
@@ -45,6 +54,6 @@ crossv_loo_n <- function(n, ...) {
 
 #' @rdname crossv_lpo
 #' @export
-crossv_loo <- function(data, ...) {
-  crossv_lpo(as_quosure(data), p = 1L, ...)
+crossv_loo <- function(expr, ...) {
+  crossv_lpo(as_quosure(expr), p = 1L, ...)
 }

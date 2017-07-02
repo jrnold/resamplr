@@ -5,49 +5,26 @@
 \alias{crossv_kfold_n}
 \title{Generate cross-validated K-fold test-training pairs}
 \usage{
-crossv_kfold(data, K, ...)
+crossv_kfold(expr, K, ...)
 
 crossv_kfold_n(n, K = 5L, shuffle = TRUE)
 }
 \arguments{
-\item{data}{A data frame}
+\item{expr}{A quosureish object}
 
-\item{K}{The number of folds}
+\item{K}{An integer scalar. The number of folds}
 
 \item{...}{Arguments passed to methods}
 
-\item{shuffle}{If \code{TRUE}, randomly assign observations to folds.
-Otherwise, observations are sequentially assigned to folds.}
+\item{n}{Number of elements to sample from.}
 
-\item{stratify}{If \code{TRUE}, within each group observations are split
-into folds, and those folds combined. If \code{FALSE}, groups are assigned
-into folds.}
+\item{shuffle}{A logical scalar. If \code{TRUE}, then the eleents are randomly shuffled prior to partitioning into folds.}
 }
 \description{
 Generate cross-validated K-fold test-training pairs. In addition to ordinary
 K-fold cross-validation, this supports stratified K-fold cross validation
 if \code{data} is a grouped data frame and \code{stratify = TRUE}, and
 Group K-fold if \code{data} is a grouped data frame and \code{stratify = FALSE}.
-}
-\examples{
-# Example originally from modelr::crossv_mc
-library("purrr")
-library("dplyr")
-
-# 5-fold cross-validation
-cv1 <- crossv_kfold(mtcars, K = 5)
-models <- map(cv1$train, ~ lm(mpg ~ wt, data = .))
-summary(map2_dbl(models, cv1$test, modelr::rmse))
-
-# k-fold by group
-cv2 <- crossv_kfold(group_by(mtcars, cyl), K = 2)
-models <- map(cv2$train, ~ lm(mpg ~ wt, data = .))
-summary(map2_dbl(models, cv2$test, modelr::rmse))
-
-# stratified k-fold
-cv3 <- crossv_kfold(group_by(mtcars, am), K = 3, stratify = TRUE)
-models <- map(cv3$train, ~ lm(mpg ~ wt, data = .))
-summary(map2_dbl(models, cv3$test, modelr::rmse))
 }
 \references{
 \itemize{

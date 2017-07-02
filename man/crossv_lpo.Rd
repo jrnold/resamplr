@@ -2,28 +2,39 @@
 % Please edit documentation in R/crossv_lpo.R
 \name{crossv_lpo}
 \alias{crossv_lpo}
+\alias{crossv_lpo_n}
 \alias{crossv_loo_n}
 \alias{crossv_loo}
 \title{Generate cross-validated leave-p-out test/training pairs}
 \usage{
-crossv_lpo(data, p = 1L, ...)
+crossv_lpo(expr, p = 1L, n = NULL, extractor = NULL)
+
+crossv_lpo_n(n, p = 1L)
 
 crossv_loo_n(n, ...)
 
-crossv_loo(data, ...)
+crossv_loo(expr, ...)
 }
 \arguments{
-\item{data}{A data frame or vector}
+\item{expr}{A \code{quosure} or one-sided formula specifying the data to be sampled from.}
 
-\item{p}{The number of elements to include in the test set.}
+\item{p}{The number of elements to include in the test set. For example, specify \code{p = 1} for leave-one-out cross validation.}
 
-\item{...}{Passed to methods}
+\item{n}{The number of elements in the data to sample from. If \code{NULL}, then the number of elements in \code{idx_len(expr)} is used.}
+
+\item{extractor}{See \code{\link{lazy_sample}}.}
+
+\item{...}{Arguments passed to \code{\link{crossv_lpo_n}}.}
 }
 \description{
-Generate cross-validated leave-one-out or leave-p-out test/training pairs.
-The function \code{leave-p-out} generates leave-p-out test/training pairs,
-while the function \code{leave-one-out} convenience function for the
+Generate cross-validated leave-one-out or leave-p-out
+test/training pairs.
+}
+\details{
+The function \code{leave-p-out} generates leave-p-out test/training pairs,  while the function \code{leave-one-out} convenience function for the
 common case of leave-one-out cross-validation, \code{p = 1}.
+
+The function
 }
 \references{
 \itemize{
@@ -33,4 +44,8 @@ common case of leave-one-out cross-validation, \code{p = 1}.
 \item{Efron, B. (1986) How biased is the apparent error rate of a prediction rule? Journal of the American Statistical Association, 81, 461–470.}
 \item{Stone, M. (1974) Cross-validation choice and assessment of statistical predictions (with Discussion). Journal of the Royal Statistical Society, B, 36, 111–147.}
 }
+}
+\seealso{
+Other cross-validation functions: \code{\link{crossv_idx}},
+  \code{\link{crossv_mc}}
 }
