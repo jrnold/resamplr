@@ -30,6 +30,12 @@ bootstrap_n(n, R = 1L, weights = NULL, bayesian = FALSE, size = NULL,
 
 \item{extractor}{A function or object coercible to a function by \code{\link[rlang]{as_function}}. See \link{LazySample} for more information.}
 }
+\value{
+data frame (\code{\link[tibble]{tibble}}) with \code{R} rows and the following columns.
+\describe{
+\item{sample}{A list column with objects representing the training sets. For bootstrap, the elements are vectors of the indexes; for bootstrap_n, the elements are \code{\link[=LazySample]{lazy_sample}} objects.}
+}
+}
 \description{
 Generate bootstrap replicates. In addition to the ordinary bootstrap,
 it supports weighted bootstrap (\code{weights}),

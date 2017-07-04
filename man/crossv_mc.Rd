@@ -27,7 +27,7 @@ crossv_mc_n(n, K = 10L, frac = 0.3, size = NULL, prob = NULL)
 \item{prob}{Probability weight that an element is in the \code{test} set.}
 }
 \value{
-A data frame with \code{K} rows and the following columns:
+A data frame (\code{\link[tibble]{tibble}}) with \code{K} rows and the following columns:
 \describe{
 \item{train}{A list column with objects representing the training sets. For \code{crossv_mc}, the elements are vectors of the indexes; for \code{crossv_mc_n}, the elements are \code{\link[=LazySample]{lazy_sample}} objects.}
 \item{test}{A list column with objects representing the training sets. For \code{crossv_mc}, the elements are vectors of the indexes; for \code{crossv_mc_n}, the elements are \code{\link[=LazySample]{lazy_sample}} objects.}

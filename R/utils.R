@@ -60,7 +60,7 @@ named <- function(x) x[is_named(x)]
 #' expects there to be an argument for every dimension.
 #'
 #' @param x An object
-#' @param ... For unnamed elements, indicies specifying elements to extract. These indices can be atomic vectors or lists of length two, where the first element is the dimension, and the second are the indicies in that dimension. Named arguments, like \code{drop}, are directly passed to \code{[}.
+#' @param ... For unnamed elements, indicies specifying elements to extract. These indexes can be atomic vectors or lists of length two, where the first element is the dimension, and the second are the indicies in that dimension. Named arguments, like \code{drop}, are directly passed to \code{[}.
 #' @noRd
 #' @importFrom rlang dots_list missing_arg lang sym splice eval_bare names2
 dextract <- function(x, ...) {

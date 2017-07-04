@@ -7,16 +7,17 @@
 #'
 #' @template param-expr
 #' @param K An integer scalar. The number of cross-validation folds.
-#' @param shuffle A logical scalar. If \code{TRUE}, then the eleents are randomly shuffled prior to partitioning into folds.
+#' @param shuffle A logical scalar. If \code{TRUE}, then the elements are randomly shuffled prior to partitioning into folds.
 #' @template param-n
 #' @param ... Arguments passed to methods
-#' @seealso This function has more features than the \pkg{modelr} function
-#'   \code{\link[modelr]{crossv_kfold}}.
+#' @seealso The \pkg{boot} function \code{\link[boot]{cv.glm}} and
+#' \pkg{modelr} function \code{\link[modelr]{crossv_kfold}} for
+#' other implementations of k-fold cross-validation.
 #'
 #' @templateVar numrows \code{K}
-#' @templateVar f crossv_kfold
-#' @templateVar fn crossv_kfold_n
-#' @template return_crossv
+#' @templateVar f \code{crossv_kfold}
+#' @templateVar fn \code{crossv_kfold_n}
+#' @template return_crossv_df
 #'
 #' @references
 #' \itemize{

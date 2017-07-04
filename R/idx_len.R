@@ -50,21 +50,3 @@ idx_len.quosure <- function(x, ...) {
   idx_len(eval_tidy(x), ...)
 }
 
-spell_check <- function() {
-  c("Biometrika",
-    "Breiman",
-    "Burman",
-    "Canty",
-    "Davison",
-    "Efron",
-    "eleents",
-    "Hinkley",
-    "idx",
-    "indices",
-    "integerish",
-    "len",
-    "Olshen",
-    "quosure",
-    "quosureish",
-    "quosures")
-}

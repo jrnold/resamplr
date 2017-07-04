@@ -5,11 +5,11 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Resampling methods • resamplr</title>
+<title>Lazy and tidy resampling • lazysample</title>
 <!-- jquery --><script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha384-nrOSfDHtoPMzJHjVTdCopGqIqeYETSXhZDFyniQ8ZHcVy08QesyHcnOUpMpqnmWq" crossorigin="anonymous"></script><!-- Bootstrap --><link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script><!-- Font Awesome icons --><link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-T8Gy5hrqNKT+hzMclPo118YTQO6cYprQmhrYwIiQ/3axmI1hQomh7Ud2hPOy8SP1" crossorigin="anonymous">
 <!-- pkgdown --><link href="pkgdown.css" rel="stylesheet">
-<script src="jquery.sticky-kit.min.js"></script><script src="pkgdown.js"></script><!-- mathjax --><script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script><!--[if lt IE 9]>
+<script src="jquery.sticky-kit.min.js"></script><script src="pkgdown.js"></script><!-- mathjax --><script src="https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script><!--[if lt IE 9]>
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
 <![endif]-->
@@ -24,15 +24,30 @@
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
-      <a class="navbar-brand" href="index.html">resamplr</a>
+      <a class="navbar-brand" href="index.html">lazysample</a>
     </div>
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
 <li>
-  <a href="reference/index.html">Reference</a>
+  <a href="/index.html">
+    <span class="fa fa-home fa-lg"></span>
+     
+  </a>
 </li>
 <li>
-  <a href="articles/index.html">Articles</a>
+  <a href="reference/index.html">Reference</a>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    Articles
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+<li>
+      <a href="articles/Intro_to_lazy_sampling.html">Lazy sampling</a>
+    </li>
+  </ul>
 </li>
       </ul>
 <ul class="nav navbar-nav navbar-right"></ul>
@@ -51,26 +66,22 @@
     
     
 <div class="contents">
-<div id="resamplr" class="section level1">
+<div id="lazy-sampling-objects" class="section level1">
 <div class="page-header"><h1 class="hasAnchor">
-<a href="#resamplr" class="anchor"> </a>resamplr</h1></div>
+<a href="#lazy-sampling-objects" class="anchor"></a>Lazy Sampling objects</h1></div>
 
-<p>The <strong>resamplr</strong> package provides functions that implement resampling methods including the bootstrap, jackknife, random test/train sets, k-fold cross-validation, leave-one-out and leave-p-out cross-validation, time-series cross validation, time-series k-fold cross validation, permutations, rolling windows. These functions generate data frames with <code>resample</code> objects that work with the modelling pipeline of <a href="https://github.com/hadley/modelr">modelr</a> and the <a href="http://tidyverse.org/">tidyverse</a>.</p>
-<div id="installation" class="section level2">
-<h2 class="hasAnchor">
-<a href="#installation" class="anchor"> </a>Installation</h2>
-<p><strong>resamplr</strong> is not on CRAN. You can install the development version with</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># install.packages("devtools")</span>
-devtools::<span class="kw">install_github</span>(<span class="st">"jrnold/resamplr"</span>)</code></pre></div>
-</div>
-<div id="main-features" class="section level2">
-<h2 class="hasAnchor">
-<a href="#main-features" class="anchor"> </a>Main Features</h2>
-<p>The <strong>resamplr</strong> package includes functions to generate data frames of lazy resample objects, as introduced in the <a href="http://tidyverse.org/">tidyverse</a> <a href="https://github.com/hadley/modelr">modelr</a> package. The <code>resample</code> class stores the a “pointer” to the original dataset and a vector of row indices. The object can be coerced to a dataframe with <code>as.data.frame</code> and the row indices with <code>as.integer</code>.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(<span class="st">"modelr"</span>)
-<span class="kw">library</span>(<span class="st">"resamplr"</span>)
-rs &lt;-<span class="st"> </span><span class="kw">resample</span>(mtcars, <span class="dv">1</span>:<span class="dv">10</span>)
-<span class="kw">as.data.frame</span>(rs)
+<p>The <strong>lazysample</strong> package provides functions that implement several resampling methods including bootstrapping and cross-validation.</p>
+<p>The building block of these methods is the <code>lazy_sample</code> object.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(<span class="st">"lazysample"</span>)
+smpl &lt;-<span class="st"> </span><span class="kw"><a href="reference/lazy_sample.html">lazy_sample</a></span>(mtcars, <span class="dv">1</span><span class="op">:</span><span class="dv">10</span>)</code></pre></div>
+<p>Instead of computing the samples immediately, when the lazy sample object is created it stores a quosure, which is an unevaluated expression and its environment, and the indexes to extract.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">smpl<span class="op">$</span>quo
+<span class="co">#&gt; &lt;quosure: global&gt;</span>
+<span class="co">#&gt; ~mtcars</span>
+smpl<span class="op">$</span>idx
+<span class="co">#&gt;  [1]  1  2  3  4  5  6  7  8  9 10</span></code></pre></div>
+<p>The sample is only lazily computed when it is needed.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">smpl<span class="op">$</span>sample
 <span class="co">#&gt;                    mpg cyl  disp  hp drat    wt  qsec vs am gear carb</span>
 <span class="co">#&gt; Mazda RX4         21.0   6 160.0 110 3.90 2.620 16.46  0  1    4    4</span>
 <span class="co">#&gt; Mazda RX4 Wag     21.0   6 160.0 110 3.90 2.875 17.02  0  1    4    4</span>
@@ -81,64 +92,89 @@ rs &lt;-<span class="st"> </span><span class="kw">resample</span>(mtcars, <span 
 <span class="co">#&gt; Duster 360        14.3   8 360.0 245 3.21 3.570 15.84  0  0    3    4</span>
 <span class="co">#&gt; Merc 240D         24.4   4 146.7  62 3.69 3.190 20.00  1  0    4    2</span>
 <span class="co">#&gt; Merc 230          22.8   4 140.8  95 3.92 3.150 22.90  1  0    4    2</span>
-<span class="co">#&gt; Merc 280          19.2   6 167.6 123 3.92 3.440 18.30  1  0    4    4</span>
-<span class="kw">as.integer</span>(rs)
-<span class="co">#&gt;  [1]  1  2  3  4  5  6  7  8  9 10</span></code></pre></div>
-<p>While the <strong>modelr</strong> package contains a few functions with resampling methods (<code>crossv_kfold</code>, <code>crossv_mc</code>, and <code>bootstrap</code>), the <strong>resamplr</strong> package implements many more resampling methods including the following:</p>
-<ul>
-<li>
-<p>boostrap</p>
-<ul>
-<li>bootstrap (weighted, Bayesian): <code>bootstrap</code>
-</li>
-<li>balanced bootstrap: <code>balanced_bootstrap</code>
-</li>
-<li>time-series bootstrap: <code>tsbootstrap</code>
-</li>
-</ul>
-</li>
-<li>
-<p>cross-validation</p>
-<ul>
-<li>test-training pairs: <code>holdout_n</code>, <code>holdout_frac</code>
-</li>
-<li>k-fold cross-validation: <code>crossv_kfold</code>
-</li>
-<li>time-series cross-validation: <code>crossv_ts</code>
-</li>
-<li>leave-one-out and leave-p-out cross-validation: <code>crossv_lpo</code>, <code>crossv_loo</code>
-</li>
-<li>time-series k-fold cross-validation: <code>crossv_tskfold</code>
-</li>
-</ul>
-</li>
-<li>jackknife: <code>jackknife</code>
-</li>
-<li>permutations: <code>permute</code>
-</li>
-<li><p>rolling windows: <code>roll</code></p></li>
-</ul>
-<p>All resampling functions are implemented as generic functions with methods for data frames (<code>data.frame</code>) and grouped data frames (<code>grouped_df</code>). When used with grouped data frames, these functions allow either resampling groups instead of rows, or resample rows within each group (stratification), or both, depending on what is appropriate for the method.</p>
+<span class="co">#&gt; Merc 280          19.2   6 167.6 123 3.92 3.440 18.30  1  0    4    4</span></code></pre></div>
+<p>Lists and list-columns in data frames can easily be used for tidy model evaluation. The function <code>lazy_sample_idx</code> produces a data frame with a list-column of resample objects. For example, this resamples from the <code>mtcars</code> data frame using a simple non-parametric bootstrap.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(<span class="st">"tidyverse"</span>)
+<span class="co">#&gt; Loading tidyverse: ggplot2</span>
+<span class="co">#&gt; Loading tidyverse: tibble</span>
+<span class="co">#&gt; Loading tidyverse: tidyr</span>
+<span class="co">#&gt; Loading tidyverse: readr</span>
+<span class="co">#&gt; Loading tidyverse: purrr</span>
+<span class="co">#&gt; Loading tidyverse: dplyr</span>
+<span class="co">#&gt; Conflicts with tidy packages ----------------------------------------------</span>
+<span class="co">#&gt; filter(): dplyr, stats</span>
+<span class="co">#&gt; lag():    dplyr, stats</span>
+idx &lt;-<span class="st"> </span><span class="kw">rerun</span>(<span class="dv">500</span>, <span class="kw">sample.int</span>(<span class="kw">nrow</span>(mtcars), <span class="dt">replace =</span> <span class="ot">TRUE</span>))
+smpl &lt;-<span class="st"> </span><span class="kw"><a href="reference/lazy_sample.html">lazy_sample_idx</a></span>(mtcars, idx)</code></pre></div>
+<p>These bootstrap samples can be used to generate confidence intervals for coefficients of a model.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">map</span>(smpl<span class="op">$</span>sample, <span class="op">~</span><span class="st"> </span><span class="kw">lm</span>(mpg <span class="op">~</span><span class="st"> </span>wt, <span class="dt">data =</span> .<span class="op">$</span>sample)) <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">map_df</span>(broom<span class="op">::</span>tidy) <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">ggplot</span>(<span class="kw">aes</span>(<span class="dt">x =</span> estimate)) <span class="op">+</span>
+<span class="st">  </span><span class="kw">geom_histogram</span>() <span class="op">+</span>
+<span class="st">  </span><span class="kw">facet_wrap</span>(<span class="op">~</span><span class="st"> </span>term, <span class="dt">ncol =</span> <span class="dv">1</span>, <span class="dt">scale =</span> <span class="st">"free_x"</span>)</code></pre></div>
+<p><img src="index_files/figure-html/unnamed-chunk-6-1.png" width="672"></p>
+<p>While various resampling methods can be implemented manually, this package provides functions for many common methods: including common fbootstrapping and cross-validation methods.</p>
+<p>The <code>bootstrap</code> function in the package implements bootstrap resampling.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">boot &lt;-<span class="st"> </span><span class="kw"><a href="reference/bootstrap.html">bootstrap</a></span>(mtcars, <span class="dt">R =</span> <span class="dv">500</span>)
+<span class="kw">map</span>(boot<span class="op">$</span>sample, <span class="op">~</span><span class="st"> </span><span class="kw">lm</span>(mpg <span class="op">~</span><span class="st"> </span>wt, <span class="dt">data =</span> .<span class="op">$</span>sample)) <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">map_df</span>(broom<span class="op">::</span>tidy) <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">ggplot</span>(<span class="kw">aes</span>(<span class="dt">x =</span> estimate)) <span class="op">+</span>
+<span class="st">  </span><span class="kw">geom_histogram</span>() <span class="op">+</span>
+<span class="st">  </span><span class="kw">facet_wrap</span>(<span class="op">~</span><span class="st"> </span>term, <span class="dt">ncol =</span> <span class="dv">1</span>, <span class="dt">scale =</span> <span class="st">"free_x"</span>)</code></pre></div>
+<p><img src="index_files/figure-html/unnamed-chunk-7-1.png" width="672"></p>
+<p>The function <code>crossv_kfold</code> implements k-fold cross validation.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">cv_5k &lt;-<span class="st"> </span><span class="kw"><a href="reference/crossv_kfold.html">crossv_kfold</a></span>(mtcars, <span class="dv">5</span>)
+models_5k &lt;-<span class="st"> </span><span class="kw">map</span>(cv_5k<span class="op">$</span>train, <span class="op">~</span><span class="st"> </span><span class="kw">lm</span>(mpg <span class="op">~</span><span class="st"> </span>wt, <span class="dt">data =</span> .<span class="op">$</span>sample))
+err_cv5k &lt;-<span class="st"> </span><span class="kw">tibble</span>(
+  <span class="dt">rmse =</span> <span class="kw">mean</span>(<span class="kw">map2_dbl</span>(models_5k, cv_5k<span class="op">$</span>test,
+                  <span class="cf">function</span>(x, y) modelr<span class="op">::</span><span class="kw"><a href="http://www.rdocumentation.org/packages/modelr/topics/model-quality">rmse</a></span>(x, y<span class="op">$</span>sample))),
+  <span class="dt">model =</span> <span class="st">"CV 5-fold"</span>)</code></pre></div>
+<p>The function <code>crossv_mc</code> implements Monte Carlo cross validation in which the data is repeatedly randomly split into training and test sets.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">cv_mc &lt;-<span class="st"> </span><span class="kw"><a href="reference/crossv_mc.html">crossv_mc</a></span>(mtcars, <span class="dv">50</span>, <span class="dt">frac =</span> <span class="fl">0.2</span>)
+models_mc &lt;-<span class="st"> </span><span class="kw">map</span>(cv_mc<span class="op">$</span>train, <span class="op">~</span><span class="st"> </span><span class="kw">lm</span>(mpg <span class="op">~</span><span class="st"> </span>wt, <span class="dt">data =</span> .<span class="op">$</span>sample))
+err_mc &lt;-<span class="st"> </span><span class="kw">tibble</span>(
+  <span class="dt">rmse =</span> <span class="kw">mean</span>(<span class="kw">map2_dbl</span>(models_mc, cv_mc<span class="op">$</span>test,
+           <span class="cf">function</span>(x, y) modelr<span class="op">::</span><span class="kw"><a href="http://www.rdocumentation.org/packages/modelr/topics/model-quality">rmse</a></span>(x, y<span class="op">$</span>sample))),
+  <span class="dt">model =</span> <span class="st">"CV Monte Carlo"</span>)</code></pre></div>
+<p>The function <code>crossv_loo</code> implements leave-one-out (LOO) cross validation in which the data are split into <span class="math inline">\(n\)</span> training/test pairs in which one observation is dropped at a time.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">cv_loo &lt;-<span class="st"> </span><span class="kw"><a href="reference/crossv_lpo.html">crossv_loo</a></span>(mtcars)
+models_loo &lt;-<span class="st"> </span><span class="kw">map</span>(cv_loo<span class="op">$</span>train, <span class="op">~</span><span class="st"> </span><span class="kw">lm</span>(mpg <span class="op">~</span><span class="st"> </span>wt, <span class="dt">data =</span> .<span class="op">$</span>sample))
+err_loo &lt;-<span class="st"> </span><span class="kw">tibble</span>(
+  <span class="dt">rmse =</span> <span class="kw">mean</span>(<span class="kw">map2_dbl</span>(models_loo, cv_loo<span class="op">$</span>test,
+                       <span class="cf">function</span>(x, y) modelr<span class="op">::</span><span class="kw"><a href="http://www.rdocumentation.org/packages/modelr/topics/model-quality">rmse</a></span>(x, y<span class="op">$</span>sample))),
+  <span class="dt">model =</span> <span class="st">"CV-LOO"</span>)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">bind_rows</span>(err_cv5k, err_mc, err_loo)
+<span class="co">#&gt; # A tibble: 3 x 2</span>
+<span class="co">#&gt;       rmse          model</span>
+<span class="co">#&gt;      &lt;dbl&gt;          &lt;chr&gt;</span>
+<span class="co">#&gt; 1 3.221937      CV 5-fold</span>
+<span class="co">#&gt; 2 2.987785 CV Monte Carlo</span>
+<span class="co">#&gt; 3 2.517436         CV-LOO</span></code></pre></div>
+<div id="installation" class="section level2">
+<h2 class="hasAnchor">
+<a href="#installation" class="anchor"></a>Installation</h2>
+<p><strong>lazysample</strong> is not on CRAN. You can install the development version with</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># install.packages("devtools")</span>
+devtools<span class="op">::</span><span class="kw"><a href="http://www.rdocumentation.org/packages/devtools/topics/install_github">install_github</a></span>(<span class="st">"jrnold/lazysample"</span>)</code></pre></div>
 </div>
 </div>
 </div>
   </div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
-    <h2>License</h2>
+    <h2 class="hasAnchor">
+<a href="#sidebar" class="anchor"></a>License</h2>
 <p><a href="https://www.r-project.org/Licenses/GPL-3">GPL-3</a></p>
 <h2>Developers</h2>
 <ul class="list-unstyled">
 <li>Jeffrey Arnold <br><small class="roles"> Author, maintainer </small> </li>
 <li><a href="authors.html">All authors...</a></li>
 </ul>
-<html><body>
 <h2>Dev status</h2>
 <ul class="list-unstyled">
-<li><a href="https://travis-ci.org/jrnold/resamplr"><img src="https://travis-ci.org/jrnold/resamplr.svg?branch=master" alt="Travis-CI Build Status"></a></li>
-<li><a href="https://codecov.io/gh/jrnold/resamplr"><img src="https://codecov.io/gh/jrnold/resamplr/branch/master/graph/badge.svg" alt="codecov"></a></li>
+<li><a href="https://travis-ci.org/jrnold/lazysample"><img src="https://travis-ci.org/jrnold/lazysample.svg?branch=master" alt="Travis-CI Build Status"></a></li>
+<li><a href="https://codecov.io/gh/jrnold/lazysample"><img src="https://codecov.io/gh/jrnold/lazysample/branch/master/graph/badge.svg" alt="codecov"></a></li>
 </ul>
-</body></html>
 </div>
 
 </div>

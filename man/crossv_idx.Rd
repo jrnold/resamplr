@@ -23,7 +23,7 @@ A data frame with <%= numrows %> rows and the following columns:
 }
 }
 \description{
-Generate cross-validation test/training pairs by specifying the indices
+Generate cross-validation test/training pairs by specifying the indexes
 in the elements in the test and training sets.
 This function provides a manual method for generating data frames with
 with cross-validation \code{resample} objects, while other functions,

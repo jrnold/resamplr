@@ -3,10 +3,9 @@
 #' Generate cross-validated leave-one-out or leave-p-out
 #' test/training pairs.
 #'
-#' The function \code{leave-p-out} generates leave-p-out test/training pairs,  while the function \code{leave-one-out} convenience function for the
-#' common case of leave-one-out cross-validation, \code{p = 1}.
-#'
-#' The function
+
+#' The function \code{crossv_loo} generates leave-one-out test/training pairs.
+#' The function \code{cross_lpo} generates the more general leave-p-out cross-validation test/training pairs.
 #'
 #' @template param-expr
 #' @template param-n
@@ -18,6 +17,7 @@
 #' @templateVar numrows \code{combn(n, p)}
 #' @templateVar f \code{crossv_lpo} and \code{crossv_loo}
 #' @templateVar fn \code{crossv_lpo_n} and \code{crossv_loo_n}
+#' @template return_crossv_df
 #' @export
 crossv_lpo <- function(expr, p = 1L, n = NULL, extractor = NULL) {
   expr <- enquo(expr)
@@ -35,6 +35,8 @@ crossv_lpo <- function(expr, p = 1L, n = NULL, extractor = NULL) {
 #' @importFrom dplyr bind_rows
 #' @importFrom utils combn
 crossv_lpo_n <- function(n, p = 1L) {
+  # Note: jackknife_n uses the same code. Update that if anything
+  # changed within here.
   n <- as.integer(n)
   assert_that(is_pos_scalar_integer(n))
   p <- as.integer(p)

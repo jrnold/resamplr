@@ -1,7 +1,5 @@
 ---
-output:
-  md_document:
-    variant: markdown_github
+output: github_document
 ---
 
 ```{r, echo = FALSE}
@@ -35,7 +33,7 @@ Lists and list-columns in data frames can easily be used for tidy model evaluati
 The function `lazy_sample_idx` produces a data frame with a list-column of resample objects.
 For example, this resamples from the `mtcars` data frame using a simple non-parametric bootstrap.
 ```{r}
-library("purrr")
+library("tidyverse")
 idx <- rerun(500, sample.int(nrow(mtcars), replace = TRUE))
 smpl <- lazy_sample_idx(mtcars, idx)
 ```
@@ -65,7 +63,7 @@ The function `crossv_kfold` implements k-fold cross validation.
 cv_5k <- crossv_kfold(mtcars, 5)
 models_5k <- map(cv_5k$train, ~ lm(mpg ~ wt, data = .$sample))
 err_cv5k <- tibble(
-  rmse = mean(map2_dbl(models_mc, cv_mc$test,
+  rmse = mean(map2_dbl(models_5k, cv_5k$test,
                   function(x, y) modelr::rmse(x, y$sample))),
   model = "CV 5-fold")
 ```

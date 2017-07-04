@@ -26,15 +26,20 @@ crossv_loo(expr, ...)
 
 \item{...}{Arguments passed to \code{\link{crossv_lpo_n}}.}
 }
+\value{
+A data frame (\code{\link[tibble]{tibble}}) with \code{combn(n, p)} rows and the following columns:
+\describe{
+\item{train}{A list column with objects representing the training sets. For \code{crossv_lpo} and \code{crossv_loo}, the elements are vectors of the indexes; for \code{crossv_lpo_n} and \code{crossv_loo_n}, the elements are \code{\link[=LazySample]{lazy_sample}} objects.}
+\item{test}{A list column with objects representing the training sets. For \code{crossv_lpo} and \code{crossv_loo}, the elements are vectors of the indexes; for \code{crossv_lpo_n} and \code{crossv_loo_n}, the elements are \code{\link[=LazySample]{lazy_sample}} objects.}
+}
+}
 \description{
 Generate cross-validated leave-one-out or leave-p-out
 test/training pairs.
 }
 \details{
-The function \code{leave-p-out} generates leave-p-out test/training pairs,  while the function \code{leave-one-out} convenience function for the
-common case of leave-one-out cross-validation, \code{p = 1}.
-
-The function
+The function \code{crossv_loo} generates leave-one-out test/training pairs.
+The function \code{cross_lpo} generates the more general leave-p-out cross-validation test/training pairs.
 }
 \references{
 \itemize{

@@ -1,19 +1,19 @@
-# reference:
-#  - title: "Lazy sampling objects"
-#    contents:
-#      - LazySample
-#      - lazy_sample
-#  - title: "Boostrapping"
-#    contents:
-#      - bootstrap
-#  - title: "Cross-validation"
-#    contents:
-#      - crossv_idx
-#      - crossv_kfold
-#      - crossv_lpo
-#      - crossv_mc
-#  - title: "Utility functions"
-#    contents:
-#      - extract_sample
-#      - idx_len
-#
+reference:
+  - title: "Lazy sample objects"
+    contents:
+     - LazySample
+     - lazy_sample
+  - title: "Boostrapping functions"
+    contents:
+    - bootstrap
+  - title: "Cross-validation functions"
+    contents:
+    - starts_with("crossv_")
+  - title: "Other resampling functions"
+    contents:
+    - jackknife
+    - permute
+  - title: "Utility functions"
+    contents:
+    - extract_sample
+    - idx_len

@@ -15,9 +15,9 @@
 #' @inherit crossv_kfold references
 #' @family cross-validation functions
 #' @templateVar numrows \code{K}
-#' @templateVar f crossv_mc
-#' @templateVar fn crossv_mc_n
-#' @template return_crossv
+#' @templateVar f \code{crossv_mc}
+#' @templateVar fn \code{crossv_mc_n}
+#' @template return_crossv_df
 #' @example inst/examples/ex-crossv_mc.R
 #' @export
 crossv_mc <- function(expr, ..., n = NULL, extractor = NULL) {

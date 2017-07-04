@@ -18,10 +18,10 @@ crossv_kfold_n(n, K = 5L, shuffle = TRUE)
 
 \item{n}{A non-negative scalar integer representing the number of elements to sample from. If \code{n} is \code{NULL}, then \code{expr} is evaluated and called be \code{\link{idx_len}} to calculate this number. However, if \code{n} is non-\code{NULL}, then \code{expr} is not evaluated at all until samples are requested.}
 
-\item{shuffle}{A logical scalar. If \code{TRUE}, then the eleents are randomly shuffled prior to partitioning into folds.}
+\item{shuffle}{A logical scalar. If \code{TRUE}, then the elements are randomly shuffled prior to partitioning into folds.}
 }
 \value{
-A data frame with \code{K} rows and the following columns:
+A data frame (\code{\link[tibble]{tibble}}) with \code{K} rows and the following columns:
 \describe{
 \item{train}{A list column with objects representing the training sets. For \code{crossv_kfold}, the elements are vectors of the indexes; for \code{crossv_kfold_n}, the elements are \code{\link[=LazySample]{lazy_sample}} objects.}
 \item{test}{A list column with objects representing the training sets. For \code{crossv_kfold}, the elements are vectors of the indexes; for \code{crossv_kfold_n}, the elements are \code{\link[=LazySample]{lazy_sample}} objects.}
@@ -43,6 +43,7 @@ Group K-fold if \code{data} is a grouped data frame and \code{stratify = FALSE}.
 }
 }
 \seealso{
-This function has more features than the \pkg{modelr} function
-  \code{\link[modelr]{crossv_kfold}}.
+The \pkg{boot} function \code{\link[boot]{cv.glm}} and
+\pkg{modelr} function \code{\link[modelr]{crossv_kfold}} for
+other implementations of k-fold cross-validation.
 }

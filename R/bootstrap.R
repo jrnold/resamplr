@@ -14,12 +14,16 @@
 #' @template param-extractor
 #' @param replace Logical scalar. If \code{TRUE}, then sample with replacement, otherwise sample without replacement.
 #' @param weights Observation level weights to use for a weighted bootstrap. If \code{bayesian = TRUE}, then the sum of these weights will adjust the concentration of the Dirichlet prior.
-
+#' @param bayesian If \code{TRUE}, a Bayesian bootstrap is used.
+#' @templateVar numrows \code{R}
+#' @templateVar f bootstrap
+#' @templateVar fn bootstrap_n
+#' @template return_lazy_sample_df
 #'
 #' @seealso The \pkg{boot} function \code{\link[boot]{boot}} which is the
 #'   canonical R bootstrap implementation.
 #'   The \pkg{modelr} function \code{\link[modelr]{bootstrap}} also implements a lazy bootstrap.
-#' @param bayesian If \code{TRUE}, a Bayesian bootstrap is used.
+
 #' @family bootstrap methods
 #' @example inst/examples/ex-bootstrap.R
 #' @references
