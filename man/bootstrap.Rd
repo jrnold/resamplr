@@ -5,14 +5,14 @@
 \alias{bootstrap_n}
 \title{Generate bootstrap replicates}
 \usage{
-bootstrap(expr, R = 1L, weights = NULL, bayesian = FALSE, m = NULL,
-  replace = TRUE, n = NULL, extractor = NULL)
+bootstrap(expr, R = 1L, weights = NULL, bayesian = FALSE, size = NULL,
+  frac = 1, replace = TRUE, n = NULL, extractor = NULL)
 
-bootstrap_n(n, R = 1L, weights = NULL, bayesian = FALSE, m = NULL,
-  replace = TRUE)
+bootstrap_n(n, R = 1L, weights = NULL, bayesian = FALSE, size = NULL,
+  frac = NULL, replace = TRUE)
 }
 \arguments{
-\item{expr}{A quosure}
+\item{expr}{An expression for the data to be sampled. This does not need to be a data frame, as \code{\link[=LazySample]{lazy_sample}} objects support or can be extended to support many classes. The unevaluated expression and its environment are captured as a \code{\link[rlang]{quosure}}.}
 
 \item{R}{Number of replicates to sample}
 
@@ -20,14 +20,15 @@ bootstrap_n(n, R = 1L, weights = NULL, bayesian = FALSE, m = NULL,
 
 \item{bayesian}{If \code{TRUE}, a Bayesian bootstrap is used.}
 
-\item{m}{Number of observations in the replicates. This can be set to values \code{m != n} for sub-sampling or oversampling.}
+\item{size}{Number of observations to sample in each replicate. Set \code{size != n} to under- or over-sample. If \code{size} is not \code{NULL}, then \code{frac} is ignored.}
+
+\item{frac}{Proportion of observations to sample in each replicates. This can be set to values \code{frac < 1} for sub-sampling or \code{frac > 1} for oversampling.}
 
 \item{replace}{Logical scalar. If \code{TRUE}, then sample with replacement, otherwise sample without replacement.}
 
-\item{n}{Number of elements to sample from. If \code{NULL}, then
-\code{n = len_idx(expr)}.}
+\item{n}{A non-negative scalar integer representing the number of elements to sample from. If \code{n} is \code{NULL}, then \code{expr} is evaluated and called be \code{\link{idx_len}} to calculate this number. However, if \code{n} is non-\code{NULL}, then \code{expr} is not evaluated at all until samples are requested.}
 
-\item{extractor}{See \code{\link{lazy_sample}}.}
+\item{extractor}{A function or object coercible to a function by \code{\link[rlang]{as_function}}. See \link{LazySample} for more information.}
 }
 \description{
 Generate bootstrap replicates. In addition to the ordinary bootstrap,
@@ -35,6 +36,35 @@ it supports weighted bootstrap (\code{weights}),
 Bayesian bootstrap (\code{bayes}), cluster bootstrap (if \code{data} is a
 grouped data frame and \code{groups = TRUE}), and stratified bootstrap
 (if \code{data} is grouped data frame and \code{stratify = TRUE}).
+}
+\examples{
+library("purrr")
+library("dplyr")
+library("ggplot2")
+
+boot <- bootstrap(mtcars, 100)
+
+models <- map(boot$sample, ~ lm(mpg ~ wt, data = .$sample))
+tidied <- map_df(models, broom::tidy, .id = "id")
+
+ggplot(tidied, aes(x = estimate)) +
+  geom_histogram() +
+  facet_wrap(~ term, scales = "free_x")
+
+# bootstrap_n requires only a number of elements
+bootstrap_n(20, 10)
+
+# Specify weights for a weighted bootstrap
+bootstrap(mtcars, 10, weights = runif(nrow(mtcars)))
+
+# A Bayesian bootstrap
+bootstrap(mtcars, 10, bayesian = TRUE)
+
+# Subsample subsets of size 5 without replacement
+bootstrap(mtcars, 10, size = 5, replace = FALSE)
+
+# Subsample subsets of 25\% without replacement
+bootstrap(mtcars, 10, frac = 0.25, replace = FALSE)
 }
 \references{
 \itemize{

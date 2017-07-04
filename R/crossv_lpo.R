@@ -8,20 +8,23 @@
 #'
 #' The function
 #'
-#' @param expr A \code{quosure} or one-sided formula specifying the data to be sampled from.
-#' @param n The number of elements in the data to sample from. If \code{NULL}, then the number of elements in \code{idx_len(expr)} is used.
+#' @template param-expr
+#' @template param-n
 #' @param p The number of elements to include in the test set. For example, specify \code{p = 1} for leave-one-out cross validation.
 #' @param ... Arguments passed to \code{\link{crossv_lpo_n}}.
-#' @param extractor See \code{\link{lazy_sample}}.
+#' @template param-extractor
 #' @family cross-validation functions
 #' @inherit crossv_kfold references
+#' @templateVar numrows \code{combn(n, p)}
+#' @templateVar f \code{crossv_lpo} and \code{crossv_loo}
+#' @templateVar fn \code{crossv_lpo_n} and \code{crossv_loo_n}
 #' @export
 crossv_lpo <- function(expr, p = 1L, n = NULL, extractor = NULL) {
-  expr <- as_quosure(expr)
+  expr <- enquo(expr)
   n <- n %||% idx_len(expr)
   out <- crossv_lpo_n(n, p = p)
   for (i in c("test", "train")) {
-    out[[i]] <- lazy_sample_lst(expr, out[[i]], extractor = extractor)
+    out[[i]] <- lazy_sample_lst(UQ(expr), out[[i]], extractor = extractor)
   }
   out
 }
@@ -42,7 +45,7 @@ crossv_lpo_n <- function(n, p = 1L) {
   } else {
     test <- combn(idx, p, simplify = FALSE)
   }
-  train <- map(test, base::setdiff, x = idx)
+  train <- map(test, function(i) base::setdiff(idx, i))
   tibble(train = train, test = test)
 }
 
@@ -55,5 +58,5 @@ crossv_loo_n <- function(n, ...) {
 #' @rdname crossv_lpo
 #' @export
 crossv_loo <- function(expr, ...) {
-  crossv_lpo(as_quosure(expr), p = 1L, ...)
+  crossv_lpo(UQ(enquo(expr)), p = 1L, ...)
 }

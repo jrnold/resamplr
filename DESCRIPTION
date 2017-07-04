@@ -1,6 +1,6 @@
-Package: resamplr
+Package: lazysample
 Type: Package
-Title: Resampling methods
+Title: Lazy and tidy resampling
 Version: 0.0.1
 Authors@R: c(person("Jeffrey", "Arnold", role = c("aut", "cre"),
                     email = "jeffrey.arnold@gmail.com"),
@@ -12,14 +12,10 @@ Authors@R: c(person("Jeffrey", "Arnold", role = c("aut", "cre"),
                     comment = "Some code extracted from the boot package"),
              person("Achim", "Zeileis", role = "ctb",
                     comment = "Some code extracted from rollapply in the zoo package"))
-Description: Additional resampling methods for the 'resampler' class in the 'modelr' package.
-  Resampling and similar methods implemented include: bootstrap methods (simple bootstrap,
-  weighted bootstrap, balanced bootstrap, moving-blocks bootstrap),
-  test-training splits, cross-validation (leave-one-out, leave-p-out, 
-  k-fold, time-series k-fold, time series rolling windows),
-  jackknife (delete-one and delete-p), permutations, and rolling windows.
-  These are implemented as generic functions which include a grouped data method
-  that implements group-wise or stratified versions of all the above.
+Description: Lazy and tidy resampling methods using quosures to delay computation 
+  of samples until they are needed. The implemented methods include 
+  bootstrap (simple, weighted, Bayesian), and cross-validation (leave-one-out,
+  leave-p-out, k-fold).
 License: GPL-3
 Encoding: UTF-8
 LazyData: true
@@ -42,5 +38,6 @@ Suggests:
   pryr,
   rmarkdown,
   testthat,
-  tidyverse
+  tidyverse,
+  ggplot2
 VignetteBuilder: knitr

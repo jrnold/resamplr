@@ -7,27 +7,49 @@
 \usage{
 crossv_mc(expr, ..., n = NULL, extractor = NULL)
 
-crossv_mc_n(n, K = 1L, frac = 0.3, size = NULL, prob = NULL)
+crossv_mc_n(n, K = 10L, frac = 0.3, size = NULL, prob = NULL)
 }
 \arguments{
-\item{expr}{A quosure or one-sided formula.}
+\item{expr}{An expression for the data to be sampled. This does not need to be a data frame, as \code{\link[=LazySample]{lazy_sample}} objects support or can be extended to support many classes. The unevaluated expression and its environment are captured as a \code{\link[rlang]{quosure}}.}
 
 \item{...}{Arguments passed to \code{crossv_mc_n}.}
 
-\item{n}{Integer scalar. The number of elements to sample from. If \code{n} is \code{NULL}, then the number of elements will determined by calling \code{\link{idx_len}} on \code{expr}.}
+\item{n}{A non-negative scalar integer representing the number of elements to sample from. If \code{n} is \code{NULL}, then \code{expr} is evaluated and called be \code{\link{idx_len}} to calculate this number. However, if \code{n} is non-\code{NULL}, then \code{expr} is not evaluated at all until samples are requested.}
 
-\item{extractor}{A function or coercible to a function by \code{as_function}. See \code{\link{lazy_sample}}.}
+\item{extractor}{A function or object coercible to a function by \code{\link[rlang]{as_function}}. See \link{LazySample} for more information.}
 
 \item{K}{Number of test/train splits to generate.}
 
-\item{frac}{A numeric scalar between 0 and 1. The fraction of elements in the test set.#' @param frac. A numeric scalar between 0 and 1. The fraction of elements in the test set.}
+\item{frac}{A numeric scalar between 0 and 1. The fraction of elements in the test set.}
 
 \item{size}{An integer scalar. The number of elements in the test set. If \code{size} is non-\code{NULL}, then it takes preference over \code{frac}.}
 
 \item{prob}{Probability weight that an element is in the \code{test} set.}
 }
+\value{
+A data frame with \code{K} rows and the following columns:
+\describe{
+\item{train}{A list column with objects representing the training sets. For \code{crossv_mc}, the elements are vectors of the indexes; for \code{crossv_mc_n}, the elements are \code{\link[=LazySample]{lazy_sample}} objects.}
+\item{test}{A list column with objects representing the training sets. For \code{crossv_mc}, the elements are vectors of the indexes; for \code{crossv_mc_n}, the elements are \code{\link[=LazySample]{lazy_sample}} objects.}
+}
+}
 \description{
 \code{crossv_mc} generates random train/test pairs where either proportion \code{frac} of the elements are in the test set and \code{1 - frac} elements are in the training set, or \code{size} elements are in the test set and \code{n - size} elements are in the training set.
+}
+\examples{
+library("purrr")
+library("dplyr")
+
+# 5-fold cross-validation
+cv1 <- crossv_mc(mtcars)
+models <- map(cv1$train, ~ lm(mpg ~ wt, data = .$sample))
+summary(map2_dbl(models, map(cv1$test, ~ .$sample), modelr::rmse))
+
+# crossv_kfold_n works with a number of elements
+cv2 <- crossv_mc_n(100)
+cv2
+cv2$train[[1]]
+cv2$test[[2]]
 }
 \references{
 \itemize{

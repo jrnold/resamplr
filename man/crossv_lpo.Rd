@@ -16,13 +16,13 @@ crossv_loo_n(n, ...)
 crossv_loo(expr, ...)
 }
 \arguments{
-\item{expr}{A \code{quosure} or one-sided formula specifying the data to be sampled from.}
+\item{expr}{An expression for the data to be sampled. This does not need to be a data frame, as \code{\link[=LazySample]{lazy_sample}} objects support or can be extended to support many classes. The unevaluated expression and its environment are captured as a \code{\link[rlang]{quosure}}.}
 
 \item{p}{The number of elements to include in the test set. For example, specify \code{p = 1} for leave-one-out cross validation.}
 
-\item{n}{The number of elements in the data to sample from. If \code{NULL}, then the number of elements in \code{idx_len(expr)} is used.}
+\item{n}{A non-negative scalar integer representing the number of elements to sample from. If \code{n} is \code{NULL}, then \code{expr} is evaluated and called be \code{\link{idx_len}} to calculate this number. However, if \code{n} is non-\code{NULL}, then \code{expr} is not evaluated at all until samples are requested.}
 
-\item{extractor}{See \code{\link{lazy_sample}}.}
+\item{extractor}{A function or object coercible to a function by \code{\link[rlang]{as_function}}. See \link{LazySample} for more information.}
 
 \item{...}{Arguments passed to \code{\link{crossv_lpo_n}}.}
 }

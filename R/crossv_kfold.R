@@ -5,13 +5,19 @@
 #' if \code{data} is a grouped data frame and \code{stratify = TRUE}, and
 #' Group K-fold if \code{data} is a grouped data frame and \code{stratify = FALSE}.
 #'
-#' @param expr A quosureish object
-#' @param K An integer scalar. The number of folds
+#' @template param-expr
+#' @param K An integer scalar. The number of cross-validation folds.
 #' @param shuffle A logical scalar. If \code{TRUE}, then the eleents are randomly shuffled prior to partitioning into folds.
-#' @param n Number of elements to sample from.
+#' @template param-n
 #' @param ... Arguments passed to methods
 #' @seealso This function has more features than the \pkg{modelr} function
 #'   \code{\link[modelr]{crossv_kfold}}.
+#'
+#' @templateVar numrows \code{K}
+#' @templateVar f crossv_kfold
+#' @templateVar fn crossv_kfold_n
+#' @template return_crossv
+#'
 #' @references
 #' \itemize{
 #' \item{Breiman, L., Friedman, J.H., Olshen, R.A. and Stone, C.J. (1984) Classification and Regression Trees. Wadsworth.}
@@ -22,10 +28,10 @@
 #' }
 #' @export
 crossv_kfold <- function(expr, K, ...) {
-  data <- as_quosure(expr)
+  expr <- enquo(expr)
   out <- crossv_kfold_n(idx_len(expr), K = K, ...)
   for (i in c("test", "train")) {
-    out[[i]] <- lazy_sample_lst(expr, out[[i]])
+    out[[i]] <- lazy_sample_lst(!!expr, out[[i]])
   }
   out
 }
@@ -46,7 +52,7 @@ crossv_kfold_n <- function(n, K = 5L, shuffle = TRUE) {
 #'
 #' @param x A vector
 #' @param K An integer scalar. The number of partitions.
-#' @param n Number of elements to sample from.
+#' @template param-n
 #' @param shuffle A logical scalar. If \code{TRUE}, then randomly shuffle the elements prior to partitioning.
 #' @return A length \code{K} list of vectors of the same type as \code{x}
 #' @noRd

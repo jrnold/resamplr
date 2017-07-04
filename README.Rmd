@@ -8,58 +8,99 @@ output:
 knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
 ```
 
-# resamplr
+# Lazy Sampling objects
 
-[![Travis-CI Build Status](https://travis-ci.org/jrnold/resamplr.svg?branch=master)](https://travis-ci.org/jrnold/resamplr)
-[![codecov](https://codecov.io/gh/jrnold/resamplr/branch/master/graph/badge.svg)](https://codecov.io/gh/jrnold/resamplr)
+[![Travis-CI Build Status](https://travis-ci.org/jrnold/lazysample.svg?branch=master)](https://travis-ci.org/jrnold/lazysample)
+[![codecov](https://codecov.io/gh/jrnold/lazysample/branch/master/graph/badge.svg)](https://codecov.io/gh/jrnold/lazysample)
 
-The **resamplr** package provides functions that implement resampling methods including the bootstrap, jackknife, random test/train sets, k-fold cross-validation, leave-one-out and leave-p-out cross-validation, time-series cross validation, time-series k-fold cross validation, permutations, rolling windows.
-These functions generate data frames with `resample` objects that work with the modelling pipeline of [modelr](https://github.com/hadley/modelr) and the [tidyverse](http://tidyverse.org/).
+The **lazysample** package provides functions that implement several resampling methods including bootstrapping and cross-validation.
+
+The building block of these methods is the `lazy_sample` object.
+```{r}
+library("lazysample")
+smpl <- lazy_sample(mtcars, 1:10)
+```
+
+Instead of computing the samples immediately, when the lazy sample object is created it stores a quosure, which is an unevaluated expression and its environment, and the indexes to extract.
+```{r}
+smpl$quo
+smpl$idx
+```
+The sample is only lazily computed when it is needed.
+```{r}
+smpl$sample
+```
+
+Lists and list-columns in data frames can easily be used for tidy model evaluation.
+The function `lazy_sample_idx` produces a data frame with a list-column of resample objects.
+For example, this resamples from the `mtcars` data frame using a simple non-parametric bootstrap.
+```{r}
+library("purrr")
+idx <- rerun(500, sample.int(nrow(mtcars), replace = TRUE))
+smpl <- lazy_sample_idx(mtcars, idx)
+```
+These bootstrap samples can be used to generate confidence intervals for coefficients of a model.
+```{r message=FALSE}
+map(smpl$sample, ~ lm(mpg ~ wt, data = .$sample)) %>%
+  map_df(broom::tidy) %>%
+  ggplot(aes(x = estimate)) +
+  geom_histogram() +
+  facet_wrap(~ term, ncol = 1, scale = "free_x")
+```
+
+While various resampling methods can be implemented manually, this package provides functions for many common methods: including common fbootstrapping and cross-validation methods.
+
+The `bootstrap` function in the package implements bootstrap resampling.
+```{r message=FALSE}
+boot <- bootstrap(mtcars, R = 500)
+map(boot$sample, ~ lm(mpg ~ wt, data = .$sample)) %>%
+  map_df(broom::tidy) %>%
+  ggplot(aes(x = estimate)) +
+  geom_histogram() +
+  facet_wrap(~ term, ncol = 1, scale = "free_x")
+```
+
+The function `crossv_kfold` implements k-fold cross validation.
+```{r cv_5k}
+cv_5k <- crossv_kfold(mtcars, 5)
+models_5k <- map(cv_5k$train, ~ lm(mpg ~ wt, data = .$sample))
+err_cv5k <- tibble(
+  rmse = mean(map2_dbl(models_mc, cv_mc$test,
+                  function(x, y) modelr::rmse(x, y$sample))),
+  model = "CV 5-fold")
+```
+
+The function `crossv_mc` implements Monte Carlo cross validation in which the data is repeatedly randomly split into training and test sets.
+```{r cv_mc}
+cv_mc <- crossv_mc(mtcars, 50, frac = 0.2)
+models_mc <- map(cv_mc$train, ~ lm(mpg ~ wt, data = .$sample))
+err_mc <- tibble(
+  rmse = mean(map2_dbl(models_mc, cv_mc$test,
+           function(x, y) modelr::rmse(x, y$sample))),
+  model = "CV Monte Carlo")
+```
+
+The function `crossv_loo` implements leave-one-out (LOO) cross validation in which the data are split into $n$ training/test pairs in which one observation is dropped at a time.
+```{r cv_loo}
+cv_loo <- crossv_loo(mtcars)
+models_loo <- map(cv_loo$train, ~ lm(mpg ~ wt, data = .$sample))
+err_loo <- tibble(
+  rmse = mean(map2_dbl(models_loo, cv_loo$test,
+                       function(x, y) modelr::rmse(x, y$sample))),
+  model = "CV-LOO")
+```
+
+```{r}
+bind_rows(err_cv5k, err_mc, err_loo)
+```
 
 
 ## Installation
 
-**resamplr** is not on CRAN. You can install the 
+**lazysample** is not on CRAN. You can install the 
 development version with
 ``` r
 # install.packages("devtools")
-devtools::install_github("jrnold/resamplr")
+devtools::install_github("jrnold/lazysample")
 ```
 
-## Main Features
-
-The **resamplr** package includes functions to generate data frames of 
-lazy resample objects, as introduced in the [tidyverse](http://tidyverse.org/) [modelr](https://github.com/hadley/modelr) package. The `resample` class
-stores the a "pointer" to the original dataset and a vector of row indices.
-The object can be coerced to a dataframe with `as.data.frame` and the row indices with `as.integer`.
-
-```{r}
-library("modelr")
-library("resamplr")
-rs <- resample(mtcars, 1:10)
-as.data.frame(rs)
-as.integer(rs)
-```
-
-While the **modelr** package contains a few functions with resampling methods (`crossv_kfold`, `crossv_mc`, and `bootstrap`), the **resamplr** package implements many more resampling methods including the following: 
-
-- boostrap
-
-    - bootstrap (weighted, Bayesian): `bootstrap`
-    - balanced bootstrap: `balanced_bootstrap`
-    - time-series bootstrap: `tsbootstrap`
-
-- cross-validation
-
-    - test-training pairs: `holdout_n`, `holdout_frac`
-    - k-fold cross-validation: `crossv_kfold`
-    - time-series cross-validation: `crossv_ts`
-    - leave-one-out and leave-p-out cross-validation: `crossv_lpo`, `crossv_loo`
-    - time-series k-fold cross-validation: `crossv_tskfold`
-
-- jackknife: `jackknife`
-- permutations: `permute`
-- rolling windows: `roll`
-
-All resampling functions are implemented as generic functions with methods for data frames (`data.frame`) and grouped data frames (`grouped_df`).
-When used with grouped data frames, these functions allow either resampling groups instead of rows, or resample rows within each group (stratification), or both, depending on what is appropriate for the method.

@@ -41,9 +41,10 @@ assertthat::on_failure(is_scalar_proportion) <- function(call, env) {
 #' @param x An object
 #' @return \code{is_unnamed} and \code{is_named} return logical
 #'   vectors the same length as \code{x}. \code{named} and \code{unnamed} return vectors that are the same type as \code{x}.
+#'
 #' @noRd
 is_unnamed <- function(x) {
-  names2(x) == ""
+  rlang::names2(x) == ""
 }
 
 unnamed <- function(x) x[is_unnamed(x)]

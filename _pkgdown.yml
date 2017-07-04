@@ -1,25 +1,19 @@
-reference:
-  - title: "Boostrapping"
-    contents:
-      - bootstrap
-      - balanced_bootstrap
-      - tsbootstrap
-  - title: "Cross-validation"
-    contents:
-      - holdout_frac
-      - holdout_n
-      - crossv_kfold
-      - crossv_lpo
-      - crossv_tskfold
-      - crossv_ts
-  - title: "Other resampling methods"
-    contents:
-      - jackknife
-      - permute
-      - roll
-  - title: "Utility functions"
-    contents:
-      - crossv_df
-      - is.resample
-      - resample_lst
-      - resample_df
+# reference:
+#  - title: "Lazy sampling objects"
+#    contents:
+#      - LazySample
+#      - lazy_sample
+#  - title: "Boostrapping"
+#    contents:
+#      - bootstrap
+#  - title: "Cross-validation"
+#    contents:
+#      - crossv_idx
+#      - crossv_kfold
+#      - crossv_lpo
+#      - crossv_mc
+#  - title: "Utility functions"
+#    contents:
+#      - extract_sample
+#      - idx_len
+#

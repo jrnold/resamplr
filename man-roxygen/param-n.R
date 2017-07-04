@@ -1,0 +1,1 @@
+#' @param n A non-negative scalar integer representing the number of elements to sample from. If \code{n} is \code{NULL}, then \code{expr} is evaluated and called be \code{\link{idx_len}} to calculate this number. However, if \code{n} is non-\code{NULL}, then \code{expr} is not evaluated at all until samples are requested.

@@ -1,0 +1,1 @@
+#' @param expr An expression for the data to be sampled. This does not need to be a data frame, as \code{\link[=LazySample]{lazy_sample}} objects support or can be extended to support many classes. The unevaluated expression and its environment are captured as a \code{\link[rlang]{quosure}}.

@@ -14,10 +14,13 @@ This object instead stores the original data as a \code{\link[rlang]{quosure}} a
 
 smpl$idx
 smpl$data
-smpl$sample
 smpl$extractor
+smpl$draw_sample()
+smpl$sample
+smpl$data
 
 print(smpl)
+as.data.frame(smpl)
 
 }
 }
@@ -27,28 +30,70 @@ print(smpl)
 \describe{
 \item{data}{An unevaluated expression that will be captured as a quosure.}
 \item{idx}{A character or integer vector. If not these, it will be coerced to an integer (numeric) or character vector (all other classes). Since \code{data} is not evaluated when the object is created, the validity of these indexes is not checked.}
-\item{extractor}{A function with two arguments (data, index) which is used to extract the sample when it is computed. This is coerced to a function via \code{\link[rlang]{as_function}}, a formula like \code{~ .x[.y]} is acceptable.If \code{NULL}, then the \code{extract_sample} method is used.
-}
+\item{extractor}{A function with two arguments (data, index) which is used to extract the sample when it is computed. This is coerced to a function via \code{\link[rlang]{as_function}}, meaning that a formula like \code{~ .x[.y]} can be used. If \code{NULL}, then \code{\link{extract_sample}} is used.}
 }
 }
 
 \section{Details}{
 
 
-\code{$sample}{Returns the sample. This is not calculated until needed, so it is lazy}
+\code{$idx} returns the indexes in the sample.
+
+\code{$quo} returns a \code{\link[rlang]{quosure}} that returns the data to be sampled from when evaluated with \code{\link[rlang]{eval_tidy}}.
+
+\code{$data} returns the data to be sampled from.
+
+\code{$sample} or \code{$draw_sample()} or \code{draw_sample(smpl)} returns the sample. \code{$sample} is is active binding and thus the sample is lazily calculated.
 
 \code{print(smpl)} or \code{smpl$print()} shows some information about the \code{LazySample} object on the screen.
+
+\code{as.data.frame(smpl)} returns the sample and coerces it to a data frame. This is a convenience function since many modeling functions, e.g. \code{lm}, call \code{as.data.frame} on the \code{data} argument.
 }
 
 \examples{
 # New lazy sample object
-smpl <- LazySample$new(mtcars, 1:5)
+smpl <- LazySample$new(~ mtcars, 1:5)
 # Get the indexes
 smpl$idx
+
 # Get the expression containing the data
 smpl$quo
+
+# the expression is stored as a quosure
+class(smpl$quo)
+# with an expression
+rlang::get_expr(smpl$quo)
+# and an environment
+rlang::get_env(smpl$quo)
+
 # Get the sample - it is not computed until called
 smpl$sample
+smpl$draw_sample()
 # Get the original data
 smpl$data
+
+# Return the sample as a data frame
+as.data.frame(smpl)
+
+# LazySample objects also work with non-data frames
+x <- 1:100
+smpl_x <- LazySample$new(~ x, sample(length(x), 10))
+smpl_x
+smpl_x$sample
+
+y <- matrix(1:300, nrow = 100)
+smpl_y <- LazySample$new(~ y, sample(nrow(y), 10))
+smpl_y
+smpl_y$sample
+
+# the extractor function can be customized
+# for example, randomly sample the columns of a data frame
+z <- as.data.frame(matrix(1:1000, nrow = 10))
+smpl_z <- LazySample$new(~ z, sample(nrow(y), 10),
+                         extractor = ~ .x[ , .y, drop = FALSE])
+smpl_z
+smpl_z$sample
+}
+\seealso{
+\code{\link{lazy_sample}} is a convenience function to create lazy sample objects, \code{\link{lazy_sample_lst}} creates a list of lazy samples objects, and \code{\link{lazy_sample_idx}} creates a data frame with a list column of lazy sample objects.
 }

@@ -1,4 +1,4 @@
-library(testthat)
-library(resamplr)
+library("testthat")
+library("lazysample")
 
-test_check("resamplr")
+test_check("lazysample")

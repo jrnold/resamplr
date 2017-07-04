@@ -10,15 +10,22 @@ crossv_kfold(expr, K, ...)
 crossv_kfold_n(n, K = 5L, shuffle = TRUE)
 }
 \arguments{
-\item{expr}{A quosureish object}
+\item{expr}{An expression for the data to be sampled. This does not need to be a data frame, as \code{\link[=LazySample]{lazy_sample}} objects support or can be extended to support many classes. The unevaluated expression and its environment are captured as a \code{\link[rlang]{quosure}}.}
 
-\item{K}{An integer scalar. The number of folds}
+\item{K}{An integer scalar. The number of cross-validation folds.}
 
 \item{...}{Arguments passed to methods}
 
-\item{n}{Number of elements to sample from.}
+\item{n}{A non-negative scalar integer representing the number of elements to sample from. If \code{n} is \code{NULL}, then \code{expr} is evaluated and called be \code{\link{idx_len}} to calculate this number. However, if \code{n} is non-\code{NULL}, then \code{expr} is not evaluated at all until samples are requested.}
 
 \item{shuffle}{A logical scalar. If \code{TRUE}, then the eleents are randomly shuffled prior to partitioning into folds.}
+}
+\value{
+A data frame with \code{K} rows and the following columns:
+\describe{
+\item{train}{A list column with objects representing the training sets. For \code{crossv_kfold}, the elements are vectors of the indexes; for \code{crossv_kfold_n}, the elements are \code{\link[=LazySample]{lazy_sample}} objects.}
+\item{test}{A list column with objects representing the training sets. For \code{crossv_kfold}, the elements are vectors of the indexes; for \code{crossv_kfold_n}, the elements are \code{\link[=LazySample]{lazy_sample}} objects.}
+}
 }
 \description{
 Generate cross-validated K-fold test-training pairs. In addition to ordinary

@@ -16,6 +16,7 @@
 #' @param x An object
 #' @param idx An integer or character vector representing index values
 #' @param ... Arguments used by methods.
+#' @example inst/examples/ex-extract_sample.R
 #' @export
 extract_sample <- function(x, idx, ...) {
   UseMethod("extract_sample")

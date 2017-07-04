@@ -13,12 +13,11 @@ lazy_sample_lst(expr, idx, extractor = NULL)
 lazy_sample_idx(expr, idx, extractor = NULL)
 }
 \arguments{
-\item{expr}{A quosure}
+\item{expr}{An expression with the data.}
 
-\item{idx}{A list of integer or character vector with the indexes in
-each sample.}
+\item{idx}{A list of integer or character vector with the indexes in each sample.}
 
-\item{extractor}{See \code{\link{lazy_sample}}.}
+\item{extractor}{A function or object coercible to a function by \code{\link[rlang]{as_function}}. See \link{LazySample} for more information.}
 }
 \value{
 \describe{
@@ -29,8 +28,24 @@ The single column is named \code{sample} and is a list of \code{LazySample} obje
 }
 }
 \description{
-The function \code{lazy_sample} is a convience function to create
+The function \code{lazy_sample} is a convenience function to create
 \code{LazySample} objects. The function \code{lazy_sample_lst} creates a list
 of lazy sample objects with the same expression, but multiple indexes.
 The function \code{lazy_sample_idx} creates a data frame with a list-column of \code{LazySample} objects.
+}
+\examples{
+require("purrr")
+
+# lazy_sample is a convenience function to create lazy_sample objects
+lazy_sample(mtcars, 1:5)
+
+# lazy_sample_lst creates a list of lazy_sample objects
+lazy_sample_idx(mtcars, rerun(3, nrow(mtcars)))
+
+# lazy_sample_idx creates a data frame with a list column
+# of lazy_sample objects
+lazy_sample_idx(mtcars, rerun(3, nrow(mtcars)))
+}
+\seealso{
+\code{\link{LazySample}} for detailed information on the \code{lazy_sample} class.
 }
