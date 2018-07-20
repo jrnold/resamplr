@@ -1,7 +1,17 @@
 resamplr
 ========
 
-[![Travis-CI Build Status](https://travis-ci.org/jrnold/resamplr.svg?branch=master)](https://travis-ci.org/jrnold/resamplr) [![codecov](https://codecov.io/gh/jrnold/resamplr/branch/master/graph/badge.svg)](https://codecov.io/gh/jrnold/resamplr)
+[![lifecycle](https://img.shields.io/badge/lifecycle-retired-orange.svg)](https://www.tidyverse.org/lifecycle/#retired) [![Travis-CI Build Status](https://travis-ci.org/jrnold/resamplr.svg?branch=master)](https://travis-ci.org/jrnold/resamplr) [![codecov](https://codecov.io/gh/jrnold/resamplr/branch/master/graph/badge.svg)](https://codecov.io/gh/jrnold/resamplr)
+
+Status
+------
+
+I have stopped active development on the **resamplr** package. I suggest using the [rsample](https://topepo.github.io/rsample/) package, which implement
+
+I am also working on a lower-level package [mlspearer](https://jrnold.github.com/mlspearer). This package will implement the same resampling, cross-validation, and permutation methods, but work for a wider variety of objects.
+
+Introduction
+------------
 
 The **resamplr** package provides functions that implement resampling methods including the bootstrap, jackknife, random test/train sets, k-fold cross-validation, leave-one-out and leave-p-out cross-validation, time-series cross validation, time-series k-fold cross validation, permutations, rolling windows. These functions generate data frames with `resample` objects that work with the modelling pipeline of [modelr](https://github.com/hadley/modelr) and the [tidyverse](http://tidyverse.org/).
 
@@ -23,6 +33,11 @@ The **resamplr** package includes functions to generate data frames of lazy resa
 ``` r
 library("modelr")
 library("resamplr")
+#> 
+#> Attaching package: 'resamplr'
+#> The following objects are masked from 'package:modelr':
+#> 
+#>     bootstrap, crossv_kfold, permute
 rs <- resample(mtcars, 1:10)
 as.data.frame(rs)
 #>                    mpg cyl  disp  hp drat    wt  qsec vs am gear carb
