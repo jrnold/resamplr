@@ -33,17 +33,12 @@ local({
                           weight_groups = c(TRUE, FALSE),
                           weight_within = c(TRUE, FALSE)
     ))
-    for (.a in .args) {
+    for (i in seq_along(.args)) {
+      .a <- .args[[i]]
       if (!length(.a$weights)) .a$weights <- NULL
-      if (!.a$groups) {
-        expect_error(invoke(bootstrap, .a))
-      } else {
-        out <- invoke(bootstrap, .a)
-        expect_bootstrap(out, .a$R)
-      }
+      print(i)
+      out <- invoke(bootstrap, .a)
+      expect_bootstrap(out, .a$R)
     }
   })
-
-
-
 })

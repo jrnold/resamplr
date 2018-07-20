@@ -84,7 +84,7 @@ bootstrap.grouped_df <- function(data,
   assert_that(is.flag(stratify))
   assert_that(is.flag(groups))
   # One of these needs to be specified
-  assert_that(stratify || groups)
+  # assert_that(stratify || groups)
   if (!is.null(weights)) {
     # fill in weights if none exist
     assert_that(weights %in% names(data))
