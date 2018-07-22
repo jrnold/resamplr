@@ -1,0 +1,31 @@
+\documentclass[tikz,border=3mm]{standalone}
+\usetikzlibrary{matrix}
+
+
+\begin{document}
+\begin{tikzpicture}[font=\sffamily]
+\matrix (m) [matrix of nodes,inner xsep=1pt,inner ysep=2pt,row sep=10pt]
+{
+  R  &   E   &   S   &   A  &   M & P & L & E & R \\
+  M  &   L   &   S   &   P  &   E & A & R & E & R \\
+};
+\path
+(m-1-1) edge (m-2-9);
+\path
+(m-1-2) edge (m-2-5);
+\path
+(m-1-3) edge (m-2-3);
+\path
+(m-1-4) edge (m-2-6);
+\path
+(m-1-5) edge (m-2-1);
+\path
+(m-1-6) edge (m-2-4);
+\path
+(m-1-7) edge (m-2-2);
+\path
+(m-1-8) edge (m-2-8);
+\path
+(m-1-9) edge (m-2-7);
+\end{tikzpicture}
+\end{document}

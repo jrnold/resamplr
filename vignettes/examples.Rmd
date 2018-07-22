@@ -18,17 +18,16 @@ library("resamplr")
 library("boot")
 ```
 
-
 ## Cross Validation
 
 These examples are taken from the examples in `cv.glm` in the **boot** package.
 
-Calculate leave-one-out and 6-fold cross-validation prediction error for a regression of mammal brain size on body size using the `mammals` data set. This 
+Calculate leave-one-out and 5-fold cross-validation prediction error for a regression of mammal brain size on body size using the `mammals` data set. This 
 will use RMSE as the cost function.
 ```{r}
 data(mammals, package = "MASS")
 mammals_cvloo <- crossv_loo(mammals)
-mammals_cv6 <- crossv_kfold(mammals, k = 6)
+mammals_cv6 <- crossv_kfold(mammals, k = 5)
 
 mammals_err <- function(train, test) {
   mod <- glm(log(brain) ~ log(body), data = as.data.frame(train))
@@ -107,7 +106,6 @@ gravity %>%
   })) %>%
   summarise_at(vars(diff_means), funs(mean, sd))
 ```
-
 
 Example from `car::Boot`:
 
