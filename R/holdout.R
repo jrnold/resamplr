@@ -47,7 +47,7 @@ holdout_frac.data.frame <- function(data, size = 0.3, K = 1L, shuffle = TRUE,
   assert_that(is.flag(shuffle))
   assert_that(is.null(prob) || (is.numeric(prob) &&
                                   length(prob) %in% c(1, nrow(data))))
-  res <- holdout_frac_(nrow(data), size = size, K = K, shuffle = shuffle)
+  res <- holdout_frac_(nrow(data), size = size, K = K, shuffle = shuffle, prob=prob)
   to_crossv_df(res, data)
 }
 
